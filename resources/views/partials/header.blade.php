@@ -59,7 +59,7 @@
                     Masuk / Login
                 </a>
                 <a
-                    href="#"
+                    href="{{ route('registrasi') }}"
                     class="inline-flex items-center bg-gold hover:bg-[#ecab20] text-espresso font-bold text-[15px] px-6 py-3.5 rounded-xl transition-colors"
                 >
                     Daftar Sekarang
@@ -90,7 +90,7 @@
             <a href="{{ url('/#informasi-kelulusan') }}" class="py-2.5 text-[15px] text-muted hover:text-ink">Informasi Kelulusan</a>
             <div class="mt-3 flex items-center gap-4">
                 <a href="#" class="text-[15px] font-semibold text-ink">Masuk / Login</a>
-                <a href="#" class="inline-flex items-center bg-gold text-espresso font-bold text-[15px] px-5 py-3 rounded-xl">
+                <a href="{{ route('registrasi') }}" class="inline-flex items-center bg-gold text-espresso font-bold text-[15px] px-5 py-3 rounded-xl">
                     Daftar Sekarang
                 </a>
             </div>

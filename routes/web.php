@@ -6,6 +6,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/registrasi', function () {
+    return view('registrasi');
+})->name('registrasi');
+
+Route::post('/registrasi', function () {
+    return view('registrasi');
+})->name('registrasi.simpan');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

@@ -28,7 +28,7 @@
 
                 <div class="mt-9 flex flex-wrap gap-4">
                     <a
-                        href="#"
+                        href="{{ route('registrasi') }}"
                         class="inline-flex items-center gap-2.5 bg-espresso hover:bg-[#3a2515] text-paper font-bold text-[15.5px] px-7 py-[17px] rounded-xl transition-colors"
                     >
                         Daftar Siswa Baru
