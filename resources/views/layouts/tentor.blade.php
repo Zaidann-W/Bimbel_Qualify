@@ -30,7 +30,7 @@
                 $nav = [
                     ['Dashboard Overview', 'layout-grid', route('tentor.dashboard'), request()->routeIs('tentor.dashboard'), null],
                     ['Absensi Siswa', 'clipboard-check', route('tentor.absensi'), request()->routeIs('tentor.absensi'), null],
-                    ['Qualify', 'message-circle', '#', false, 3],
+                    ['Qualify', 'message-circle', route('tentor.qualifix'), request()->routeIs('tentor.qualifix'), 3],
                     ['Materi Pembelajaran', 'book-open', '#', false, null],
                     ['Profil Saya', 'users', '#', false, null],
                 ];
