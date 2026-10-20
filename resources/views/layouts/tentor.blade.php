@@ -22,7 +22,7 @@
         </div>
 
         {{-- Role badge --}}
-        <span class="mt-5 w-fit rounded-md bg-ember-400 px-2 py-[3px] text-[10px] font-bold text-bark-900">Admin</span>
+        <span class="mt-5 w-fit rounded-md bg-ember-400 px-2 py-[3px] text-[10px] font-bold text-bark-900">Tentor</span>
 
         {{-- Nav --}}
         <nav class="mt-3 space-y-0.5 text-[13px]">
