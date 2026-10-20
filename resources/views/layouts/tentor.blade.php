@@ -7,10 +7,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-bark-50 font-sans text-bark-800 antialiased">
-<div class="flex min-h-screen p-0 lg:p-3">
+<div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden">
 
     {{-- Sidebar --}}
-    <aside class="hidden w-[240px] shrink-0 flex-col rounded-2xl bg-bark-800 px-4 py-6 lg:flex">
+    <aside class="hidden w-[240px] shrink-0 flex-col overflow-y-auto bg-bark-800 px-4 py-6 lg:sticky lg:top-0 lg:flex lg:h-screen">
 
         {{-- Logo --}}
         <div class="flex items-center gap-2.5 px-1">
@@ -32,7 +32,7 @@
                     ['Absensi Siswa', 'clipboard-check', route('tentor.absensi'), request()->routeIs('tentor.absensi'), null],
                     ['Qualify', 'message-circle', route('tentor.qualifix'), request()->routeIs('tentor.qualifix'), 3],
                     ['Materi Pembelajaran', 'book-open', route('tentor.materi'), request()->routeIs('tentor.materi'), null],
-                    ['Profil Saya', 'users', '#', false, null],
+                    ['Profil Saya', 'users', route('tentor.profil'), request()->routeIs('tentor.profil'), null],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active, $count])
@@ -66,7 +66,7 @@
     </aside>
 
     {{-- Main column --}}
-    <div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex min-w-0 flex-1 flex-col lg:overflow-y-auto lg:p-3">
 
         {{-- Topbar --}}
         <header class="flex items-center gap-4 px-4 py-4 sm:px-6">

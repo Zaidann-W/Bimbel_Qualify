@@ -21,3 +21,7 @@ Route::get('/tentor/qualifix', function () {
 Route::get('/tentor/materi', function () {
     return view('tentor.materi');
 })->name('tentor.materi');
+
+Route::get('/tentor/profil', function () {
+    return view('tentor.profil');
+})->name('tentor.profil');

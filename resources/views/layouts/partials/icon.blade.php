@@ -35,6 +35,11 @@
         'file-image' => '<path d="M14 4H6.5A1.5 1.5 0 0 0 5 5.5v13A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9Z"/><path d="M14 4v5h5"/><circle cx="10" cy="12.5" r="1.2"/><path d="m7 17 2.5-2.5 2 2L14 14l3 3"/>',
         'plus' => '<path d="M12 5v14M5 12h14"/>',
         'presentation' => '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v3M8.5 21h7"/>',
+        'shield-check' => '<path d="M12 3.5 5 6v5.5c0 4 2.9 7.4 7 9 4.1-1.6 7-5 7-9V6Z"/><path d="m9 12 2 2 4-4"/>',
+        'lock' => '<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>',
+        'bell' => '<path d="M15 17h5l-1.4-2.1A2 2 0 0 1 18 13.8V10a6 6 0 1 0-12 0v3.8a2 2 0 0 1-.6 1.1L4 17h5m6 0a3 3 0 1 1-6 0"/>',
+        'sliders' => '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+        'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/>',
     ];
 @endphp
 
