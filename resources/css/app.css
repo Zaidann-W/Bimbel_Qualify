@@ -4,6 +4,48 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Palet Bimbel QUALIFY — diekstrak dari rancangan di folder docs/ */
+    --color-cream: #fbf9f4;
+    --color-shell: #f5f4ef;
+    --color-sand: #f1efe9;
+    --color-paper: #ffffff;
+    --color-line: #e8e5dc;
+    --color-ink: #141414;
+    --color-muted: #57554f;
+    --color-gold: #f5b72e;
+    --color-bronze: #9b7718;
+    --color-espresso: #2a1a0e;
+    --color-sandgold: #fbefd5;
+    --color-palegold: #f4dfb1;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background-color: var(--color-cream);
+        color: var(--color-ink);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    section[id] {
+        scroll-margin-top: 32px;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-bronze);
+        outline-offset: 3px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
