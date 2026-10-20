@@ -28,15 +28,15 @@
         <nav class="mt-3 space-y-0.5 text-[13px]">
             @php
                 $nav = [
-                    ['Dashboard Overview', 'layout-grid', true, null],
-                    ['Absensi Siswa', 'clipboard-check', false, null],
-                    ['Qualify', 'message-circle', false, 3],
-                    ['Materi Pembelajaran', 'book-open', false, null],
-                    ['Profil Saya', 'users', false, null],
+                    ['Dashboard Overview', 'layout-grid', route('tentor.dashboard'), request()->routeIs('tentor.dashboard'), null],
+                    ['Absensi Siswa', 'clipboard-check', route('tentor.absensi'), request()->routeIs('tentor.absensi'), null],
+                    ['Qualify', 'message-circle', '#', false, 3],
+                    ['Materi Pembelajaran', 'book-open', '#', false, null],
+                    ['Profil Saya', 'users', '#', false, null],
                 ];
             @endphp
-            @foreach ($nav as [$label, $icon, $active, $count])
-                <a href="#"
+            @foreach ($nav as [$label, $icon, $href, $active, $count])
+                <a href="{{ $href }}"
                    @class([
                        'flex items-center gap-3 rounded-lg px-2.5 py-2.5 transition',
                        'bg-white font-semibold text-bark-800' => $active,
