@@ -23,7 +23,7 @@
 
                 <div class="mt-9 flex flex-wrap justify-center gap-4">
                     <a
-                        href="#"
+                        href="{{ route('registrasi') }}"
                         class="inline-flex items-center gap-2.5 bg-gold hover:bg-[#ecab20] text-espresso font-bold text-[15.5px] px-6 py-4 rounded-xl transition-colors"
                     >
                         Isi Formulir Pendaftarkan Sekarang
