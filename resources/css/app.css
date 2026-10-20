@@ -20,6 +20,29 @@
     --color-espresso: #2a1a0e;
     --color-sandgold: #fbefd5;
     --color-palegold: #f4dfb1;
+
+    /* Skala warna Bark & Ember dari main */
+    --color-bark-50: #faf6f2;
+    --color-bark-100: #f0e6db;
+    --color-bark-200: #d9c4ab;
+    --color-bark-300: #b8956f;
+    --color-bark-400: #8a6440;
+    --color-bark-500: #6b4a2a;
+    --color-bark-600: #543920;
+    --color-bark-700: #3f2c18;
+    --color-bark-800: #2e2010;
+    --color-bark-900: #1f1509;
+
+    --color-ember-50: #fff8ed;
+    --color-ember-100: #ffeed4;
+    --color-ember-200: #ffd9a8;
+    --color-ember-300: #ffbe70;
+    --color-ember-400: #ff9b37;
+    --color-ember-500: #f97a0f;
+    --color-ember-600: #e85d04;
+    --color-ember-700: #c04507;
+    --color-ember-800: #97370e;
+    --color-ember-900: #7a2f0f;
 }
 
 @layer base {
