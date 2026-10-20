@@ -93,10 +93,18 @@
 
                 <ul class="divide-y divide-bark-100">
                     @foreach ($jadwal as [$jam, $mapel, $meta, $status, $badge, $highlight, $tags])
+                        @php
+                            [$room, $siswa] = array_map('trim', explode('·', $meta));
+                        @endphp
                         <li @class([
-                            'flex gap-4 px-5 py-4 transition hover:bg-bark-50/60',
+                            'jadwal-row flex gap-4 px-5 py-4 transition hover:bg-bark-50/60 cursor-pointer',
                             'border-l-[3px] border-ember-400 bg-ember-50/40' => $highlight,
-                        ])>
+                        ]) role="button" tabindex="0"
+                            aria-label="Detail sesi {{ $mapel }}"
+                            data-title="{{ $mapel }}"
+                            data-subtitle="{{ trim($tags[0]) }} • Hari ini, {{ explode(' – ', $jam)[0] }} WIB"
+                            data-room="{{ $room }}"
+                            data-siswa="{{ $siswa }}">
                             <div class="w-24 shrink-0 pt-0.5">
                                 <p class="text-[13px] font-bold text-bark-800">{{ explode(' – ', $jam)[0] }}</p>
                                 <p class="text-[11px] text-bark-400">{{ explode(' – ', $jam)[1] }}</p>
@@ -204,4 +212,6 @@
         </section>
     </div>
 </div>
+
+<x-jadwal-detail-modal />
 @endsection
