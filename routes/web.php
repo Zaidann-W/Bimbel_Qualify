@@ -17,3 +17,7 @@ Route::get('/tentor/absensi', function () {
 Route::get('/tentor/qualifix', function () {
     return view('tentor.qualifix');
 })->name('tentor.qualifix');
+
+Route::get('/tentor/materi', function () {
+    return view('tentor.materi');
+})->name('tentor.materi');
