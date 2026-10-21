@@ -66,6 +66,10 @@ Route::get('/owner/pengaturan-website', function () {
     return view('owner.pengaturan-website');
 })->name('owner.pengaturanWebsite');
 
+Route::get('/manager', function () {
+    return view('manager.dashboard');
+})->name('manager.dashboard');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
