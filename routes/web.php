@@ -109,3 +109,7 @@ Route::get('/wali/pembayaran', function () {
 Route::get('/wali/pendaftaran', function () {
     return view('wali.pendaftaran');
 })->name('wali.pendaftaran');
+
+Route::get('/wali/profil', function () {
+    return view('wali.profil');
+})->name('wali.profil');
