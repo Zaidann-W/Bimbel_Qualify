@@ -34,7 +34,7 @@
                 $nav = [
                     ['Dashboard', 'layout-grid', '#', false],
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
-                    ['Laporan Absensi', 'clipboard-check', '#', false],
+                    ['Laporan Absensi', 'clipboard-check', route('owner.laporanAbsensi'), request()->routeIs('owner.laporanAbsensi')],
                     ['Pemantauan Materi', 'book-open', '#', false],
                     ['Pengaturan Website & Profil', 'sliders', '#', false],
                 ];
