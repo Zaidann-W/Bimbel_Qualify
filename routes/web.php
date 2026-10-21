@@ -61,3 +61,7 @@ Route::get('/siswa/materi', function () {
 Route::get('/siswa/qualifix', function () {
     return view('siswa.qualifix');
 })->name('siswa.qualifix');
+
+Route::get('/siswa/profil', function () {
+    return view('siswa.profil');
+})->name('siswa.profil');
