@@ -38,7 +38,10 @@
                 $nav = [
                     ['Dashboard', 'layout-grid', route('owner.dashboard'), request()->routeIs('owner.dashboard')],
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
+                    ['Laporan Absensi', 'clipboard-check', route('owner.laporanAbsensi'), request()->routeIs('owner.laporanAbsensi')],
+
                     ['Laporan Absensi', 'user-check', '#', false],
+
                     ['Pemantauan Materi', 'book-open', '#', false],
                     ['Pengaturan Website', 'sliders', '#', false],
                 ];
@@ -87,7 +90,6 @@
                 @include('layouts.partials.icon', ['name' => 'menu', 'class' => 'h-5 w-5'])
             </button>
 
-<<<<<<< HEAD
             <div class="flex min-w-0 items-center gap-2.5">
                 <p class="truncate text-[12.5px] font-semibold text-ink">Bimbel QUALIFY</p>
                 @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5 text-bark-300'])
@@ -95,7 +97,6 @@
                 <span class="hidden items-center gap-1.5 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-bold text-bronze md:inline-flex">
                     <span class="h-1.5 w-1.5 rounded-full bg-gold"></span>
                     TA 2024/2025 Semester Genap
-=======
             <div class="flex min-w-0 items-center gap-3">
                 <p class="flex min-w-0 items-center gap-1.5 truncate text-[12.5px] text-muted">
                     Portal Pemilik
@@ -106,18 +107,15 @@
                 <span class="hidden items-center gap-1.5 whitespace-nowrap text-[12px] font-semibold text-bronze md:inline-flex">
                     @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5 text-gold'])
                     T.A 2024/2025 Genap
->>>>>>> origin/main
                 </span>
             </div>
 
             <div class="ml-auto flex min-w-0 shrink items-center justify-end gap-2 sm:gap-3">
-<<<<<<< HEAD
                 <button type="button" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand">
                     @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 text-bronze'])
                     <span class="hidden sm:inline">Hari ini: 24 Mei 2025</span>
                     <span class="sm:hidden">24 Mei 2025</span>
                     @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-=======
                 <span class="hidden items-center gap-1.5 text-[11.5px] text-muted lg:inline-flex">
                     @include('layouts.partials.icon', ['name' => 'cloud', 'class' => 'h-4 w-4 text-bark-300'])
                     Sinkronisasi Otomatis
@@ -126,7 +124,6 @@
                 <button type="button" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand sm:px-3">
                     @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-4 w-4 text-bronze'])
                     Ekspor Data
->>>>>>> origin/main
                 </button>
 
                 <button type="button" class="relative grid h-9 w-9 shrink-0 place-items-center rounded-lg text-bark-500 transition hover:bg-bark-50" aria-label="Notifikasi">
@@ -134,7 +131,6 @@
                     <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-500 ring-2 ring-white"></span>
                 </button>
 
-<<<<<<< HEAD
                 <div class="flex shrink-0 items-center gap-2">
                     <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-[11px] font-bold text-espresso">IH</span>
                     <div class="hidden leading-tight sm:block">
@@ -142,11 +138,9 @@
                         <p class="text-[10.5px] text-muted">Owner</p>
                     </div>
                 </div>
-=======
                 <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold/60 bg-sandgold text-bronze" title="Ir. H. Hendra Gunawan — Owner">
                     @include('layouts.partials.icon', ['name' => 'graduation-cap', 'class' => 'h-4 w-4'])
                 </span>
->>>>>>> origin/main
             </div>
         </header>
 

@@ -46,6 +46,7 @@ Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
 
+
 Route::get('/owner', function () {
     return view('owner.dashboard');
 })->name('owner.dashboard');
@@ -53,6 +54,10 @@ Route::get('/owner', function () {
 Route::get('/owner/laporan-keuangan', function () {
     return view('owner.laporan-keuangan');
 })->name('owner.laporanKeuangan');
+
+Route::get('/owner/laporan-absensi', function () {
+    return view('owner.laporan-absensi');
+})->name('owner.laporanAbsensi');
 
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
