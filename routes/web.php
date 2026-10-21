@@ -45,3 +45,7 @@ Route::get('/tentor/profil', function () {
 Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
+
+Route::get('/owner/laporan-keuangan', function () {
+    return view('owner.laporan-keuangan');
+})->name('owner.laporanKeuangan');

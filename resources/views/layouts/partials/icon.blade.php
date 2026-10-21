@@ -40,6 +40,15 @@
         'bell' => '<path d="M15 17h5l-1.4-2.1A2 2 0 0 1 18 13.8V10a6 6 0 1 0-12 0v3.8a2 2 0 0 1-.6 1.1L4 17h5m6 0a3 3 0 1 1-6 0"/>',
         'sliders' => '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/>',
+        'file-text' => '<path d="M14 3.5H7A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8Z"/><path d="M14 3.5V8h4.5"/><path d="M8.5 12.5h7M8.5 16h4.5"/>',
+        'wallet' => '<path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h11"/><rect x="3.5" y="8.5" width="17" height="10" rx="2"/><path d="M20.5 12h-3.2a1.75 1.75 0 0 0 0 3.5h3.2"/>',
+        'trending-up' => '<path d="M3.5 16.5 9 11l3.5 3.5L20 7"/><path d="M15 7h5v5"/>',
+        'briefcase' => '<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5"/><path d="M3.5 12.5h17"/>',
+        'printer' => '<path d="M7 8.5V4.5h10v4"/><rect x="3.5" y="8.5" width="17" height="7.5" rx="2"/><path d="M7 13h10v6.5H7z"/>',
+        'refresh' => '<path d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4.5 15"/><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19.5 9"/><path d="M4.5 9v3h3M19.5 15v-3h-3"/>',
+        'log-out' => '<path d="M10 5.5H6.5A1.5 1.5 0 0 0 5 7v10a1.5 1.5 0 0 0 1.5 1.5H10"/><path d="M14 12h6m0 0-3-3m3 3-3 3"/>',
+        'chevron-down' => '<path d="m6 9.5 6 6 6-6"/>',
+        'menu' => '<path d="M4 7h16M4 12h16M4 17h16"/>',
     ];
 @endphp
 
