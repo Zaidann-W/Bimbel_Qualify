@@ -29,6 +29,8 @@
         'monitor' => '<rect x="3" y="4.5" width="18" height="12.5" rx="2"/><path d="M9 20.5h6M12 17v3.5"/>',
         'wind' => '<path d="M3.5 8.5h9a2.5 2.5 0 1 0-2.4-3.2"/><path d="M3.5 12.5h13a2.5 2.5 0 1 1-2.4 3.2"/><path d="M3.5 16.5h6a2 2 0 1 1-1.9 2.6"/>',
         'download' => '<path d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5"/><path d="M4.5 16.5v2A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5v-2"/>',
+        'upload' => '<path d="M12 15V5m0 0L8.5 8.5M12 5l3.5 3.5"/><path d="M4.5 16.5v2A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5v-2"/>',
+        'headset' => '<path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><rect x="2.5" y="12.5" width="4" height="6" rx="1.5"/><rect x="17.5" y="12.5" width="4" height="6" rx="1.5"/><path d="M19.5 18.5v.5a2.5 2.5 0 0 1-2.5 2.5h-3"/>',
         'x' => '<path d="M6 6l12 12M18 6 6 18"/>',
         'check-circle' => '<circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
         'image' => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m4 17.5 4.5-4.5 3 3L15 12l5 5"/>',
