@@ -45,3 +45,7 @@ Route::get('/tentor/profil', function () {
 Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
+
+Route::get('/siswa/jadwal/detail', function () {
+    return view('siswa.detail-pertemuan');
+})->name('siswa.jadwal.detail');

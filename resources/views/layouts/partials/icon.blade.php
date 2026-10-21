@@ -40,6 +40,8 @@
         'bell' => '<path d="M15 17h5l-1.4-2.1A2 2 0 0 1 18 13.8V10a6 6 0 1 0-12 0v3.8a2 2 0 0 1-.6 1.1L4 17h5m6 0a3 3 0 1 1-6 0"/>',
         'sliders' => '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/>',
+        'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
+        'building' => '<rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2"/><path d="M10 20.5v-4h4v4"/>',
     ];
 @endphp
 
