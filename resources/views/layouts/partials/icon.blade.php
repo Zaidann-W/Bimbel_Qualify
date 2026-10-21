@@ -71,6 +71,9 @@
         'credit-card' => '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 14.5h3"/>',
         'megaphone' => '<path d="M4 10v4a1.5 1.5 0 0 0 1.5 1.5H7l7 4.5V5.5L7 10H5.5A1.5 1.5 0 0 0 4 10Z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>',
         'share' => '<circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="m8.3 10.8 6.4-3.6M8.3 13.2l6.4 3.6"/>',
+        'compass' => '<circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/>',
+        'filter' => '<path d="M4.5 5.5h15l-5.8 6.9v5.4l-3.4 1.7v-7.1Z"/>',
+        'leaf' => '<path d="M12 20.5V13"/><path d="M12 13c0-4 3-7.5 8.5-8-.2 5.8-3.4 8.7-8.5 8Z"/><path d="M12 15.5c-3.4 0-5.9-2.4-6.5-6 3.6.2 6.1 2.3 6.5 6Z"/>',
         'refresh' => '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5"/><path d="M4 4.5v4h4"/><path d="M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M20 19.5v-4h-4"/>',
     ];
 @endphp

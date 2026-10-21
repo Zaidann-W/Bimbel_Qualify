@@ -24,10 +24,6 @@
             </div>
         </div>
 
-        {{-- Nav --}}
-        <nav class="mt-6 space-y-0.5 text-[13px]">
-            <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Utama</p>
-
         {{-- Role badge --}}
         <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Admin</span>
 
@@ -39,10 +35,7 @@
                     ['Dashboard', 'layout-grid', route('owner.dashboard'), request()->routeIs('owner.dashboard')],
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
                     ['Laporan Absensi', 'clipboard-check', route('owner.laporanAbsensi'), request()->routeIs('owner.laporanAbsensi')],
-
-                    ['Laporan Absensi', 'user-check', '#', false],
-
-                    ['Pemantauan Materi', 'book-open', '#', false],
+                    ['Pemantauan Materi', 'book-open', route('owner.pemantauanMateri'), request()->routeIs('owner.pemantauanMateri')],
                     ['Pengaturan Website', 'sliders', '#', false],
                 ];
             @endphp
@@ -90,13 +83,6 @@
                 @include('layouts.partials.icon', ['name' => 'menu', 'class' => 'h-5 w-5'])
             </button>
 
-            <div class="flex min-w-0 items-center gap-2.5">
-                <p class="truncate text-[12.5px] font-semibold text-ink">Bimbel QUALIFY</p>
-                @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5 text-bark-300'])
-                <p class="truncate text-[12.5px] text-muted">Executive Center</p>
-                <span class="hidden items-center gap-1.5 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-bold text-bronze md:inline-flex">
-                    <span class="h-1.5 w-1.5 rounded-full bg-gold"></span>
-                    TA 2024/2025 Semester Genap
             <div class="flex min-w-0 items-center gap-3">
                 <p class="flex min-w-0 items-center gap-1.5 truncate text-[12.5px] text-muted">
                     Portal Pemilik
@@ -116,6 +102,8 @@
                     <span class="hidden sm:inline">Hari ini: 24 Mei 2025</span>
                     <span class="sm:hidden">24 Mei 2025</span>
                     @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5 text-bark-400'])
+                </button>
+
                 <span class="hidden items-center gap-1.5 text-[11.5px] text-muted lg:inline-flex">
                     @include('layouts.partials.icon', ['name' => 'cloud', 'class' => 'h-4 w-4 text-bark-300'])
                     Sinkronisasi Otomatis
