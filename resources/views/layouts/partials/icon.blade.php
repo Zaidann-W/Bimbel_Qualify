@@ -63,6 +63,10 @@
         'sigma' => '<path d="M17 5H7l5 7-5 7h10"/>',
         'beaker' => '<path d="M9.5 3v6.2L4.8 17a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3l-4.7-7.8V3"/><path d="M8 3h8M7.2 14h9.6"/>',
         'save' => '<path d="M5 6.5A1.5 1.5 0 0 1 6.5 5H16l3 3v9.5A1.5 1.5 0 0 1 17.5 19h-11A1.5 1.5 0 0 1 5 17.5Z"/><path d="M8 5v4h7V5M8 19v-5h8v5"/>',
+        'credit-card' => '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 14.5h3"/>',
+        'megaphone' => '<path d="M4 10v4a1.5 1.5 0 0 0 1.5 1.5H7l7 4.5V5.5L7 10H5.5A1.5 1.5 0 0 0 4 10Z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>',
+        'share' => '<circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="m8.3 10.8 6.4-3.6M8.3 13.2l6.4 3.6"/>',
+        'refresh' => '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5"/><path d="M4 4.5v4h4"/><path d="M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M20 19.5v-4h-4"/>',
     ];
 @endphp
 

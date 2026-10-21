@@ -46,7 +46,6 @@ Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
 
-
 Route::get('/owner/laporan-keuangan', function () {
     return view('owner.laporan-keuangan');
 })->name('owner.laporanKeuangan');
@@ -70,3 +69,7 @@ Route::get('/siswa/qualifix', function () {
 Route::get('/siswa/profil', function () {
     return view('siswa.profil');
 })->name('siswa.profil');
+
+Route::get('/wali', function () {
+    return view('wali.dashboard');
+})->name('wali.dashboard');
