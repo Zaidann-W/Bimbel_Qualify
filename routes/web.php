@@ -101,3 +101,7 @@ Route::get('/wali/kehadiran', function () {
 Route::get('/wali/informasi', function () {
     return view('wali.informasi');
 })->name('wali.informasi');
+
+Route::get('/wali/pembayaran', function () {
+    return view('wali.pembayaran');
+})->name('wali.pembayaran');
