@@ -1,8 +1,8 @@
 {{-- Formulir pengajuan izin siswa. Trigger: [data-izin-open]. Include: <x-izin-siswa-modal /> --}}
 {{-- shortcut: jenis izin, unggah berkas, dan kirim izin masih mock UI; sambungkan ke backend pengajuan izin --}}
-<div id="izin-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="izin-modal-title" tabindex="-1">
-    <div class="absolute inset-0 bg-bark-900/50" data-izin-close></div>
-    <div class="relative flex min-h-full items-start justify-center overflow-y-auto p-4 sm:p-8">
+<div id="izin-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="izin-modal-title" tabindex="-1">
+    <div class="fixed inset-0 bg-bark-900/50" data-izin-close></div>
+    <div class="relative flex min-h-full items-start justify-center p-4 sm:p-8">
         <div class="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl">
 
             {{-- Header --}}
@@ -112,12 +112,14 @@
     const open = (trigger) => {
         lastTrigger = trigger;
         modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         modal.focus();
     };
 
     const close = () => {
         if (modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
+        document.body.style.overflow = '';
         if (lastTrigger) lastTrigger.focus();
     };
 

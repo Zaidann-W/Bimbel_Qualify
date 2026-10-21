@@ -1,7 +1,7 @@
 {{-- Overlay detail sesi jadwal. Include sekali per halaman: <x-jadwal-detail-modal /> --}}
-<div id="jadwal-detail-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="jadwal-detail-title" tabindex="-1">
-    <div class="absolute inset-0 bg-bark-900/40" data-modal-close></div>
-    <div class="relative flex min-h-full items-center justify-center p-4 sm:p-6">
+<div id="jadwal-detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="jadwal-detail-title" tabindex="-1">
+    <div class="fixed inset-0 bg-bark-900/40" data-modal-close></div>
+    <div class="relative flex min-h-full items-start justify-center p-4 sm:p-6">
         <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
 
             {{-- Header --}}
@@ -121,12 +121,14 @@
         fill(row);
         lastRow = row;
         modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         modal.focus();
     };
 
     const close = () => {
         if (modal.classList.contains('hidden')) return;
         modal.classList.add('hidden');
+        document.body.style.overflow = '';
         if (lastRow) lastRow.focus();
     };
 
