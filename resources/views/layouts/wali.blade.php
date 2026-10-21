@@ -31,7 +31,7 @@
                 $nav = [
                     ['Dashboard', 'layout-grid', route('wali.dashboard'), request()->routeIs('wali.dashboard*')],
                     ['Kehadiran Anak', 'clipboard-check', route('wali.kehadiran'), request()->routeIs('wali.kehadiran*')],
-                    ['Informasi Anak', 'book-open', '#', false],
+                    ['Informasi Anak', 'book-open', route('wali.informasi'), request()->routeIs('wali.informasi*')],
                     ['Pembayaran', 'credit-card', '#', false],
                     ['Pendaftaran', 'clipboard-form', '#', false],
                     ['Profil Saya', 'user', '#', false],

@@ -77,3 +77,7 @@ Route::get('/wali', function () {
 Route::get('/wali/kehadiran', function () {
     return view('wali.kehadiran');
 })->name('wali.kehadiran');
+
+Route::get('/wali/informasi', function () {
+    return view('wali.informasi');
+})->name('wali.informasi');
