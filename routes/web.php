@@ -14,6 +14,14 @@ Route::post('/registrasi', function () {
     return view('registrasi');
 })->name('registrasi.simpan');
 
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function () {
+    return view('login');
+})->name('login.simpan');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

@@ -55,7 +55,7 @@
 
             {{-- Aksi --}}
             <div class="hidden lg:flex items-center gap-7 ml-auto shrink-0">
-                <a href="#" class="text-[15px] font-semibold text-ink hover:text-bronze transition-colors">
+                <a href="{{ route('login') }}" class="text-[15px] font-semibold text-ink hover:text-bronze transition-colors">
                     Masuk / Login
                 </a>
                 <a
@@ -89,7 +89,7 @@
             <a href="{{ url('/#testimoni') }}" class="py-2.5 text-[15px] text-muted hover:text-ink">Testimoni</a>
             <a href="{{ url('/#informasi-kelulusan') }}" class="py-2.5 text-[15px] text-muted hover:text-ink">Informasi Kelulusan</a>
             <div class="mt-3 flex items-center gap-4">
-                <a href="#" class="text-[15px] font-semibold text-ink">Masuk / Login</a>
+                <a href="{{ route('login') }}" class="text-[15px] font-semibold text-ink">Masuk / Login</a>
                 <a href="{{ route('registrasi') }}" class="inline-flex items-center bg-gold text-espresso font-bold text-[15px] px-5 py-3 rounded-xl">
                     Daftar Sekarang
                 </a>
