@@ -24,15 +24,12 @@
             </div>
         </div>
 
-        {{-- Role badge --}}
-        <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Owner</span>
-
         {{-- Nav --}}
-        <nav class="mt-5 space-y-0.5 text-[13px]">
+        <nav class="mt-6 space-y-0.5 text-[13px]">
             <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Utama</p>
             @php
                 $nav = [
-                    ['Dashboard', 'layout-grid', '#', false],
+                    ['Dashboard', 'layout-grid', route('owner.dashboard'), request()->routeIs('owner.dashboard')],
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
                     ['Laporan Absensi', 'clipboard-check', '#', false],
                     ['Pemantauan Materi', 'book-open', '#', false],
@@ -55,9 +52,12 @@
         {{-- User card --}}
         <div class="mt-auto rounded-xl bg-white/5 px-3 py-3">
             <div class="flex items-center gap-2.5">
-                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-bark-600 text-[11px] font-bold text-bark-100">HG</span>
+                <span class="relative grid h-9 w-9 shrink-0 place-items-center rounded-full bg-palegold text-[11px] font-bold text-espresso">
+                    IH
+                    <span class="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-gold ring-2 ring-espresso"></span>
+                </span>
                 <div class="min-w-0 flex-1 leading-tight">
-                    <p class="truncate text-[12px] font-bold text-white">Ir. H. Hendra Gunawan</p>
+                    <p class="text-[12px] font-bold leading-snug text-white">Ir. H. Hendra Gunawan</p>
                     <p class="mt-0.5 text-[10px] text-bark-300">Owner &amp; Founder</p>
                 </div>
                 <button type="button" aria-label="Keluar dari portal" class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-bark-300 transition hover:bg-white/10 hover:text-white">
@@ -81,22 +81,21 @@
             </button>
 
             <div class="flex min-w-0 items-center gap-2.5">
-                <p class="truncate text-[12px] text-muted">Portal Pemilik <span class="text-bark-200">•</span> Monitoring Eksekutif</p>
-                <span class="hidden items-center gap-1.5 rounded-md border border-line bg-cream px-2 py-1 text-[10.5px] font-semibold text-bronze md:inline-flex">
-                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3 w-3'])
-                    T.A 2024/2025 • Genap
+                <p class="truncate text-[12.5px] font-semibold text-ink">Bimbel QUALIFY</p>
+                @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5 text-bark-300'])
+                <p class="truncate text-[12.5px] text-muted">Executive Center</p>
+                <span class="hidden items-center gap-1.5 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-bold text-bronze md:inline-flex">
+                    <span class="h-1.5 w-1.5 rounded-full bg-gold"></span>
+                    TA 2024/2025 Semester Genap
                 </span>
             </div>
 
             <div class="ml-auto flex min-w-0 shrink items-center justify-end gap-2 sm:gap-3">
-                <span class="hidden items-center gap-1.5 text-[11.5px] text-muted xl:inline-flex">
-                    @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-3.5 w-3.5 text-bark-300'])
-                    Sinkronisasi Otomatis
-                </span>
-
-                <button type="button" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand sm:px-3">
-                    @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-4 w-4 text-bronze'])
-                    Ekspor Data
+                <button type="button" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand">
+                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 text-bronze'])
+                    <span class="hidden sm:inline">Hari ini: 24 Mei 2025</span>
+                    <span class="sm:hidden">24 Mei 2025</span>
+                    @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5 text-bark-400'])
                 </button>
 
                 <button type="button" class="relative grid h-9 w-9 shrink-0 place-items-center rounded-lg text-bark-500 transition hover:bg-bark-50" aria-label="Notifikasi">
@@ -105,9 +104,9 @@
                 </button>
 
                 <div class="flex shrink-0 items-center gap-2">
-                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-[11px] font-bold text-espresso">HG</span>
+                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-[11px] font-bold text-espresso">IH</span>
                     <div class="hidden leading-tight sm:block">
-                        <p class="text-[12.5px] font-semibold text-ink">Ir. H. Hendra Gunawan</p>
+                        <p class="whitespace-nowrap text-[12.5px] font-semibold text-ink">Ir. H. Hendra G.</p>
                         <p class="text-[10.5px] text-muted">Owner</p>
                     </div>
                 </div>
