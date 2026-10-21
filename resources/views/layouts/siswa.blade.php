@@ -30,7 +30,7 @@
             @php
                 $nav = [
                     ['Dashboard', 'layout-grid', route('siswa.dashboard'), request()->routeIs('siswa.dashboard')],
-                    ['Jadwal Belajar', 'calendar', route('siswa.jadwal.detail'), request()->routeIs('siswa.jadwal*')],
+                    ['Jadwal Belajar', 'calendar', route('siswa.jadwal'), request()->routeIs('siswa.jadwal*')],
                     ['Materi Pembelajaran', 'book-open', '#', false],
                     ['Qualify', 'message-circle', '#', false],
                     ['Profil Saya', 'users', '#', false],

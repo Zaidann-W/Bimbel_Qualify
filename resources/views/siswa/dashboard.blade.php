@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard Siswa')
 
-{{-- shortcut: tombol Lihat Detail, Baca Modul, kalender, dan link "Semua Modul" masih mock UI; sambungkan ke route materi/jadwal siswa kalau halamannya sudah ada --}}
+{{-- shortcut: tombol Baca Modul, kalender, dan link "Semua Modul" masih mock UI; sambungkan ke route materi siswa kalau halamannya sudah ada --}}
 @section('content')
 @php
     $jadwal = [
@@ -133,9 +133,9 @@
                                 @if ($today)
                                     <span class="rounded-full bg-ember-100 px-2 py-[3px] text-[10px] font-bold text-ember-700">Hari ini</span>
                                 @endif
-                                <button type="button" class="rounded-lg border border-bark-200 bg-white px-3 py-2 text-[11.5px] font-semibold text-bark-600 transition hover:bg-bark-50">
+                                <a href="{{ route('siswa.jadwal') }}" class="rounded-lg border border-bark-200 bg-white px-3 py-2 text-[11.5px] font-semibold text-bark-600 transition hover:bg-bark-50">
                                     Lihat Detail
-                                </button>
+                                </a>
                             </div>
                         </li>
                     @endforeach
