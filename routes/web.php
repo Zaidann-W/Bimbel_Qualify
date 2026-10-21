@@ -73,3 +73,7 @@ Route::get('/siswa/profil', function () {
 Route::get('/wali', function () {
     return view('wali.dashboard');
 })->name('wali.dashboard');
+
+Route::get('/wali/kehadiran', function () {
+    return view('wali.kehadiran');
+})->name('wali.kehadiran');
