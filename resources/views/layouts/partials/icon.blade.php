@@ -46,6 +46,8 @@
         'star' => '<path d="m12 4 2.5 5 5.5.8-4 3.9.9 5.5L12 16.6 7.1 19.2l.9-5.5-4-3.9L9.5 9Z"/>',
         'send' => '<path d="M20 4 4 10.5l6.5 2.5L13 20Z"/><path d="m10.5 13 9.5-9"/>',
         'clipboard-form' => '<rect x="5" y="5" width="14" height="15.5" rx="1.5"/><path d="M9.5 5V3.5h5V5"/><path d="M9 11h6M9 15h4"/>',
+        'bookmark' => '<path d="M7 4.5h10A1.5 1.5 0 0 1 18.5 6v14L12 16.5 5.5 20V6A1.5 1.5 0 0 1 7 4.5Z"/>',
+        'play' => '<path d="M8 5.5v13l11-6.5Z"/>',
     ];
 @endphp
 
