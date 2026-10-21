@@ -33,3 +33,7 @@ Route::get('/tentor/materi', function () {
 Route::get('/tentor/profil', function () {
     return view('tentor.profil');
 })->name('tentor.profil');
+
+Route::get('/siswa', function () {
+    return view('siswa.dashboard');
+})->name('siswa.dashboard');
