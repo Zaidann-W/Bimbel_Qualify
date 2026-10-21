@@ -49,3 +49,7 @@ Route::get('/siswa', function () {
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
+
+Route::get('/siswa/jadwal', function () {
+    return view('siswa.detail-jadwal');
+})->name('siswa.jadwal');

@@ -42,6 +42,10 @@
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/>',
         'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
         'building' => '<rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2"/><path d="M10 20.5v-4h4v4"/>',
+        'file' => '<path d="M14 4H6.5A1.5 1.5 0 0 0 5 5.5v13A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9Z"/><path d="M14 4v5h5"/>',
+        'star' => '<path d="m12 4 2.5 5 5.5.8-4 3.9.9 5.5L12 16.6 7.1 19.2l.9-5.5-4-3.9L9.5 9Z"/>',
+        'send' => '<path d="M20 4 4 10.5l6.5 2.5L13 20Z"/><path d="m10.5 13 9.5-9"/>',
+        'clipboard-form' => '<rect x="5" y="5" width="14" height="15.5" rx="1.5"/><path d="M9.5 5V3.5h5V5"/><path d="M9 11h6M9 15h4"/>',
     ];
 @endphp
 

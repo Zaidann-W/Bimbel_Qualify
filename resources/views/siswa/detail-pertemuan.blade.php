@@ -2,7 +2,7 @@
 
 @section('title', 'Detail Pertemuan Siswa')
 
-{{-- shortcut: filter matpel, dropdown rentang minggu, tombol Masuk ke Kelas, dan Detail Pertemuan masih mock UI; sambungkan ke backend jadwal siswa --}}
+{{-- shortcut: filter matpel, dropdown rentang minggu, dan tombol Masuk ke Kelas masih mock UI; sambungkan ke backend jadwal siswa --}}
 @section('content')
 @php
     $filter = ['Semua Matpel', 'Matematika', 'Fisika', 'Kimia', 'Biologi', 'TPS Penalaran'];
@@ -155,10 +155,10 @@
                         Masuk ke Kelas
                     </button>
                 @else
-                    <button type="button" class="inline-flex shrink-0 items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
+                    <a href="{{ route('siswa.jadwal') }}" class="inline-flex shrink-0 items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
                         Detail Pertemuan
                         @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5'])
-                    </button>
+                    </a>
                 @endif
             </li>
         @endforeach
