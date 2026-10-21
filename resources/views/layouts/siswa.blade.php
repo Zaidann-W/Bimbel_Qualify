@@ -33,7 +33,7 @@
                     ['Jadwal Belajar', 'calendar', route('siswa.jadwal'), request()->routeIs('siswa.jadwal*')],
                     ['Materi Pembelajaran', 'book-open', route('siswa.materi'), request()->routeIs('siswa.materi*')],
                     ['Qualifix', 'message-circle', route('siswa.qualifix'), request()->routeIs('siswa.qualifix*')],
-                    ['Profil Saya', 'users', '#', false],
+                    ['Profil Saya', 'user', route('siswa.profil'), request()->routeIs('siswa.profil*')],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active])

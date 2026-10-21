@@ -49,6 +49,8 @@
         'log-out' => '<path d="M10 5.5H6.5A1.5 1.5 0 0 0 5 7v10a1.5 1.5 0 0 0 1.5 1.5H10"/><path d="M14 12h6m0 0-3-3m3 3-3 3"/>',
         'chevron-down' => '<path d="m6 9.5 6 6 6-6"/>',
         'menu' => '<path d="M4 7h16M4 12h16M4 17h16"/>',
+        'cloud' => '<path d="M7 18.5h10a4 4 0 0 0 .4-8 5.5 5.5 0 0 0-10.6 1A3.75 3.75 0 0 0 7 18.5Z"/>',
+        'piggy-bank' => '<path d="M11.8 5.5h.6a5.4 5.4 0 0 1 5.4 5.4v1.6a4 4 0 0 1-1.2 2.9V19h-2.6v-1.2c-.6.1-1.3.2-2 .2h-.8c-.7 0-1.4-.1-2-.2V19H6.7v-3.6A4 4 0 0 1 5.5 12.5v-1.6A5.4 5.4 0 0 1 11.8 5.5Z"/><path d="M5.5 11H4.2"/><circle cx="9.6" cy="10.6" r=".7" fill="currentColor" stroke="none"/><path d="M15.6 7.6c.3-1.3 1.4-2.2 2.7-2.1"/>',
         'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
         'building' => '<rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2"/><path d="M10 20.5v-4h4v4"/>',
         'file' => '<path d="M14 4H6.5A1.5 1.5 0 0 0 5 5.5v13A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9Z"/><path d="M14 4v5h5"/>',
@@ -60,6 +62,11 @@
         'play' => '<path d="M8 5.5v13l11-6.5Z"/>',
         'sigma' => '<path d="M17 5H7l5 7-5 7h10"/>',
         'beaker' => '<path d="M9.5 3v6.2L4.8 17a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3l-4.7-7.8V3"/><path d="M8 3h8M7.2 14h9.6"/>',
+        'save' => '<path d="M5 6.5A1.5 1.5 0 0 1 6.5 5H16l3 3v9.5A1.5 1.5 0 0 1 17.5 19h-11A1.5 1.5 0 0 1 5 17.5Z"/><path d="M8 5v4h7V5M8 19v-5h8v5"/>',
+        'credit-card' => '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 14.5h3"/>',
+        'megaphone' => '<path d="M4 10v4a1.5 1.5 0 0 0 1.5 1.5H7l7 4.5V5.5L7 10H5.5A1.5 1.5 0 0 0 4 10Z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>',
+        'share' => '<circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="m8.3 10.8 6.4-3.6M8.3 13.2l6.4 3.6"/>',
+        'refresh' => '<path d="M20 11.5A8 8 0 0 0 6.3 6.3L4 8.5"/><path d="M4 4.5v4h4"/><path d="M4 12.5a8 8 0 0 0 13.7 5.2l2.3-2.2"/><path d="M20 19.5v-4h-4"/>',
     ];
 @endphp
 
