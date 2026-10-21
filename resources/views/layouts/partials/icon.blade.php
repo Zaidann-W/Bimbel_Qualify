@@ -47,7 +47,10 @@
         'send' => '<path d="M20 4 4 10.5l6.5 2.5L13 20Z"/><path d="m10.5 13 9.5-9"/>',
         'clipboard-form' => '<rect x="5" y="5" width="14" height="15.5" rx="1.5"/><path d="M9.5 5V3.5h5V5"/><path d="M9 11h6M9 15h4"/>',
         'bookmark' => '<path d="M7 4.5h10A1.5 1.5 0 0 1 18.5 6v14L12 16.5 5.5 20V6A1.5 1.5 0 0 1 7 4.5Z"/>',
+        'eye' => '<path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.8"/>',
         'play' => '<path d="M8 5.5v13l11-6.5Z"/>',
+        'sigma' => '<path d="M17 5H7l5 7-5 7h10"/>',
+        'beaker' => '<path d="M9.5 3v6.2L4.8 17a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3l-4.7-7.8V3"/><path d="M8 3h8M7.2 14h9.6"/>',
     ];
 @endphp
 

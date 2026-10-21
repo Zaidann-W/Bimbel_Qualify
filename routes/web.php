@@ -57,3 +57,7 @@ Route::get('/siswa/jadwal', function () {
 Route::get('/siswa/materi', function () {
     return view('siswa.materi');
 })->name('siswa.materi');
+
+Route::get('/siswa/qualifix', function () {
+    return view('siswa.qualifix');
+})->name('siswa.qualifix');

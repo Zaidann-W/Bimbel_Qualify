@@ -32,7 +32,7 @@
                     ['Dashboard', 'layout-grid', route('siswa.dashboard'), request()->routeIs('siswa.dashboard')],
                     ['Jadwal Belajar', 'calendar', route('siswa.jadwal'), request()->routeIs('siswa.jadwal*')],
                     ['Materi Pembelajaran', 'book-open', route('siswa.materi'), request()->routeIs('siswa.materi*')],
-                    ['Qualifix', 'message-circle', '#', false],
+                    ['Qualifix', 'message-circle', route('siswa.qualifix'), request()->routeIs('siswa.qualifix*')],
                     ['Profil Saya', 'users', '#', false],
                 ];
             @endphp
