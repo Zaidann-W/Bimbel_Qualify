@@ -46,6 +46,11 @@ Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
 
+
+Route::get('/owner/laporan-keuangan', function () {
+    return view('owner.laporan-keuangan');
+})->name('owner.laporanKeuangan');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
