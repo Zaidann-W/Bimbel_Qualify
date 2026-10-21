@@ -62,6 +62,10 @@ Route::get('/owner/pemantauan-materi', function () {
     return view('owner.pemantauan-materi');
 })->name('owner.pemantauanMateri');
 
+Route::get('/owner/pengaturan-website', function () {
+    return view('owner.pengaturan-website');
+})->name('owner.pengaturanWebsite');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');

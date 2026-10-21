@@ -36,7 +36,7 @@
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
                     ['Laporan Absensi', 'clipboard-check', route('owner.laporanAbsensi'), request()->routeIs('owner.laporanAbsensi')],
                     ['Pemantauan Materi', 'book-open', route('owner.pemantauanMateri'), request()->routeIs('owner.pemantauanMateri')],
-                    ['Pengaturan Website', 'sliders', '#', false],
+                    ['Pengaturan Website', 'sliders', route('owner.pengaturanWebsite'), request()->routeIs('owner.pengaturanWebsite')],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active])
