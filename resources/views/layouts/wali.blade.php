@@ -33,7 +33,7 @@
                     ['Kehadiran Anak', 'clipboard-check', route('wali.kehadiran'), request()->routeIs('wali.kehadiran*')],
                     ['Informasi Anak', 'book-open', route('wali.informasi'), request()->routeIs('wali.informasi*')],
                     ['Pembayaran', 'credit-card', route('wali.pembayaran'), request()->routeIs('wali.pembayaran*')],
-                    ['Pendaftaran', 'clipboard-form', '#', false],
+                    ['Pendaftaran', 'clipboard-form', route('wali.pendaftaran'), request()->routeIs('wali.pendaftaran*')],
                     ['Profil Saya', 'user', '#', false],
                 ];
             @endphp
