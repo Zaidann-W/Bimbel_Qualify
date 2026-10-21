@@ -20,23 +20,23 @@
             </span>
             <div class="leading-tight">
                 <p class="text-[15px] font-bold tracking-wide text-white">QUALIFY</p>
-                <p class="text-[9px] font-medium uppercase tracking-[0.18em] text-bark-300">Owner Portal</p>
+                <p class="text-[9px] font-medium uppercase tracking-[0.18em] text-bark-300">Bimbel Portal</p>
             </div>
         </div>
 
         {{-- Role badge --}}
-        <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Owner</span>
+        <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Admin</span>
 
         {{-- Nav --}}
         <nav class="mt-5 space-y-0.5 text-[13px]">
-            <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Utama</p>
+            <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Operasional</p>
             @php
                 $nav = [
                     ['Dashboard', 'layout-grid', '#', false],
                     ['Laporan Keuangan', 'file-text', route('owner.laporanKeuangan'), request()->routeIs('owner.laporanKeuangan')],
-                    ['Laporan Absensi', 'clipboard-check', '#', false],
+                    ['Laporan Absensi', 'user-check', '#', false],
                     ['Pemantauan Materi', 'book-open', '#', false],
-                    ['Pengaturan Website & Profil', 'sliders', '#', false],
+                    ['Pengaturan Website', 'sliders', '#', false],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active])
@@ -80,17 +80,22 @@
                 @include('layouts.partials.icon', ['name' => 'menu', 'class' => 'h-5 w-5'])
             </button>
 
-            <div class="flex min-w-0 items-center gap-2.5">
-                <p class="truncate text-[12px] text-muted">Portal Pemilik <span class="text-bark-200">•</span> Monitoring Eksekutif</p>
-                <span class="hidden items-center gap-1.5 rounded-md border border-line bg-cream px-2 py-1 text-[10.5px] font-semibold text-bronze md:inline-flex">
-                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3 w-3'])
-                    T.A 2024/2025 • Genap
+            <div class="flex min-w-0 items-center gap-3">
+                <p class="flex min-w-0 items-center gap-1.5 truncate text-[12.5px] text-muted">
+                    Portal Pemilik
+                    @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3 w-3 text-bark-200'])
+                    <span class="font-semibold text-ink">Monitoring Eksekutif</span>
+                </p>
+                <span class="hidden h-5 w-px bg-line md:block"></span>
+                <span class="hidden items-center gap-1.5 whitespace-nowrap text-[12px] font-semibold text-bronze md:inline-flex">
+                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5 text-gold'])
+                    T.A 2024/2025 Genap
                 </span>
             </div>
 
             <div class="ml-auto flex min-w-0 shrink items-center justify-end gap-2 sm:gap-3">
-                <span class="hidden items-center gap-1.5 text-[11.5px] text-muted xl:inline-flex">
-                    @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-3.5 w-3.5 text-bark-300'])
+                <span class="hidden items-center gap-1.5 text-[11.5px] text-muted lg:inline-flex">
+                    @include('layouts.partials.icon', ['name' => 'cloud', 'class' => 'h-4 w-4 text-bark-300'])
                     Sinkronisasi Otomatis
                 </span>
 
@@ -104,13 +109,9 @@
                     <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-500 ring-2 ring-white"></span>
                 </button>
 
-                <div class="flex shrink-0 items-center gap-2">
-                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-[11px] font-bold text-espresso">HG</span>
-                    <div class="hidden leading-tight sm:block">
-                        <p class="text-[12.5px] font-semibold text-ink">Ir. H. Hendra Gunawan</p>
-                        <p class="text-[10.5px] text-muted">Owner</p>
-                    </div>
-                </div>
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold/60 bg-sandgold text-bronze" title="Ir. H. Hendra Gunawan — Owner">
+                    @include('layouts.partials.icon', ['name' => 'graduation-cap', 'class' => 'h-4 w-4'])
+                </span>
             </div>
         </header>
 
