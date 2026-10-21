@@ -46,6 +46,11 @@ Route::get('/siswa', function () {
     return view('siswa.dashboard');
 })->name('siswa.dashboard');
 
+
+Route::get('/owner', function () {
+    return view('owner.dashboard');
+})->name('owner.dashboard');
+
 Route::get('/owner/laporan-keuangan', function () {
     return view('owner.laporan-keuangan');
 })->name('owner.laporanKeuangan');
@@ -69,3 +74,19 @@ Route::get('/siswa/materi', function () {
 Route::get('/siswa/qualifix', function () {
     return view('siswa.qualifix');
 })->name('siswa.qualifix');
+
+Route::get('/siswa/profil', function () {
+    return view('siswa.profil');
+})->name('siswa.profil');
+
+Route::get('/wali', function () {
+    return view('wali.dashboard');
+})->name('wali.dashboard');
+
+Route::get('/wali/kehadiran', function () {
+    return view('wali.kehadiran');
+})->name('wali.kehadiran');
+
+Route::get('/wali/informasi', function () {
+    return view('wali.informasi');
+})->name('wali.informasi');
