@@ -53,3 +53,7 @@ Route::get('/siswa/jadwal/detail', function () {
 Route::get('/siswa/jadwal', function () {
     return view('siswa.detail-jadwal');
 })->name('siswa.jadwal');
+
+Route::get('/siswa/materi', function () {
+    return view('siswa.materi');
+})->name('siswa.materi');
