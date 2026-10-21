@@ -32,7 +32,7 @@
                     ['Dashboard', 'layout-grid', route('wali.dashboard'), request()->routeIs('wali.dashboard*')],
                     ['Kehadiran Anak', 'clipboard-check', route('wali.kehadiran'), request()->routeIs('wali.kehadiran*')],
                     ['Informasi Anak', 'book-open', route('wali.informasi'), request()->routeIs('wali.informasi*')],
-                    ['Pembayaran', 'credit-card', '#', false],
+                    ['Pembayaran', 'credit-card', route('wali.pembayaran'), request()->routeIs('wali.pembayaran*')],
                     ['Pendaftaran', 'clipboard-form', '#', false],
                     ['Profil Saya', 'user', '#', false],
                 ];
