@@ -74,6 +74,10 @@ Route::get('/manager/keuangan-bulanan', function () {
     return view('manager.keuangan-bulanan');
 })->name('manager.keuanganBulanan');
 
+Route::get('/manager/pemantauan-materi', function () {
+    return view('manager.pemantauan-materi');
+})->name('manager.pemantauanMateri');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
