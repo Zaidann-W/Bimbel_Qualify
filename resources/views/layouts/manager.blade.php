@@ -31,12 +31,12 @@
         <nav class="mt-5 space-y-0.5 text-[13px]">
             <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Operasional</p>
             @php
-                // Halaman Pemantauan Materi s/d Profil Saya menyusul; rute ditambahkan
+                // Halaman Ringkasan Operasional s/d Profil Saya menyusul; rute ditambahkan
                 // saat modul masing-masing dibuat, lalu tautan diganti route().
                 $nav = [
                     ['Dashboard', 'layout-grid', route('manager.dashboard'), request()->routeIs('manager.dashboard')],
                     ['Keuangan Bulanan', 'wallet', route('manager.keuanganBulanan'), request()->routeIs('manager.keuanganBulanan')],
-                    ['Pemantauan Materi', 'book-open', '#', false],
+                    ['Pemantauan Materi', 'book-open', route('manager.pemantauanMateri'), request()->routeIs('manager.pemantauanMateri')],
                     ['Ringkasan Operasional', 'clipboard-check', '#', false],
                     ['Profil Saya', 'user', '#', false],
                 ];
