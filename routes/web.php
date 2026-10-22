@@ -70,6 +70,10 @@ Route::get('/manager', function () {
     return view('manager.dashboard');
 })->name('manager.dashboard');
 
+Route::get('/manager/keuangan-bulanan', function () {
+    return view('manager.keuangan-bulanan');
+})->name('manager.keuanganBulanan');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
