@@ -29,6 +29,8 @@
         'monitor' => '<rect x="3" y="4.5" width="18" height="12.5" rx="2"/><path d="M9 20.5h6M12 17v3.5"/>',
         'wind' => '<path d="M3.5 8.5h9a2.5 2.5 0 1 0-2.4-3.2"/><path d="M3.5 12.5h13a2.5 2.5 0 1 1-2.4 3.2"/><path d="M3.5 16.5h6a2 2 0 1 1-1.9 2.6"/>',
         'download' => '<path d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5"/><path d="M4.5 16.5v2A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5v-2"/>',
+        'upload' => '<path d="M12 15V5m0 0L8.5 8.5M12 5l3.5 3.5"/><path d="M4.5 16.5v2A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5v-2"/>',
+        'headset' => '<path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><rect x="2.5" y="12.5" width="4" height="6" rx="1.5"/><rect x="17.5" y="12.5" width="4" height="6" rx="1.5"/><path d="M19.5 18.5v.5a2.5 2.5 0 0 1-2.5 2.5h-3"/>',
         'x' => '<path d="M6 6l12 12M18 6 6 18"/>',
         'check-circle' => '<circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
         'image' => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m4 17.5 4.5-4.5 3 3L15 12l5 5"/>',
@@ -83,6 +85,10 @@
         'table' => '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M9.5 9.5v10"/>',
         'pie-chart' => '<path d="M20.5 12A8.5 8.5 0 1 1 12 3.5Z"/><path d="M12 3.5A8.5 8.5 0 0 1 20.5 12H12Z"/>',
         'slash-circle' => '<circle cx="12" cy="12" r="8.5"/><path d="m7 17 10-10"/>',
+        'hourglass' => '<path d="M7 4h10M7 20h10M8 4v3.5c0 2 4 3.5 4 4.5 0-1 4-2.5 4-4.5V4M8 20v-3.5c0-2 4-3.5 4-4.5 0 1 4 2.5 4 4.5V20"/>',
+        'receipt' => '<path d="M6 3.5h12v17l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5Z"/><path d="M9 8h6M9 12h6"/>',
+        'zap' => '<path d="M13 3 5 13h6l-1 8 8-10h-6Z"/>',
+        'qr-code' => '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h6M18 14v2"/>',
     ];
 @endphp
 

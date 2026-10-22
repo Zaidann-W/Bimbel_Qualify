@@ -32,9 +32,9 @@
                     ['Dashboard', 'layout-grid', route('wali.dashboard'), request()->routeIs('wali.dashboard*')],
                     ['Kehadiran Anak', 'clipboard-check', route('wali.kehadiran'), request()->routeIs('wali.kehadiran*')],
                     ['Informasi Anak', 'book-open', route('wali.informasi'), request()->routeIs('wali.informasi*')],
-                    ['Pembayaran', 'credit-card', '#', false],
-                    ['Pendaftaran', 'clipboard-form', '#', false],
-                    ['Profil Saya', 'user', '#', false],
+                    ['Pembayaran', 'credit-card', route('wali.pembayaran'), request()->routeIs('wali.pembayaran*')],
+                    ['Pendaftaran', 'clipboard-form', route('wali.pendaftaran'), request()->routeIs('wali.pendaftaran*')],
+                    ['Profil Saya', 'user', route('wali.profil'), request()->routeIs('wali.profil*')],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active])

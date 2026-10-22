@@ -105,3 +105,15 @@ Route::get('/wali/kehadiran', function () {
 Route::get('/wali/informasi', function () {
     return view('wali.informasi');
 })->name('wali.informasi');
+
+Route::get('/wali/pembayaran', function () {
+    return view('wali.pembayaran');
+})->name('wali.pembayaran');
+
+Route::get('/wali/pendaftaran', function () {
+    return view('wali.pendaftaran');
+})->name('wali.pendaftaran');
+
+Route::get('/wali/profil', function () {
+    return view('wali.profil');
+})->name('wali.profil');
