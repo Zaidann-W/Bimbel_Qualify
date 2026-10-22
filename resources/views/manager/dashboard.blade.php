@@ -155,7 +155,7 @@
                 </p>
 
                 <nav class="mt-4 flex flex-col gap-2 text-[12.5px] font-semibold" aria-label="Jalur cepat manajer">
-                    <a href="#" class="w-fit text-bronze transition hover:text-espresso focus-visible:underline">Keuangan Bulanan <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('manager.keuanganBulanan') }}" class="w-fit text-bronze transition hover:text-espresso focus-visible:underline">Keuangan Bulanan <span aria-hidden="true">→</span></a>
                     <a href="#" class="w-fit text-bronze transition hover:text-espresso focus-visible:underline">Pemantauan Materi <span aria-hidden="true">→</span></a>
                     <a href="#" class="w-fit text-bronze transition hover:text-espresso focus-visible:underline">Ringkasan Operasional <span aria-hidden="true">→</span></a>
                 </nav>
