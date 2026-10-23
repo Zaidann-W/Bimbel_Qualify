@@ -38,6 +38,10 @@ Route::get('/admin/data-siswa', function () {
     return view('admin.datasiswa');
 })->name('admin.dataSiswa');
 
+Route::get('/admin/keuangan', function () {
+    return view('admin.keuangan');
+})->name('admin.keuangan');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

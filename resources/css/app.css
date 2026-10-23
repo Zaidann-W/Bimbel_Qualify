@@ -43,6 +43,14 @@
     --color-ember-700: #c04507;
     --color-ember-800: #97370e;
     --color-ember-900: #7a2f0f;
+
+    /* Skala Forest — status lunas & arus masuk pada modul keuangan */
+    --color-forest-50: #edf6f0;
+    --color-forest-100: #d9ecdf;
+    --color-forest-200: #b4d9c3;
+    --color-forest-500: #2f8a57;
+    --color-forest-600: #237045;
+    --color-forest-700: #1b5736;
 }
 
 @layer base {
