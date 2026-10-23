@@ -26,6 +26,14 @@ Route::get('/admin', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
+Route::get('/admin/pendaftaran', function () {
+    return view('admin.pendaftaran');
+})->name('admin.pendaftaran');
+
+Route::get('/admin/pendaftaran/{kode}', function (string $kode) {
+    return view('admin.pendaftaran-detail', ['kode' => $kode]);
+})->name('admin.pendaftaran.detail');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');
