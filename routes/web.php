@@ -34,6 +34,10 @@ Route::get('/admin/pendaftaran/{kode}', function (string $kode) {
     return view('admin.pendaftaran-detail', ['kode' => $kode]);
 })->name('admin.pendaftaran.detail');
 
+Route::get('/admin/data-siswa', function () {
+    return view('admin.datasiswa');
+})->name('admin.dataSiswa');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

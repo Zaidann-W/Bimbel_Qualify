@@ -33,7 +33,7 @@
                 $nav = [
                     ['Dashboard Overview', 'layout-grid', route('admin.dashboard'), 'admin.dashboard', null],
                     ['Pendaftaran Siswa', 'user-plus', route('admin.pendaftaran'), 'admin.pendaftaran*', '12'],
-                    ['Data Siswa & Kelas', 'users', '#', null, null],
+                    ['Data Siswa & Kelas', 'users', route('admin.dataSiswa'), 'admin.dataSiswa', null],
                     ['Keuangan & Transaksi', 'wallet', '#', null, null],
                     ['Manajemen Materi Ajar', 'book-open', '#', null, null],
                     ['Absensi & Jadwal', 'clipboard-check', '#', null, null],
