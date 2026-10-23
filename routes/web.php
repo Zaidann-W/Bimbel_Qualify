@@ -22,6 +22,10 @@ Route::post('/login', function () {
     return view('login');
 })->name('login.simpan');
 
+Route::get('/admin', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');
