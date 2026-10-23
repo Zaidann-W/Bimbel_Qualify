@@ -62,10 +62,25 @@
     ];
 @endphp
 
-<div class="px-4 py-5 sm:px-6">
+<section class="bg-white px-4 pb-5 pt-5 sm:px-6">
+    <div class="max-w-2xl">
+        <p class="flex flex-wrap items-center gap-2.5">
+            <span class="rounded-md bg-sandgold px-2.5 py-1.5 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-bronze">
+                Modul 5.3 Admisi
+            </span>
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-gold"></span>
+            <span class="text-[11.5px] font-semibold text-muted">Bimbel QUALIFY T.A. 2024/2025</span>
+        </p>
+        <h1 class="mt-3 text-[28px] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-[32px]">
+            Verifikasi &amp; Pengelolaan Pendaftaran Siswa
+        </h1>
+        <p class="mt-3 max-w-xl text-[13.5px] leading-relaxed text-muted">
+            Pemeriksaan formulir pendaftaran masuk, verifikasi berkas &amp; bukti transfer, penetapan status siswa (Menunggu, Perlu Perbaikan, Diterima, Ditolak), dan aktivasi akun.
+        </p>
+    </div>
 
     {{-- Remah roti & aksi atas --}}
-    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+    <div class="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-line pt-4">
         <p class="flex flex-wrap items-center gap-2 text-[12.5px] leading-snug">
             <a href="{{ route('admin.pendaftaran') }}" class="font-medium text-muted transition hover:text-espresso hover:underline">Pendaftaran Siswa</a>
             <span class="text-bark-300">/</span>
@@ -140,8 +155,10 @@
             </div>
         </div>
     </section>
+</section>
 
-    <div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">
+<div class="px-4 py-5 sm:px-6">
+    <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
 
         {{-- Kolom utama --}}
         <div class="space-y-5 xl:col-span-2">
@@ -359,8 +376,8 @@
                 </fieldset>
 
                 <button type="button"
-                        class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-espresso py-3 text-[12.5px] font-semibold text-white transition hover:bg-bark-800">
-                    @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4 text-gold'])
+                        class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-3 text-[12.5px] font-bold text-espresso transition hover:bg-palegold">
+                    @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4'])
                     Terapkan Perubahan Status
                 </button>
             </section>
