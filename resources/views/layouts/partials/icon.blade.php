@@ -89,6 +89,7 @@
         'receipt' => '<path d="M6 3.5h12v17l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5Z"/><path d="M9 8h6M9 12h6"/>',
         'zap' => '<path d="M13 3 5 13h6l-1 8 8-10h-6Z"/>',
         'qr-code' => '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h6M18 14v2"/>',
+        'camera' => '<path d="M14.5 4.5h-5L8 7H4.5A1.5 1.5 0 0 0 3 8.5v10A1.5 1.5 0 0 0 4.5 20h15a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 19.5 7H16Z"/><circle cx="12" cy="13" r="3.4"/>',
     ];
 @endphp
 
