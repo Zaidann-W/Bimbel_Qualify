@@ -32,7 +32,7 @@
             @php
                 $nav = [
                     ['Dashboard Overview', 'layout-grid', route('admin.dashboard'), 'admin.dashboard', null],
-                    ['Pendaftaran Siswa', 'user-plus', '#', null, '12'],
+                    ['Pendaftaran Siswa', 'user-plus', route('admin.pendaftaran'), 'admin.pendaftaran*', '12'],
                     ['Data Siswa & Kelas', 'users', '#', null, null],
                     ['Keuangan & Transaksi', 'wallet', '#', null, null],
                     ['Manajemen Materi Ajar', 'book-open', '#', null, null],
