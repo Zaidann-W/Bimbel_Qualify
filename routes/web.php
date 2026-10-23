@@ -78,6 +78,14 @@ Route::get('/manager/pemantauan-materi', function () {
     return view('manager.pemantauan-materi');
 })->name('manager.pemantauanMateri');
 
+Route::get('/manager/profil', function () {
+    return view('manager.profil');
+})->name('manager.profil');
+
+Route::post('/manager/profil', function () {
+    return view('manager.profil');
+})->name('manager.profilSimpan');
+
 Route::get('/siswa/jadwal/detail', function () {
     return view('siswa.detail-pertemuan');
 })->name('siswa.jadwal.detail');
