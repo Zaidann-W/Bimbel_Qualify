@@ -54,6 +54,10 @@ Route::get('/admin/qualifix', function () {
     return view('admin.qualifix');
 })->name('admin.qualifix');
 
+Route::get('/admin/laporan-pengaturan', function () {
+    return view('admin.laporan-pengaturan');
+})->name('admin.laporanPengaturan');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

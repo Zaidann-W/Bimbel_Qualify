@@ -33,6 +33,7 @@
         'headset' => '<path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><rect x="2.5" y="12.5" width="4" height="6" rx="1.5"/><rect x="17.5" y="12.5" width="4" height="6" rx="1.5"/><path d="M19.5 18.5v.5a2.5 2.5 0 0 1-2.5 2.5h-3"/>',
         'x' => '<path d="M6 6l12 12M18 6 6 18"/>',
         'check-circle' => '<circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+        'check' => '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
         'image' => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m4 17.5 4.5-4.5 3 3L15 12l5 5"/>',
         'file-image' => '<path d="M14 4H6.5A1.5 1.5 0 0 0 5 5.5v13A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9Z"/><path d="M14 4v5h5"/><circle cx="10" cy="12.5" r="1.2"/><path d="m7 17 2.5-2.5 2 2L14 14l3 3"/>',
         'plus' => '<path d="M12 5v14M5 12h14"/>',
