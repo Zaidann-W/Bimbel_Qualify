@@ -38,7 +38,7 @@
                     ['Keuangan & Transaksi', 'wallet', route('admin.keuangan'), 'admin.keuangan', null],
                     ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
                     ['Absensi & Jadwal', 'clipboard-check', route('admin.absensiJadwal'), 'admin.absensiJadwal', null],
-                    ['Klinik PR', 'help-circle', '#', null, '5'],
+                    ['QualiFix', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
                     ['Laporan & Pengaturan', 'sliders', '#', null, null],
                 ];
             @endphp

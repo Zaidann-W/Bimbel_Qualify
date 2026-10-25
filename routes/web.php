@@ -50,6 +50,10 @@ Route::get('/admin/absensi-jadwal', function () {
     return view('admin.absensi-jadwal');
 })->name('admin.absensiJadwal');
 
+Route::get('/admin/qualifix', function () {
+    return view('admin.qualifix');
+})->name('admin.qualifix');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');
