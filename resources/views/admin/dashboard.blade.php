@@ -303,7 +303,7 @@
                 </div>
 
                 <footer class="mt-4 flex justify-center">
-                    <a href="#" class="text-[12.5px] font-semibold text-bronze transition hover:text-espresso focus-visible:underline">
+                    <a href="{{ route('admin.absensiJadwal') }}" class="text-[12.5px] font-semibold text-bronze transition hover:text-espresso focus-visible:underline">
                         Buka Manajemen Absensi &amp; Jadwal Lengkap <span aria-hidden="true">→</span>
                     </a>
                 </footer>
