@@ -42,6 +42,10 @@ Route::get('/admin/keuangan', function () {
     return view('admin.keuangan');
 })->name('admin.keuangan');
 
+Route::get('/admin/manajemen-materi', function () {
+    return view('admin.manajemen-materi');
+})->name('admin.manajemenMateri');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');

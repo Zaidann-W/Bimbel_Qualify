@@ -35,7 +35,7 @@
                     ['Pendaftaran Siswa', 'user-plus', route('admin.pendaftaran'), 'admin.pendaftaran*', '12'],
                     ['Data Siswa & Kelas', 'users', route('admin.dataSiswa'), 'admin.dataSiswa', null],
                     ['Keuangan & Transaksi', 'wallet', route('admin.keuangan'), 'admin.keuangan', null],
-                    ['Manajemen Materi Ajar', 'book-open', '#', null, null],
+                    ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
                     ['Absensi & Jadwal', 'clipboard-check', '#', null, null],
                     ['Klinik PR', 'help-circle', '#', null, '5'],
                     ['Laporan & Pengaturan', 'sliders', '#', null, null],
