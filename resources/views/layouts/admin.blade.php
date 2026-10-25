@@ -39,7 +39,7 @@
                     ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
                     ['Absensi & Jadwal', 'clipboard-check', route('admin.absensiJadwal'), 'admin.absensiJadwal', null],
                     ['QualiFix', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
-                    ['Laporan & Pengaturan', 'sliders', '#', null, null],
+                    ['Laporan & Pengaturan', 'sliders', route('admin.laporanPengaturan'), 'admin.laporanPengaturan', null],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $routeName, $badge])
