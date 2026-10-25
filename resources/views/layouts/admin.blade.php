@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Portal Admin') — Qualify</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 <body class="min-h-screen bg-cream font-sans text-ink antialiased">
-<div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden">
+<div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden print:h-auto print:overflow-visible">
 
     {{-- Sidebar --}}
     <aside id="admin-sidebar"
-           class="hidden w-[240px] shrink-0 flex-col overflow-y-auto bg-espresso px-4 py-6 lg:sticky lg:top-0 lg:flex lg:h-screen">
+           class="hidden w-[240px] shrink-0 flex-col overflow-y-auto bg-espresso px-4 py-6 lg:sticky lg:top-0 lg:flex lg:h-screen print:hidden">
 
         {{-- Logo --}}
         <div class="flex items-center gap-2.5 px-1">
@@ -36,7 +37,7 @@
                     ['Data Siswa & Kelas', 'users', route('admin.dataSiswa'), 'admin.dataSiswa', null],
                     ['Keuangan & Transaksi', 'wallet', route('admin.keuangan'), 'admin.keuangan', null],
                     ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
-                    ['Absensi & Jadwal', 'clipboard-check', '#', null, null],
+                    ['Absensi & Jadwal', 'clipboard-check', route('admin.absensiJadwal'), 'admin.absensiJadwal', null],
                     ['Klinik PR', 'help-circle', '#', null, '5'],
                     ['Laporan & Pengaturan', 'sliders', '#', null, null],
                 ];
@@ -79,13 +80,13 @@
     </aside>
 
     {{-- Overlay mobile --}}
-    <div id="admin-backdrop" class="fixed inset-0 z-30 hidden bg-espresso/50 lg:hidden"></div>
+    <div id="admin-backdrop" class="fixed inset-0 z-30 hidden bg-espresso/50 lg:hidden print:hidden"></div>
 
     {{-- Main column --}}
-    <div class="flex min-w-0 flex-1 flex-col lg:overflow-y-auto">
+    <div id="admin-utama" class="flex min-w-0 flex-1 flex-col lg:overflow-y-auto print:overflow-visible">
 
         {{-- Topbar --}}
-        <header class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-white px-4 py-3 sm:px-6">
+        <header class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-white px-4 py-3 sm:px-6 print:hidden">
             <button type="button" data-sidebar-toggle aria-controls="admin-sidebar" aria-expanded="false" aria-label="Buka menu"
                     class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-white text-bark-500 lg:hidden">
                 @include('layouts.partials.icon', ['name' => 'menu', 'class' => 'h-5 w-5'])

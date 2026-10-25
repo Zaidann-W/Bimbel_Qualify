@@ -46,6 +46,10 @@ Route::get('/admin/manajemen-materi', function () {
     return view('admin.manajemen-materi');
 })->name('admin.manajemenMateri');
 
+Route::get('/admin/absensi-jadwal', function () {
+    return view('admin.absensi-jadwal');
+})->name('admin.absensiJadwal');
+
 Route::get('/tentor', function () {
     return view('tentor.dashboard');
 })->name('tentor.dashboard');
