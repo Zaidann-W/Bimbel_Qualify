@@ -88,6 +88,8 @@
                 novalidate
                 class="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:gap-8"
             >
+                {{-- Honeypot anti-spam: bot-isian akan mengisi field ini, manusia akan melewati --}}
+                <input type="text" name="anti_spam_honeypot" class="hidden" autocomplete="off">
                 <div class="space-y-6 min-w-0">
                     {{-- Bagian 1 — Data calon siswa --}}
                     <section class="bg-paper border border-line/60 rounded-[24px] p-6 sm:p-8 shadow-[0_10px_30px_-22px_rgba(42,26,14,0.35)]">
@@ -698,8 +700,6 @@
             });
 
             form.addEventListener('submit', function (event) {
-                event.preventDefault();
-
                 var pertamaInvalid = null;
 
                 wajib.forEach(function (kontrol) {
@@ -716,13 +716,16 @@
                     gulirKe(permukaan(pertamaInvalid) || pertamaInvalid);
                     pertamaInvalid.focus({ preventScroll: true });
 
+                    event.preventDefault();
+
                     return;
                 }
 
-                document.getElementById('sukses-nama').textContent = form.elements.nama_lengkap.value.trim();
-                form.classList.add('hidden');
-                panelSukses.classList.remove('hidden');
-                gulirKe(panelSukses);
+                // Let the form submit natively; the server-side Form Request
+                // will validate again and redirect to konfirmasi on success.
+                // No event.preventDefault() here — the browser will post
+                // the form to {{ route('registrasi') }} and the controller
+                // will redirect to /registrasi/konfirmasi with the registration number.
             });
 
             document.getElementById('ulangi-pendaftaran').addEventListener('click', function () {

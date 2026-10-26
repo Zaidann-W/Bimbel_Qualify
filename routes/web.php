@@ -16,13 +16,14 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/registrasi', function () {
-    return view('registrasi');
-})->name('registrasi');
+Route::get('/registrasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'create'])
+    ->name('registrasi');
 
-Route::post('/registrasi', function () {
-    return view('registrasi');
-})->name('registrasi.simpan');
+Route::post('/registrasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'store'])
+    ->name('registrasi.simpan');
+
+Route::get('/registrasi/konfirmasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'konfirmasi'])
+    ->name('registrasi.konfirmasi');
 
 // Login routes
 Route::middleware('guest')->group(function () {
