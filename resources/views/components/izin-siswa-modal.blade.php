@@ -1,4 +1,6 @@
-{{-- Formulir pengajuan izin siswa. Trigger: [data-izin-open]. Include: <x-izin-siswa-modal /> --}}
+{{-- Formulir pengajuan izin siswa. Trigger: [data-izin-open]. Include: <x-izin-siswa-modal :study-session="$studySession" /> --}}
+@props(['studySession' => null])
+
 {{-- shortcut: jenis izin, unggah berkas, dan kirim izin masih mock UI; sambungkan ke backend pengajuan izin --}}
 <div id="izin-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="izin-modal-title" tabindex="-1">
     <div class="fixed inset-0 bg-bark-900/50" data-izin-close></div>
@@ -17,7 +19,14 @@
                     </div>
                     <div class="pr-8">
                         <h3 id="izin-modal-title" class="text-[15.5px] font-bold text-bark-800">Pengajuan Izin / Berhalangan Hadir</h3>
-                        <p class="mt-0.5 text-[11.5px] text-bark-400">Sesi: Kelas 12 IPA - Super Intensif UTBK SNBT (Senin, 10 Maret 2025)</p>
+                        <p class="mt-0.5 text-[11.5px] text-bark-400">
+                            Sesi:
+                            @if ($studySession)
+                                {{ $studySession->category_badge }} ({{ $studySession->date_label }})
+                            @else
+                                Kelas 12 IPA - Super Intensif UTBK SNBT (Senin, 10 Maret 2025)
+                            @endif
+                        </p>
                     </div>
                 </div>
             </header>
@@ -44,7 +53,13 @@
                     <p class="text-[12.5px] font-bold text-bark-700">Tanggal &amp; Sesi Belajar</p>
                     <div class="mt-2 flex items-center gap-2.5 rounded-xl border border-bark-100 bg-bark-50 px-4 py-3">
                         @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 shrink-0 text-ember-500'])
-                        <p class="text-[12.5px] text-bark-600">Senin, 10 Maret 2025 • 15.30 – 17.00 WIB (Kalkulus &amp; Aplikasi Integral)</p>
+                        <p class="text-[12.5px] text-bark-600">
+                            @if ($studySession)
+                                {{ $studySession->date_label }} • {{ $studySession->time_range_label }} ({{ $studySession->title }})
+                            @else
+                                Senin, 10 Maret 2025 • 15.30 – 17.00 WIB (Kalkulus &amp; Aplikasi Integral)
+                            @endif
+                        </p>
                     </div>
                 </div>
 

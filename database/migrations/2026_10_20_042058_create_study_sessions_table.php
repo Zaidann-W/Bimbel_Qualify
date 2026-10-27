@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('category_badge')->nullable(); // Contoh: 12 Super Intensif UTBK SNBT
             $table->integer('session_number')->nullable(); // Contoh: Sesi ke-14
             $table->integer('total_sessions')->nullable(); // Contoh: dari 24 sesi
-            $table->date('date'); // Tanggal sesi
+            $table->date('date')->index(); // Tanggal sesi
             $table->time('start_time'); // 15:30
             $table->time('end_time'); // 17:00
             $table->integer('duration_minutes')->default(90); // Durasi dalam menit
