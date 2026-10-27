@@ -14,7 +14,21 @@
 
         {{-- Logo --}}
         <div class="flex items-center gap-2.5 px-1">
-            <div class="grid h-9 w-9 place-items-center rounded-full bg-white text-sm font-bold text-espresso">Q</div>
+            <svg width="30" height="30" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0" role="img" aria-label="Logo Bimbel QUALIFY">
+                <defs>
+                    <linearGradient id="qualify-gold-sidebar" x1="8%" y1="0%" x2="92%" y2="100%">
+                        <stop offset="0%" stop-color="#F9DE8C" />
+                        <stop offset="45%" stop-color="#E3AC3C" />
+                        <stop offset="100%" stop-color="#A9711A" />
+                    </linearGradient>
+                </defs>
+                <circle cx="13.5" cy="12.5" r="3" fill="url(#qualify-gold-sidebar)" />
+                <circle cx="33.8" cy="7.6" r="3.2" fill="url(#qualify-gold-sidebar)" />
+                <circle cx="54.1" cy="12.5" r="3" fill="url(#qualify-gold-sidebar)" />
+                <path d="M14.2 24.8 18.4 14.1c.4-1 1.8-1.1 2.3-.1l5.9 9.4 6-11.8c.5-1 1.9-.9 2.3.1l6 11.8 5.9-9.4c.5-1 1.9-.9 2.3.1l4.2 10.7c.4 1-.3 2.1-1.4 2.1H15.6c-1.1 0-1.8-1.1-1.4-2.1Z" fill="url(#qualify-gold-sidebar)" />
+                <circle cx="36" cy="47.5" r="13.6" stroke="url(#qualify-gold-sidebar)" stroke-width="7" />
+                <path d="M45.4 56.6 52.6 64" stroke="url(#qualify-gold-sidebar)" stroke-width="7" stroke-linecap="round" />
+            </svg>
             <div class="leading-tight">
                 <p class="text-[15px] font-bold tracking-wide text-white">QUALIFY</p>
                 <p class="text-[9px] font-medium uppercase tracking-[0.18em] text-bark-300">Bimbel Portal</p>
@@ -88,13 +102,11 @@
                     @include('layouts.partials.icon', ['name' => 'bell', 'class' => 'h-5 w-5'])
                     <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-400 ring-2 ring-bark-50"></span>
                 </button>
-                <div class="flex items-center gap-2">
-                    <div class="grid h-9 w-9 place-items-center rounded-full bg-ember-100 text-[12px] font-bold text-ember-700">AP</div>
-                    <div class="hidden leading-tight sm:block">
-                        <p class="text-[13px] font-semibold text-bark-800">Aisyah Putri Azzahra</p>
-                        <p class="text-[11px] text-bark-400">SMA Kelas 12 IPA</p>
-                    </div>
+                <div class="hidden leading-tight sm:block">
+                    <p class="text-right text-[13px] font-semibold text-bark-800">Aisyah Putri Azzahra</p>
+                    <p class="text-right text-[11px] text-bark-400">SMA Kelas 12 IPA</p>
                 </div>
+                <div class="grid h-9 w-9 place-items-center rounded-full bg-espresso text-[12px] font-bold text-gold">AP</div>
             </div>
         </header>
 
