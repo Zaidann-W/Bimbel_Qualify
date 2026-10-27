@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\AbsensiJadwalController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DataSiswaController;
+use App\Http\Controllers\Admin\KeuanganController;
+use App\Http\Controllers\Admin\LaporanPengaturanController;
+use App\Http\Controllers\Admin\ManajemenMateriController;
+use App\Http\Controllers\Admin\PendaftaranController;
+use App\Http\Controllers\Admin\QualifixController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,43 +25,38 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/admin', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard')->middleware('role:admin');
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/admin/pendaftaran', function () {
-    return '<h1>Pendaftaran Siswa</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.pendaftaran');
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/admin/data-siswa', function () {
-    return '<h1>Data Siswa & Kelas</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.dataSiswa');
+    Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran');
+    Route::get('/pendaftaran/{kode}', [PendaftaranController::class, 'show'])->name('pendaftaran.detail');
 
-Route::get('/admin/keuangan', function () {
-    return '<h1>Keuangan & Transaksi</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.keuangan');
+    Route::get('/data-siswa', [DataSiswaController::class, 'index'])->name('dataSiswa');
 
-Route::get('/admin/manajemen-materi', function () {
-    return '<h1>Manajemen Materi Ajar</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.manajemenMateri');
+    Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
 
-Route::get('/admin/absensi-jadwal', function () {
-    return '<h1>Absensi & Jadwal</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.absensiJadwal');
+    Route::get('/manajemen-materi', [ManajemenMateriController::class, 'index'])->name('manajemenMateri');
 
-Route::get('/admin/qualifix', function () {
-    return '<h1>QualiFix</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.qualifix');
+    Route::get('/absensi-jadwal', [AbsensiJadwalController::class, 'index'])->name('absensiJadwal');
 
-Route::get('/admin/laporan-pengaturan', function () {
-    return '<h1>Laporan & Pengaturan</h1><p>Fitur sedang dalam pengembangan.</p>';
-})->name('admin.laporanPengaturan');
+    Route::get('/qualifix', [QualifixController::class, 'index'])->name('qualifix');
 
-Route::get('/registrasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'create'])
+    Route::get('/laporan-pengaturan', [LaporanPengaturanController::class, 'index'])->name('laporanPengaturan');
+});
+
+Route::get('/registrasi', [RegistrasiController::class, 'create'])
     ->name('registrasi');
 
-Route::post('/registrasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'store'])
+Route::post('/registrasi', [RegistrasiController::class, 'store'])
     ->name('registrasi.simpan');
 
-Route::get('/registrasi/konfirmasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'konfirmasi'])
+Route::get('/registrasi/konfirmasi', [RegistrasiController::class, 'konfirmasi'])
     ->name('registrasi.konfirmasi');
 
 // Login routes

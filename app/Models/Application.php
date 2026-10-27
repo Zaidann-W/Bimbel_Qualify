@@ -51,4 +51,24 @@ class Application extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+
+    public function batch()
+    {
+        return $this->belongsTo(AdmissionBatch::class, 'batch_id');
+    }
+
+    public function studyShift()
+    {
+        return $this->belongsTo(StudyShift::class, 'study_shift_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(ApplicationDocument::class);
+    }
+
+    public function scopePendingReview($query)
+    {
+        return $query->whereIn('status', ['menunggu_review', 'perlu_perbaikan']);
+    }
 }

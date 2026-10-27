@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClassSession extends Model
 {
@@ -54,5 +53,15 @@ class ClassSession extends Model
     public function studyShift()
     {
         return $this->belongsTo(StudyShift::class, 'study_shift_id');
+    }
+
+    public function attendance()
+    {
+        return $this->hasMany(StudentAttendance::class);
+    }
+
+    public function scopeToday($query)
+    {
+        return $query->whereDate('session_date', today());
     }
 }
