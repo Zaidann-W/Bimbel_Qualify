@@ -1,5 +1,14 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->actingAs(User::factory()->create(['role' => 'siswa']));
+});
+
 test('detail pertemuan siswa page returns a successful response', function () {
     $response = $this->get('/siswa/jadwal/detail');
 

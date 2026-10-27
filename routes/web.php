@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Student\SessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -114,9 +115,11 @@ Route::middleware('auth')->group(function () {
             return view('siswa.detail-pertemuan');
         })->name('jadwal.detail');
 
-        Route::get('/jadwal', function () {
-            return view('siswa.detail-jadwal');
-        })->name('jadwal');
+        Route::get('/jadwal/{studySession}', [SessionController::class, 'show'])
+            ->whereNumber('studySession')
+            ->name('jadwal.show');
+
+        Route::get('/jadwal', [SessionController::class, 'current'])->name('jadwal');
 
         Route::get('/materi', function () {
             return view('siswa.materi');
