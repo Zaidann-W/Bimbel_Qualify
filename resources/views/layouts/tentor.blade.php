@@ -62,6 +62,14 @@
                 <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-bark-200">Tentor</p>
             </div>
             <p class="mt-0.5 text-[13px] font-semibold text-white">Farhan Kamil</p>
+
+            <form action="{{ route('logout') }}" method="POST" class="mt-2.5 border-t border-bark-600 pt-2">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-bark-200 transition hover:bg-bark-600 hover:text-white">
+                    @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
+                    Keluar
+                </button>
+            </form>
         </div>
     </aside>
 

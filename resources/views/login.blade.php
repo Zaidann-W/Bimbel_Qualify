@@ -42,6 +42,13 @@
                     </div>
                 @endif
 
+                {{-- Pesan status (logout manual / sesi berakhir karena idle) --}}
+                @if (session('status'))
+                    <div class="mt-4 p-4 rounded-xl bg-forest-50 border border-forest-200 text-forest-700 text-[14px] text-center" role="status">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
                 <form id="form-masuk" action="{{ route('login.simpan') }}" method="POST" novalidate class="mt-7">
                     @csrf
 

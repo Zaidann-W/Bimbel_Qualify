@@ -3,22 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\SessionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
     /**
-     * Logout user.
+     * Logout user: hapus seluruh session sehingga wajib login ulang.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, SessionService $sessions): RedirectResponse
     {
-        Auth::logout();
+        $sessions->terminate($request);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('login')->with('status', 'Anda telah keluar dari akun.');
+        return redirect()->route('login')->with('status', 'Anda telah keluar dari akun. Silakan masuk kembali untuk melanjutkan.');
     }
 }

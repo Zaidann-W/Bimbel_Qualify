@@ -29,12 +29,12 @@
             <p class="mb-2 px-2.5 text-[9px] font-bold uppercase tracking-[0.15em] text-bark-300">Menu Operasional</p>
             @php
                 $nav = [
-                    ['Dashboard', 'layout-grid', route('wali.dashboard'), request()->routeIs('wali.dashboard*')],
-                    ['Kehadiran Anak', 'clipboard-check', route('wali.kehadiran'), request()->routeIs('wali.kehadiran*')],
-                    ['Informasi Anak', 'book-open', route('wali.informasi'), request()->routeIs('wali.informasi*')],
-                    ['Pembayaran', 'credit-card', route('wali.pembayaran'), request()->routeIs('wali.pembayaran*')],
-                    ['Pendaftaran', 'clipboard-form', route('wali.pendaftaran'), request()->routeIs('wali.pendaftaran*')],
-                    ['Profil Saya', 'user', route('wali.profil'), request()->routeIs('wali.profil*')],
+                    ['Dashboard', 'layout-grid', route('ortu.dashboard'), request()->routeIs('ortu.dashboard*')],
+                    ['Kehadiran Anak', 'clipboard-check', route('ortu.kehadiran'), request()->routeIs('ortu.kehadiran*')],
+                    ['Informasi Anak', 'book-open', route('ortu.informasi'), request()->routeIs('ortu.informasi*')],
+                    ['Pembayaran', 'credit-card', route('ortu.pembayaran'), request()->routeIs('ortu.pembayaran*')],
+                    ['Pendaftaran', 'clipboard-form', route('ortu.pendaftaran'), request()->routeIs('ortu.pendaftaran*')],
+                    ['Profil Saya', 'user', route('ortu.profil'), request()->routeIs('ortu.profil*')],
                 ];
             @endphp
             @foreach ($nav as [$label, $icon, $href, $active])
@@ -58,6 +58,14 @@
             </div>
             <p class="mt-1 text-[11px] font-bold uppercase tracking-wide text-white">Ir. Hendra Gunawan</p>
             <p class="mt-0.5 text-[10px] leading-relaxed text-bark-300">Wali dari: Aisyah Putri Azzahra &amp; Anindya Putri Rahayu</p>
+
+            <form action="{{ route('logout') }}" method="POST" class="mt-3 border-t border-white/10 pt-2">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-bark-200 transition hover:bg-white/10 hover:text-white">
+                    @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
+                    Keluar
+                </button>
+            </form>
         </div>
     </aside>
 

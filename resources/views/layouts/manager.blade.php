@@ -62,6 +62,14 @@
             </p>
             <p class="mt-2 text-[12px] font-bold leading-snug text-white">Ir. Rahmat Hidayat, M.M.</p>
             <p class="mt-0.5 text-[10px] text-bark-300">NIP: 00124487</p>
+
+            <form action="{{ route('logout') }}" method="POST" class="mt-3 border-t border-white/10 pt-2">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-bark-200 transition hover:bg-white/10 hover:text-white">
+                    @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
+                    Keluar
+                </button>
+            </form>
         </div>
     </aside>
 

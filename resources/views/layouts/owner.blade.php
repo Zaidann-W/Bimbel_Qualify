@@ -63,9 +63,13 @@
                     <p class="text-[12px] font-bold leading-snug text-white">Ir. H. Hendra Gunawan</p>
                     <p class="mt-0.5 text-[10px] text-bark-300">Owner &amp; Founder</p>
                 </div>
-                <button type="button" aria-label="Keluar dari portal" class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-bark-300 transition hover:bg-white/10 hover:text-white">
-                    @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
-                </button>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" aria-label="Keluar dari portal" title="Keluar dari portal"
+                            class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-bark-300 transition hover:bg-white/10 hover:text-white">
+                        @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
+                    </button>
+                </form>
             </div>
         </div>
     </aside>

@@ -38,6 +38,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Idle Timeout (Minutes)
+    |
+    | Pengguna yang tidak aktif lebih lama dari durasi ini akan otomatis
+    | dikeluarkan dari akunnya (untuk seluruh role) dan diminta masuk
+    | ulang dengan kredensialnya. Nilai 0 menonaktifkan batas waktu ini.
+    |
+    */
+
+    'idle_timeout' => (int) env('SESSION_IDLE_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Cookie
+    |
+    | Cookie pendamping yang menyimpan waktu aktivitas terakhir pengguna.
+    | Cookie ini dibuat "forever" sehingga bertahan lebih lama daripada
+    | session, agar batas waktu diam tetap dapat diberlakukan meskipun
+    | session di perangkat sudah hilang.
+    |
+    */
+
+    'activity_cookie' => env(
+        'SESSION_ACTIVITY_COOKIE',
+        Str::slug((string) env('APP_NAME', 'laravel')).'-last-activity'
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Encryption
     |--------------------------------------------------------------------------
     |
