@@ -1,4 +1,4 @@
-@extends('layouts.{{ $role }}')
+@extends('layouts.' . $role)
 
 @section('title', ucfirst($role) . ' Dashboard — Bimbel QUALIFY')
 
