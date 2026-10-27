@@ -72,10 +72,13 @@
                     </span>
                     <span class="mt-1 block truncate text-[12.5px] font-semibold text-white">Farhan Kamil</span>
                 </span>
-                <a href="{{ route('login') }}" aria-label="Keluar dari portal"
-                   class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-bark-300 transition hover:bg-white/10 hover:text-white">
-                    @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
-                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" aria-label="Keluar dari portal" title="Keluar dari portal"
+                            class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-bark-300 transition hover:bg-white/10 hover:text-white">
+                        @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4'])
+                    </button>
+                </form>
             </div>
         </div>
     </aside>
