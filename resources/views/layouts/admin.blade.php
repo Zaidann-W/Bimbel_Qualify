@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Portal Admin') — Qualify</title>
+    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -38,7 +39,7 @@
                     ['Keuangan & Transaksi', 'wallet', route('admin.keuangan'), 'admin.keuangan', null],
                     ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
                     ['Absensi & Jadwal', 'clipboard-check', route('admin.absensiJadwal'), 'admin.absensiJadwal', null],
-                    ['QualiFix', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
+                    ['Klinik PR', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
                     ['Laporan & Pengaturan', 'sliders', route('admin.laporanPengaturan'), 'admin.laporanPengaturan', null],
                 ];
             @endphp
@@ -157,5 +158,6 @@
         window.addEventListener('resize', () => setMenuOpen(false));
     })();
 </script>
+@stack('scripts')
 </body>
 </html>

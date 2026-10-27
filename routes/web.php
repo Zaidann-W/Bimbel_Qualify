@@ -16,6 +16,36 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/admin', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard')->middleware('role:admin');
+
+Route::get('/admin/pendaftaran', function () {
+    return '<h1>Pendaftaran Siswa</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.pendaftaran');
+
+Route::get('/admin/data-siswa', function () {
+    return '<h1>Data Siswa & Kelas</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.dataSiswa');
+
+Route::get('/admin/keuangan', function () {
+    return '<h1>Keuangan & Transaksi</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.keuangan');
+
+Route::get('/admin/manajemen-materi', function () {
+    return '<h1>Manajemen Materi Ajar</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.manajemenMateri');
+
+Route::get('/admin/absensi-jadwal', function () {
+    return '<h1>Absensi & Jadwal</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.absensiJadwal');
+
+Route::get('/admin/qualifix', function () {
+    return '<h1>QualiFix</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.qualifix');
+
+Route::get('/admin/laporan-pengaturan', function () {
+    return '<h1>Laporan & Pengaturan</h1><p>Fitur sedang dalam pengembangan.</p>';
+})->name('admin.laporanPengaturan');
+
 Route::get('/registrasi', [\App\Http\Controllers\Auth\RegistrasiController::class, 'create'])
     ->name('registrasi');
 
@@ -46,45 +76,6 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
-
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
-
-        Route::get('/pendaftaran', function () {
-            return view('admin.pendaftaran');
-        })->name('pendaftaran');
-
-        Route::get('/pendaftaran/{kode}', function (string $kode) {
-            return view('admin.pendaftaran-detail', ['kode' => $kode]);
-        })->name('pendaftaran.detail');
-
-        Route::get('/data-siswa', function () {
-            return view('admin.datasiswa');
-        })->name('dataSiswa');
-
-        Route::get('/keuangan', function () {
-            return view('admin.keuangan');
-        })->name('keuangan');
-
-        Route::get('/manajemen-materi', function () {
-            return view('admin.manajemen-materi');
-        })->name('manajemenMateri');
-
-        Route::get('/absensi-jadwal', function () {
-            return view('admin.absensi-jadwal');
-        })->name('absensiJadwal');
-
-        Route::get('/qualifix', function () {
-            return view('admin.qualifix');
-        })->name('qualifix');
-
-        Route::get('/laporan-pengaturan', function () {
-            return view('admin.laporan-pengaturan');
-        })->name('laporanPengaturan');
-    });
 
     // Tentor routes
     Route::prefix('tentor')->name('tentor.')->middleware('role:tentor')->group(function () {
