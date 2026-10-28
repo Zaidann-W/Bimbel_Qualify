@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,9 +108,7 @@ Route::middleware('auth')->group(function () {
 
     // Siswa routes
     Route::prefix('siswa')->name('siswa.')->middleware('role:siswa')->group(function () {
-        Route::get('/', function () {
-            return view('siswa.dashboard');
-        })->name('dashboard');
+        Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/jadwal/detail', function () {
             return view('siswa.detail-pertemuan');

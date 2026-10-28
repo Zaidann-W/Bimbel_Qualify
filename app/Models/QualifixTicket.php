@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
 class QualifixTicket extends Model
@@ -13,6 +12,7 @@ class QualifixTicket extends Model
     protected $table = 'qualifix_tickets';
 
     protected $fillable = [
+        'ticket_number',
         'student_id',
         'subject_id',
         'class_group_id',
@@ -20,10 +20,12 @@ class QualifixTicket extends Model
         'question',
         'status',
         'submitted_at',
+        'resolved_at',
     ];
 
     protected $casts = [
         'submitted_at' => 'datetime',
+        'resolved_at' => 'datetime',
     ];
 
     public function student()
