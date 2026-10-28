@@ -2,40 +2,7 @@
 
 @section('title', 'Qualifix Siswa')
 
-{{-- shortcut: tab filter, search, dan tombol aksi kartu masih mock UI; sambungkan ke backend Q&A --}}
 @section('content')
-@php
-    $stats = [
-        ['Total Diajukan', '8', 'Soal', 'file', 'bg-bark-100 text-bark-600', false],
-        ['Menunggu Jawaban', '1', 'Pertanyaan', 'clock', 'bg-ember-100 text-ember-600', true],
-        ['Sudah Dijawab', '5', 'Tersedia', 'message-circle', 'bg-bark-100 text-bark-600', false],
-        ['Selesai / Dipahami', '2', 'Arsip', 'check-circle', 'bg-emerald-50 text-emerald-600', false],
-    ];
-
-    $tabs = [
-        ['Semua', 8, true],
-        ['Menunggu', 1, false],
-        ['Dijawab', 5, false],
-        ['Selesai', 2, false],
-    ];
-
-    // [ikonMapel, mapel, bab, status, judul, deskripsi, awalAvatar, nama, waktu, tombol]
-    $soal = [
-        ['sigma', 'Matematika Saintek', 'Bab Barisan & Deret', 'Sudah Dijawab',
-         'Soal No. 14 Try Out TPS Penalaran Kuantitatif – Barisan Geometri Bertingkat',
-         'Kak Hendra, untuk soal tipe nomor 14 mencari suku ke-10 dari deret bersusun ini, saya bingung menentukan beda rasio bertingkatnya apakah menggunakan eliminasi persamaan sekaligus atau rumus cepat deret aritmatika tingkat dua…',
-         'HW', 'Kak Hendra Wijaya, M. Sc', '2 jam lalu', 'Lihat Coretan Pembahasan'],
-        ['beaker', 'Kimia Saintek', 'Kesetimbangan & Garam', 'Menunggu Jawaban',
-         'Soal Stokiometri Laju Buffer Asam Basa pH Campuran',
-         'Dalam soal no. 5 percobaan titrasi asam lemah dengan basa kuat, saya bingung menentukan titik ekuivalen sebelum dan sesudah penambahan indikator…',
-         'NS', 'Nadia Syafitri', '3 menit lalu', 'Lihat Detail Soal'],
-        ['wind', 'Fisika Saintek', 'Bab Listrik Statis', 'Selesai / Dipahami',
-         'Analisis Gaya Gerak Listrik Induksi via Hukum Lenz',
-         'Kak, untuk rangkaian batang konduktor ini saya sudah paham arah arus induksinya, tapi waktu menghitung besar GFLnya masih bingung memakai kaidah kanan tangan yang mana…',
-         'SA', 'Kak Sarah Anastasia, S.Pd', '1 hari lalu', 'Lihat Coretan Pembahasan'],
-    ];
-@endphp
-
 <div class="space-y-5">
 
     {{-- Badge row --}}
@@ -66,26 +33,26 @@
 
     {{-- Stat cards --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach ($stats as [$label, $value, $unit, $icon, $tone, $active])
+        @foreach ($stats as $stat)
             <div @class([
                 'rounded-2xl border bg-white p-4',
-                'border-ember-300 ring-1 ring-ember-100' => $active,
-                'border-bark-100' => ! $active,
+                'border-ember-300 ring-1 ring-ember-100' => $stat['active'],
+                'border-bark-100' => ! $stat['active'],
             ])>
                 <div class="flex items-start justify-between">
                     <div>
                         <p @class([
                             'text-[11px] font-semibold uppercase tracking-wide',
-                            'text-ember-600' => $active,
-                            'text-bark-400' => ! $active,
-                        ])>{{ $label }}</p>
+                            'text-ember-600' => $stat['active'],
+                            'text-bark-400' => ! $stat['active'],
+                        ])>{{ $stat['label'] }}</p>
                         <div class="mt-1.5 flex items-baseline gap-1.5">
-                            <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $value }}</span>
-                            <span class="text-[11.5px] font-medium text-bark-400">{{ $unit }}</span>
+                            <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $stat['value'] }}</span>
+                            <span class="text-[11.5px] font-medium text-bark-400">{{ $stat['unit'] }}</span>
                         </div>
                     </div>
-                    <div @class(['grid h-9 w-9 place-items-center rounded-xl', $tone])>
-                        @include('layouts.partials.icon', ['name' => $icon, 'class' => 'h-[18px] w-[18px]'])
+                    <div @class(['grid h-9 w-9 place-items-center rounded-xl', $stat['tone']])>
+                        @include('layouts.partials.icon', ['name' => $stat['icon'], 'class' => 'h-[18px] w-[18px]'])
                     </div>
                 </div>
             </div>
@@ -98,14 +65,14 @@
         {{-- Tabs + search --}}
         <header class="flex flex-wrap items-center justify-between gap-3 border-b border-bark-100 px-5 py-4">
             <div class="flex flex-wrap gap-1.5">
-                @foreach ($tabs as [$label, $count, $active])
-                    <button type="button" aria-pressed="{{ $active ? 'true' : 'false' }}"
+                @foreach ($tabs as $tab)
+                    <button type="button" aria-pressed="{{ $tab['active'] ? 'true' : 'false' }}"
                             @class([
                                 'flex items-center gap-1 rounded-lg px-3.5 py-2 text-[12.5px] font-semibold transition',
-                                'bg-bark-800 text-white' => $active,
-                                'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => ! $active,
+                                'bg-bark-800 text-white' => $tab['active'],
+                                'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => ! $tab['active'],
                             ])>
-                        {{ $label }}({{ $count }})
+                        {{ $tab['label'] }}({{ $tab['count'] }})
                     </button>
                 @endforeach
             </div>
@@ -118,51 +85,65 @@
 
         {{-- Cards --}}
         <div class="divide-y divide-bark-100">
-            @foreach ($soal as [$ikon, $mapel, $bab, $status, $judul, $deskripsi, $awal, $nama, $waktu, $tombol])
+            @forelse ($soal as $ticket)
                 <article class="border-l-4 border-l-ember-400 px-5 py-4 transition hover:bg-bark-50/60">
 
                     {{-- Meta --}}
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex flex-wrap items-center gap-2 text-[11.5px]">
                             <span class="inline-flex items-center gap-1.5 rounded-md bg-ember-50 px-2 py-1 font-bold text-ember-700 ring-1 ring-ember-200">
-                                @include('layouts.partials.icon', ['name' => $ikon, 'class' => 'h-3.5 w-3.5'])
-                                {{ $mapel }}
+                                @include('layouts.partials.icon', ['name' => $ticket->subject?->code === 'MTK' ? 'sigma' : ($ticket->subject?->code === 'FIS' ? 'wind' : 'beaker'), 'class' => 'h-3.5 w-3.5'])
+                                {{ $ticket->subject?->name ?? 'Mata Pelajaran' }}
                             </span>
-                            <span class="text-bark-400">• {{ $bab }}</span>
+                            <span class="text-bark-400">• {{ $ticket->subject?->name ?? 'Bab' }}</span>
                         </div>
                         <span @class([
                             'shrink-0 rounded-full px-2.5 py-1 text-[10.5px] font-bold',
-                            'bg-ember-100 text-ember-700' => $status === 'Menunggu Jawaban',
-                            'bg-bark-100 text-bark-600' => $status === 'Sudah Dijawab',
-                            'bg-emerald-50 text-emerald-600' => $status === 'Selesai / Dipahami',
-                        ])>{{ $status }}</span>
+                            'bg-ember-100 text-ember-700' => in_array($ticket->status, ['menunggu_tentor', 'sedang_dibahas']),
+                            'bg-bark-100 text-bark-600' => $ticket->status === 'dijawab',
+                            'bg-emerald-50 text-emerald-600' => $ticket->status === 'selesai',
+                        ])>{{ $ticket->status === 'menunggu_tentor' ? 'Menunggu Jawaban' : ($ticket->status === 'sedang_dibahas' ? 'Sedang Dibahas' : ($ticket->status === 'dijawab' ? 'Sudah Dijawab' : 'Selesai / Dipahami')) }}</span>
                     </div>
 
                     {{-- Judul + deskripsi --}}
-                    <h3 class="mt-2.5 text-[15px] font-bold leading-snug text-bark-800">{{ $judul }}</h3>
-                    <p class="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-bark-500">{{ $deskripsi }}</p>
+                    <h3 class="mt-2.5 text-[15px] font-bold leading-snug text-bark-800">{{ $ticket->title }}</h3>
+                    <p class="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-bark-500">{{ Str::limit($ticket->question, 120) }}</p>
 
                     {{-- Footer --}}
                     <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
                             <div @class([
                                 'grid h-8 w-8 shrink-0 place-items-center rounded-full text-[11px] font-bold',
-                                'bg-ember-100 text-ember-700' => $status === 'Menunggu Jawaban',
-                                'bg-bark-800 text-white' => $status !== 'Menunggu Jawaban',
-                            ])>{{ $awal }}</div>
+                                'bg-ember-100 text-ember-700' => in_array($ticket->status, ['menunggu_tentor', 'sedang_dibahas']),
+                                'bg-bark-800 text-white' => ! in_array($ticket->status, ['menunggu_tentor', 'sedang_dibahas']),
+                            ])>{{ Str::upper(Str::substr($ticket->student?->nickname ?? $ticket->student?->full_name ?? 'S', 0, 1)) }}</div>
                             <div class="leading-tight">
-                                <p class="text-[12.5px] font-semibold text-bark-700">{{ $nama }}</p>
-                                <p class="text-[11px] text-bark-400">{{ $waktu }}</p>
+                                <p class="text-[12.5px] font-semibold text-bark-700">{{ $ticket->student?->full_name ?? 'Siswa' }}</p>
+                                <p class="text-[11px] text-bark-400">{{ $ticket->created_at?->diffForHumans() ?? '-' }}</p>
                             </div>
                         </div>
                         <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-bold text-bark-600 transition hover:bg-bark-50">
-                            {{ $tombol }}
+                            {{ in_array($ticket->status, ['menunggu_tentor', 'sedang_dibahas']) ? 'Lihat Detail Soal' : 'Lihat Coretan Pembahasan' }}
                             @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5'])
                         </button>
                     </div>
                 </article>
-            @endforeach
+            @empty
+                <div class="px-5 py-8 text-center text-[12px] text-bark-400">
+                    Belum ada pertanyaan yang diajukan.
+                </div>
+            @endforelse
         </div>
+
+        {{-- Pagination --}}
+        @if ($soal->hasPages())
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-bark-100 px-5 py-4">
+                <p class="text-[11.5px] text-bark-400">Menampilkan {{ $soal->firstItem() }} – {{ $soal->lastItem() }} dari {{ $soal->total() }} pertanyaan</p>
+                <div class="flex items-center gap-1.5">
+                    {{ $soal->links() }}
+                </div>
+            </div>
+        @endif
     </section>
 </div>
 

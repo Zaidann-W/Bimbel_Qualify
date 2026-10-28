@@ -41,6 +41,49 @@ class SessionController extends Controller
         return $this->renderDetail($studySession, $request);
     }
 
+    /**
+     * Tampilkan daftar jadwal belajar siswa beserta statistik pekan berjalan.
+     */
+    public function jadwal(Request $request): View
+    {
+        $sessions = StudySession::query()
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->get();
+
+        $weekStart = now()->startOfWeek();
+        $weekEnd = now()->endOfWeek();
+
+        $runningToday = $sessions->filter(fn (StudySession $session): bool => $session->date->isToday());
+        $thisWeek = $sessions->filter(fn (StudySession $session): bool => $session->date->between($weekStart, $weekEnd));
+
+        $filter = $sessions->pluck('category_badge')->filter()->unique()->prepend('Semua Matpel')->values();
+
+        $mainRoom = $sessions->first(fn (StudySession $session): bool => $session->room_name !== null);
+
+        $student = $request->user()->student;
+        $classGroup = $student?->enrollments()->where('status', 'aktif')->first()?->classGroup;
+        $periode = $classGroup?->academicPeriod;
+
+        $context = collect([$periode?->semester, $periode?->academic_year])
+            ->filter()
+            ->implode(' ')
+            ?: 'Semester Berjalan';
+
+        $context .= $classGroup !== null
+            ? ' • Kelas '.$classGroup->grade.' '.$classGroup->major
+            : '';
+
+        return view('siswa.detail-pertemuan', [
+            'sessions' => $sessions,
+            'runningToday' => $runningToday,
+            'thisWeek' => $thisWeek,
+            'filter' => $filter,
+            'mainRoom' => $mainRoom,
+            'context' => $context,
+        ]);
+    }
+
     private function renderDetail(StudySession $studySession, Request $request): View
     {
         $studySession->load([
