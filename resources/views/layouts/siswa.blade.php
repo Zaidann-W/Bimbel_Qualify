@@ -7,6 +7,21 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-bark-50 font-sans text-bark-800 antialiased">
+@php
+    $authUser = auth()->user();
+    $authStudent = $authUser?->student;
+    $authClassGroup = $authStudent?->enrollments()->where('status', 'aktif')->first()?->classGroup;
+    $displayName = $authStudent?->full_name ?? $authUser?->name ?? 'Siswa';
+    $displayNisn = $authStudent?->nisn;
+    $kelasLabel = $authClassGroup === null
+        ? 'Siswa'
+        : trim(sprintf('Siswa %s %s %s', $authClassGroup->education_level, $authClassGroup->grade, $authClassGroup->major));
+    $initials = collect(preg_split('/\s+/', trim($displayName)))
+        ->filter()
+        ->take(2)
+        ->map(fn (string $kata) => mb_strtoupper(mb_substr($kata, 0, 1)))
+        ->implode('');
+@endphp
 <div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden">
 
     {{-- Sidebar --}}
@@ -36,7 +51,7 @@
         </div>
 
         {{-- Role badge --}}
-        <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Siswa SMA 12 IPA</span>
+        <span class="mt-5 w-fit rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">{{ $kelasLabel }}</span>
 
         {{-- Nav --}}
         <nav class="mt-5 space-y-0.5 text-[13px]">
@@ -69,8 +84,8 @@
                 <span class="h-1.5 w-1.5 rounded-full bg-gold"></span>
                 <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-bark-200">Berlangganan</p>
             </div>
-            <p class="mt-1 text-[11px] font-bold uppercase tracking-wide text-white">Aisyah Putri Azzahra</p>
-            <p class="mt-0.5 text-[10px] text-bark-300">NISN 0098123471</p>
+            <p class="mt-1 text-[11px] font-bold uppercase tracking-wide text-white">{{ $displayName }}</p>
+            <p class="mt-0.5 text-[10px] text-bark-300">{{ $displayNisn === null ? 'NISN belum terdaftar' : 'NISN '.$displayNisn }}</p>
 
             <form action="{{ route('logout') }}" method="POST" class="mt-3 border-t border-white/10 pt-2">
                 @csrf
@@ -103,10 +118,10 @@
                     <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-400 ring-2 ring-bark-50"></span>
                 </button>
                 <div class="hidden leading-tight sm:block">
-                    <p class="text-right text-[13px] font-semibold text-bark-800">Aisyah Putri Azzahra</p>
-                    <p class="text-right text-[11px] text-bark-400">SMA Kelas 12 IPA</p>
+                    <p class="text-right text-[13px] font-semibold text-bark-800">{{ $displayName }}</p>
+                    <p class="text-right text-[11px] text-bark-400">{{ $kelasLabel }}</p>
                 </div>
-                <div class="grid h-9 w-9 place-items-center rounded-full bg-espresso text-[12px] font-bold text-gold">AP</div>
+                <div class="grid h-9 w-9 place-items-center rounded-full bg-espresso text-[12px] font-bold text-gold">{{ $initials }}</div>
             </div>
         </header>
 
