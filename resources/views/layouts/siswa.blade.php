@@ -59,7 +59,7 @@
             @php
                 $nav = [
                     ['Dashboard', 'layout-grid', route('siswa.dashboard'), request()->routeIs('siswa.dashboard')],
-                    ['Jadwal Belajar', 'calendar', route('siswa.jadwal'), request()->routeIs('siswa.jadwal*')],
+                    ['Jadwal Belajar', 'calendar', route('siswa.jadwal.detail'), request()->routeIs('siswa.jadwal*')],
                     ['Materi Pembelajaran', 'book-open', route('siswa.materi'), request()->routeIs('siswa.materi*')],
                     ['Qualifix', 'message-circle', route('siswa.qualifix'), request()->routeIs('siswa.qualifix*')],
                     ['Profil Saya', 'user', route('siswa.profil'), request()->routeIs('siswa.profil*')],

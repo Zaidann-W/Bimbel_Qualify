@@ -50,6 +50,65 @@ class StudySession extends Model
         ];
     }
 
+    /**
+     * Apakah sesi sedang berjalan pada waktu ini (berlangsung hari ini dan sudah melewati jam mulai).
+     */
+    public function isRunning(): bool
+    {
+        return $this->date->isToday() && now()->between($this->start_time, $this->end_time);
+    }
+
+    /**
+     * Apakah sesi telah selesai dilaksanakan.
+     */
+    public function isFinished(): bool
+    {
+        return $this->date->isPast() || ($this->date->isToday() && now()->greaterThan($this->end_time));
+    }
+
+    /**
+     * Kunci status sesi untuk pemilihan warna badge: "berjalan", "terjadwal", atau "selesai".
+     */
+    protected function statusKey(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if ($this->isRunning()) {
+                return 'berjalan';
+            }
+
+            return $this->isFinished() ? 'selesai' : 'terjadwal';
+        });
+    }
+
+    /**
+     * Label status sesi untuk badge, misalnya "Sesi Berjalan" atau "Terjadwal".
+     */
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::get(fn (): string => match ($this->status_key) {
+            'berjalan' => 'Sesi Berjalan',
+            'selesai' => 'Selesai',
+            default => 'Terjadwal',
+        });
+    }
+
+    /**
+     * Kelompok sesi berdasarkan jam mulai, misalnya "Sesi Sore" untuk sesi mulai 15.30.
+     */
+    protected function sessionSlotLabel(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $hour = (int) $this->start_time->format('H');
+
+            return match (true) {
+                $hour < 10 => 'Sesi Pagi',
+                $hour < 13 => 'Sesi Siang',
+                $hour < 16 => 'Sesi Sore',
+                default => 'Sesi Malam',
+            };
+        });
+    }
+
     public function materials(): HasMany
     {
         return $this->hasMany(SessionMaterial::class);

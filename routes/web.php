@@ -111,8 +111,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('siswa')->name('siswa.')->middleware('role:siswa')->group(function () {
         Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/jadwal/detail', [SessionController::class, 'jadwal'])
-            ->name('jadwal.detail');
+        Route::get('/jadwal/detail', [SessionController::class, 'schedule'])->name('jadwal.detail');
 
         Route::get('/jadwal/{studySession}', [SessionController::class, 'show'])
             ->whereNumber('studySession')
