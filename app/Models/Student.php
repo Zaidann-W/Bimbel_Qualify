@@ -42,9 +42,11 @@ class Student extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function guardian()
+    public function guardians()
     {
-        return $this->belongsTo(Guardian::class, 'user_id');
+        return $this->belongsToMany(Guardian::class, 'student_guardians', 'student_id', 'guardian_id')
+            ->withPivot('relationship', 'is_primary_contact', 'is_financial_responsible')
+            ->withTimestamps();
     }
 
     public function invoices()

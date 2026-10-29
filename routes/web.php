@@ -13,7 +13,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
+use App\Http\Controllers\Student\StudentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -107,9 +109,7 @@ Route::middleware('auth')->group(function () {
 
     // Siswa routes
     Route::prefix('siswa')->name('siswa.')->middleware('role:siswa')->group(function () {
-        Route::get('/', function () {
-            return view('siswa.dashboard');
-        })->name('dashboard');
+        Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/jadwal/detail', [SessionController::class, 'schedule'])->name('jadwal.detail');
 
@@ -119,17 +119,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/jadwal', [SessionController::class, 'current'])->name('jadwal');
 
-        Route::get('/materi', function () {
-            return view('siswa.materi');
-        })->name('materi');
+        Route::get('/materi', [StudentController::class, 'materi'])->name('materi');
 
-        Route::get('/qualifix', function () {
-            return view('siswa.qualifix');
-        })->name('qualifix');
+        Route::get('/qualifix', [StudentController::class, 'qualifix'])->name('qualifix');
 
-        Route::get('/profil', function () {
-            return view('siswa.profil');
-        })->name('profil');
+        Route::get('/profil', [StudentController::class, 'profil'])->name('profil');
     });
 
     // Owner routes

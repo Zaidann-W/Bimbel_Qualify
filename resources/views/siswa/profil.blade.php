@@ -2,19 +2,7 @@
 
 @section('title', 'Profil Siswa')
 
-{{-- shortcut: Simpan Perubahan dan Ubah Sandi masih mock UI; sambungkan ke backend profil siswa --}}
 @section('content')
-@php
-    $dataDiri = [
-        ['Nama Lengkap', 'Aisyah Putri Azzahra'],
-        ['Nama Panggilan', 'Aisyah'],
-        ['Asal Sekolah', 'SMAN 8 Jakarta'],
-        ['Tanggal Lahir', '14 Mei 2007'],
-        ['No. WhatsApp Siswa', '0812-9843-2210'],
-        ['Alamat Domisili', 'Jl. Tebet Barat Dalam No. 42, Tebet, Jakarta Selatan'],
-    ];
-@endphp
-
 <div class="space-y-5">
 
     {{-- Breadcrumb --}}
@@ -39,13 +27,15 @@
     {{-- Kartu profil --}}
     <section class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-bark-100 bg-white px-5 py-4">
         <div class="flex items-center gap-4">
-            <div class="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-ember-100 text-[18px] font-bold text-ember-700">AP</div>
+            <div class="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-ember-100 text-[18px] font-bold text-ember-700">
+                {{ Str::upper(Str::of($student->nickname ?? $student->full_name ?? 'S')->explode(' ')->take(2)->map(fn($w) => Str::substr($w, 0, 1))->implode('')) }}
+            </div>
             <div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <h2 class="text-[17px] font-bold text-bark-800">Aisyah Putri Azzahra</h2>
-                    <span class="rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">Aktif</span>
+                    <h2 class="text-[17px] font-bold text-bark-800">{{ $student->full_name }}</h2>
+                    <span class="rounded-md bg-gold px-2 py-[3px] text-[10px] font-bold text-espresso">{{ $student->status }}</span>
                 </div>
-                <p class="mt-1 text-[12px] text-bark-400">NISN: <span class="font-semibold text-bark-600">0098234121</span> • Kelas 12 SMA IPA</p>
+                <p class="mt-1 text-[12px] text-bark-400">NISN: <span class="font-semibold text-bark-600">{{ $student->nisn ?? '-' }}</span> • {{ $classGroup ? 'Kelas '.$classGroup->grade.' '.$classGroup->education_level.' '.$classGroup->major : 'Belum ada kelas aktif' }}</p>
             </div>
         </div>
         <span class="inline-flex items-center gap-1.5 rounded-full border border-bark-200 bg-white px-3 py-1.5 text-[11.5px] font-bold text-bark-500">
@@ -69,10 +59,10 @@
             </header>
 
             <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                @foreach ($dataDiri as [$label, $value])
-                    <div @class(['sm:col-span-2' => $label === 'Nama Lengkap' || $label === 'Alamat Domisili'])>
-                        <label class="text-[11.5px] font-semibold text-bark-500" for="profil-{{ Str::slug($label) }}">{{ $label }}</label>
-                        <input id="profil-{{ Str::slug($label) }}" type="text" value="{{ $value }}"
+                @foreach ($dataDiri as $item)
+                    <div @class(['sm:col-span-2' => in_array($item['label'], ['Nama Lengkap', 'Alamat Domisili'])] )>
+                        <label class="text-[11.5px] font-semibold text-bark-500" for="profil-{{ $item['slug'] }}">{{ $item['label'] }}</label>
+                        <input id="profil-{{ $item['slug'] }}" type="text" value="{{ $item['value'] }}"
                                class="mt-1.5 w-full rounded-lg border border-bark-100 bg-bark-50 px-3.5 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100">
                     </div>
                 @endforeach
@@ -96,18 +86,18 @@
                 <div class="mt-5 space-y-4">
                     <div>
                         <label for="profil-wali-nama" class="text-[11.5px] font-semibold text-bark-500">Nama Orang Tua / Wali</label>
-                        <input id="profil-wali-nama" type="text" value="Ir. Bambang Azzahra"
+                        <input id="profil-wali-nama" type="text" value="{{ $guardian->name ?? '-' }}"
                                class="mt-1.5 w-full rounded-lg border border-bark-100 bg-bark-50 px-3.5 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="profil-hubungan" class="text-[11.5px] font-semibold text-bark-500">Hubungan</label>
-                            <input id="profil-hubungan" type="text" value="Ayah Kandung"
+                            <input id="profil-hubungan" type="text" value="{{ $guardian->pivot->relationship ?? '-' }}"
                                    class="mt-1.5 w-full rounded-lg border border-bark-100 bg-bark-50 px-3.5 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100">
                         </div>
                         <div>
                             <label for="profil-wali-wa" class="text-[11.5px] font-semibold text-bark-500">No. WhatsApp Orang Tua</label>
-                            <input id="profil-wali-wa" type="text" value="0811-8820-4491"
+                            <input id="profil-wali-wa" type="text" value="{{ $guardian->phone_wa ?? '-' }}"
                                    class="mt-1.5 w-full rounded-lg border border-bark-100 bg-bark-50 px-3.5 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100">
                         </div>
                     </div>
@@ -121,7 +111,7 @@
                     </div>
                     <div>
                         <h2 class="text-[15px] font-bold text-bark-800">Akun Pembelajaran</h2>
-                        <p class="text-[11.5px] text-bark-400">Akses portal &amp; kata sandi</p>
+                        <p class="text-[11.5px] text-bark-400">Akses portal & kata sandi</p>
                     </div>
                 </header>
 
@@ -129,7 +119,7 @@
                     <div>
                         <label for="profil-email" class="text-[11.5px] font-semibold text-bark-500">Email Belajar</label>
                         <div class="relative mt-1.5">
-                            <input id="profil-email" type="email" value="aisyah.azzahra@student.qualify.id" readonly
+                            <input id="profil-email" type="email" value="{{ auth()->user()->email }}" readonly
                                    class="w-full rounded-lg border border-bark-100 bg-bark-50 px-3.5 py-2.5 pr-9 text-[13px] text-bark-700">
                             @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500'])
                         </div>

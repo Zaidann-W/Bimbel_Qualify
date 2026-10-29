@@ -204,7 +204,7 @@
             </li>
         @empty
             <li class="rounded-2xl border border-bark-100 bg-white px-4 py-10 text-center">
-                <p class="text-[13px] font-semibold text-bark-600">Belum ada sesi belajar</p>
+                <p class="text-[13px] font-semibold text-bark-600">Belum ada sesi belajar yang terjadwal.</p>
                 <p class="mt-1 text-[11.5px] text-bark-400">Tidak ada jadwal yang cocok dengan filter yang dipilih.</p>
             </li>
         @endforelse
