@@ -17,6 +17,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Tentor\TentorDashboardController;
+use App\Http\Controllers\Tentor\TentorQualifixController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -93,9 +94,7 @@ Route::middleware('auth')->group(function () {
             return view('tentor.absensi');
         })->name('absensi');
 
-        Route::get('/qualifix', function () {
-            return view('tentor.qualifix');
-        })->name('qualifix');
+        Route::get('/qualifix', [TentorQualifixController::class, 'index'])->name('qualifix');
 
         Route::get('/materi', function () {
             return view('tentor.materi');
