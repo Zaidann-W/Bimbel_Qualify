@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -127,9 +128,7 @@ Route::middleware('auth')->group(function () {
 
     // Owner routes
     Route::prefix('owner')->name('owner.')->middleware('role:owner')->group(function () {
-        Route::get('/', function () {
-            return view('owner.dashboard');
-        })->name('dashboard');
+        Route::get('/', [OwnerDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/laporan-keuangan', function () {
             return view('owner.laporan-keuangan');
