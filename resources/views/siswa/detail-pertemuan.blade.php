@@ -1,21 +1,9 @@
 @extends('layouts.siswa')
 
-@section('title', 'Detail Pertemuan Siswa')
+@section('title', 'Jadwal Belajar Siswa')
 
-{{-- shortcut: filter matpel, dropdown rentang minggu, dan tombol Masuk ke Kelas masih mock UI; sambungkan ke backend jadwal siswa --}}
 @section('content')
-@php
-    $filter = ['Semua Matpel', 'Matematika', 'Fisika', 'Kimia', 'Biologi', 'TPS Penalaran'];
-
-    // [hari, tanggal, matpel, status, topik, sesi, guru, ruang, berjalan]
-    $sesi = [
-        ['SEN', '10', 'Matematika Saintek', 'Sesi Berjalan', 'Kalkulus & Integral Lanjutan', 'Sesi Sore (15.30 – 17.00 WIB)', 'Kak Hendra Wijaya, M.Sc', 'Ruang Eureka Lt. 2', true],
-        ['JUM', '12', 'Fisika Saintek', 'Terjadwal', 'Dinamika Gerak & Listrik Magnet', 'Sesi Sore (15.30 – 17.00 WIB)', 'Kak Sarah Anastasia, S.Pd', 'Ruang Newton Lt. 1', false],
-        ['SAB', '12', 'Fisika Saintek', 'Terjadwal', 'Dinamika Gerak & Listrik Magnet', 'Sesi Sore (15.30 – 17.00 WIB)', 'Kak Sarah Anastasia, S.Pd', 'Ruang Newton Lt. 1', false],
-        ['KAM', '13', 'Kimia Saintek', 'Terjadwal', 'Termokimia & Kesetimbangan Kimia', 'Sesi Sore (15.30 – 17.00 WIB)', 'Dr Hartanto, M.Pd', 'Ruang Volta Lt. 2', false],
-    ];
-@endphp
-
+{{-- Seluruh kartu sesi, filter, dan statistik kini dinamis dari tabel study_sessions (dikelola admin) --}}
 <div class="space-y-5">
 
     {{-- Header --}}
@@ -25,7 +13,7 @@
             Semester Genap 2024/2025 • Kelas 12 IPA
         </span>
         <h1 class="mt-3 text-[22px] font-bold tracking-tight text-bark-800">Jadwal Belajar Siswa</h1>
-        <p class="mt-1 text-[13px] text-bark-400">Jadwal kelas terdaftar otomatis sesuai sem belajar semester berjalan.</p>
+        <p class="mt-1 text-[13px] text-bark-400">Jadwal kelas terdaftar otomatis sesuai semester belajar yang berjalan.</p>
     </div>
 
     {{-- Stat cards --}}
@@ -35,7 +23,7 @@
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">Sesi Berjalan Hari Ini</p>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">1</span>
+                        <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $runningCount }}</span>
                         <span class="text-[11.5px] font-medium text-bark-400">Sesi</span>
                     </div>
                 </div>
@@ -43,7 +31,13 @@
                     @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-[18px] w-[18px]'])
                 </div>
             </div>
-            <span class="mt-3 inline-block rounded-md bg-ember-100 px-2 py-0.5 text-[10px] font-bold text-ember-700">Senin 16.30 – 17.00</span>
+            <span class="mt-3 inline-block rounded-md bg-ember-100 px-2 py-0.5 text-[10px] font-bold text-ember-700">
+                @if ($runningSession)
+                    {{ $runningSession->timeRangeLabel }}
+                @else
+                    Belum ada sesi berjalan
+                @endif
+            </span>
         </div>
 
         <div class="rounded-2xl border border-bark-100 bg-white p-4">
@@ -51,7 +45,7 @@
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">Total Sesi Pekan Ini</p>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">4</span>
+                        <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $weekTotal }}</span>
                         <span class="text-[11.5px] font-medium text-bark-400">Sesi</span>
                     </div>
                 </div>
@@ -66,41 +60,85 @@
             <div class="flex items-start justify-between">
                 <div class="min-w-0">
                     <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">Ruangan Belajar Utama</p>
-                    <p class="mt-1.5 text-[17px] font-bold leading-tight text-bark-800">Eureka (Lantai 2)</p>
+                    <p class="mt-1.5 text-[17px] font-bold leading-tight text-bark-800">
+                        @if ($mainRoom)
+                            {{ $mainRoom['name'] }} {{ $mainRoom['floor'] }}
+                        @else
+                            Belum ada ruangan terjadwal
+                        @endif
+                    </p>
                 </div>
                 <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-600">
                     @include('layouts.partials.icon', ['name' => 'building', 'class' => 'h-[18px] w-[18px]'])
                 </div>
             </div>
-            <span class="mt-3 inline-block rounded-md bg-bark-50 px-2 py-0.5 text-[10px] font-bold text-bark-500">Ruang / 15 Siswa</span>
+            <span class="mt-3 inline-block rounded-md bg-bark-50 px-2 py-0.5 text-[10px] font-bold text-bark-500">
+                @if ($mainRoom)
+                    Ruang / {{ $mainRoom['capacity'] ?? 15 }} Siswa
+                @else
+                    -
+                @endif
+            </span>
         </div>
     </div>
 
     {{-- Filter --}}
     <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bark-100 bg-white px-4 py-3">
         <div class="flex flex-wrap items-center gap-1">
-            @foreach ($filter as $i => $f)
-                @php $active = $i === 0; @endphp
-                <button type="button"
-                        @class([
-                            'rounded-lg px-3 py-1.5 text-[12px] font-semibold transition',
-                            'bg-bark-800 text-white' => $active,
-                            'text-bark-500 hover:bg-bark-50' => ! $active,
-                        ])>{{ $f }}</button>
+            @foreach ($categoryTabs as $tab)
+                @php
+                    $active = $tab['key'] === $categoryKey;
+                    $tabUrl = route('siswa.jadwal.detail', array_filter([
+                        'category' => $tab['key'],
+                        'week' => $weekFilter,
+                    ]));
+                @endphp
+                <a href="{{ $tabUrl }}"
+                   @class([
+                       'rounded-lg px-3 py-1.5 text-[12px] font-semibold transition',
+                       'bg-bark-800 text-white' => $active,
+                       'text-bark-500 hover:bg-bark-50' => ! $active,
+                   ])>{{ $tab['label'] }}</a>
             @endforeach
         </div>
         <div class="flex items-center gap-3">
-            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-bark-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
-                Minggu Ini
-                @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5'])
-            </button>
-            <span class="text-[11.5px] text-bark-400">10 – 16 Maret 2025</span>
+            <details class="relative">
+                <summary class="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-bark-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50 [&::-webkit-details-marker]:hidden">
+                    {{ $weekFilter === 'semua' ? 'Semua Minggu' : 'Minggu Ini' }}
+                    @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5'])
+                </summary>
+                <div class="absolute right-0 z-10 mt-1.5 w-44 rounded-xl border border-bark-100 bg-white p-1.5 shadow-lg">
+                    @foreach (['minggu-ini' => 'Minggu Ini', 'semua' => 'Semua Minggu'] as $weekOption => $weekOptionLabel)
+                        <a href="{{ route('siswa.jadwal.detail', array_filter([
+                            'category' => $categoryKey,
+                            'week' => $weekOption,
+                        ])) }}"
+                           @class([
+                               'flex items-center justify-between rounded-lg px-3 py-2 text-[12px] font-semibold transition',
+                               'bg-bark-50 text-bark-800' => $weekFilter === $weekOption,
+                               'text-bark-500 hover:bg-bark-50' => $weekFilter !== $weekOption,
+                           ])>
+                            {{ $weekOptionLabel }}
+                            @if ($weekFilter === $weekOption)
+                                @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5'])
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
+            </details>
+            <span class="text-[11.5px] text-bark-400">
+                {{ $weekFilter === 'semua' ? 'Tanpa batasan minggu' : $weekLabel }}
+            </span>
         </div>
     </div>
 
     {{-- Daftar sesi --}}
     <ul class="space-y-3">
-        @foreach ($sesi as [$hari, $tanggal, $matpel, $status, $topik, $waktu, $guru, $ruang, $berjalan])
+        @forelse ($sessions as $session)
+            @php
+                $berjalan = $session->status_key === 'berjalan';
+                $selesai = $session->status_key === 'selesai';
+            @endphp
             <li @class([
                 'flex flex-wrap items-center gap-4 rounded-2xl border px-4 py-4',
                 'border-ember-300 bg-ember-50/50' => $berjalan,
@@ -112,8 +150,8 @@
                     'bg-bark-50 text-bark-600' => ! $berjalan,
                 ])>
                     <div>
-                        <p class="text-[9px] font-bold uppercase leading-none tracking-wide">{{ $hari }}</p>
-                        <p class="mt-1 text-[18px] font-bold leading-none">{{ $tanggal }}</p>
+                        <p class="text-[9px] font-bold uppercase leading-none tracking-wide">{{ mb_strtoupper($session->date->locale('id')->translatedFormat('D')) }}</p>
+                        <p class="mt-1 text-[18px] font-bold leading-none">{{ $session->date->translatedFormat('j') }}</p>
                     </div>
                 </div>
 
@@ -123,45 +161,53 @@
                             'rounded-md px-2 py-[3px] text-[10px] font-bold',
                             'bg-ember-100 text-ember-700' => $berjalan,
                             'bg-bark-100 text-bark-500' => ! $berjalan,
-                        ])>{{ $matpel }}</span>
+                        ])>{{ $session->category_badge ?? 'Umum' }}</span>
                         <span @class([
                             'rounded-full px-2 py-[3px] text-[10px] font-bold',
                             'bg-ember-500 text-white' => $berjalan,
-                            'bg-bark-50 text-bark-400' => ! $berjalan,
-                        ])>{{ $status }}</span>
+                            'bg-bark-100 text-bark-300' => $selesai,
+                            'bg-bark-50 text-bark-400' => ! $berjalan && ! $selesai,
+                        ])>{{ $session->status_label }}</span>
                     </div>
 
-                    <p class="mt-2 text-[15px] font-bold text-bark-800">{{ $topik }}</p>
+                    <p class="mt-2 text-[15px] font-bold text-bark-800">{{ $session->title }}</p>
 
                     <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-bark-400">
                         <span class="inline-flex items-center gap-1.5">
                             @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-3.5 w-3.5'])
-                            {{ $waktu }}
+                            {{ $session->session_slot_label }} ({{ $session->timeRangeLabel }})
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             @include('layouts.partials.icon', ['name' => 'user', 'class' => 'h-3.5 w-3.5'])
-                            {{ $guru }}
+                            {{ $session->tutor_name }}
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             @include('layouts.partials.icon', ['name' => 'map-pin', 'class' => 'h-3.5 w-3.5'])
-                            {{ $ruang }}
+                            {{ $session->room_name }}
                         </span>
                     </div>
                 </div>
 
                 @if ($berjalan)
-                    <button type="button" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-bark-800 px-4 py-2.5 text-[12.5px] font-bold text-white transition hover:bg-bark-900">
+                    <a href="{{ route('siswa.jadwal.show', $session) }}"
+                       class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-bark-800 px-4 py-2.5 text-[12.5px] font-bold text-white transition hover:bg-bark-900">
                         @include('layouts.partials.icon', ['name' => 'log-in', 'class' => 'h-3.5 w-3.5'])
                         Masuk ke Kelas
-                    </button>
+                    </a>
                 @else
-                    <a href="{{ route('siswa.jadwal') }}" class="inline-flex shrink-0 items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
+                    <a href="{{ route('siswa.jadwal.show', $session) }}"
+                       class="inline-flex shrink-0 items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
                         Detail Pertemuan
                         @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5'])
                     </a>
                 @endif
             </li>
-        @endforeach
+        @empty
+            <li class="rounded-2xl border border-bark-100 bg-white px-4 py-10 text-center">
+                <p class="text-[13px] font-semibold text-bark-600">Belum ada sesi belajar</p>
+                <p class="mt-1 text-[11.5px] text-bark-400">Tidak ada jadwal yang cocok dengan filter yang dipilih.</p>
+            </li>
+        @endforelse
     </ul>
 </div>
 @endsection

@@ -111,9 +111,7 @@ Route::middleware('auth')->group(function () {
             return view('siswa.dashboard');
         })->name('dashboard');
 
-        Route::get('/jadwal/detail', function () {
-            return view('siswa.detail-pertemuan');
-        })->name('jadwal.detail');
+        Route::get('/jadwal/detail', [SessionController::class, 'schedule'])->name('jadwal.detail');
 
         Route::get('/jadwal/{studySession}', [SessionController::class, 'show'])
             ->whereNumber('studySession')
