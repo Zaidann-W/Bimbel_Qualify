@@ -151,6 +151,29 @@
                     </div>
                 @endforeach
             @endif
+
+            {{-- Akses Cepat Pengajar --}}
+            <div class="rounded-2xl border border-bark-100 bg-white p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wide text-bark-400 mb-3">Akses Cepat Pengajar</p>
+                <ul class="space-y-0">
+                    @php
+                        $quickLinks = [
+                            ['Lihat Kalender Jadwal Pekanan', 'calendar', '#'],
+                            ['Katalog Bank Soal & Modul', 'folder-open', '#'],
+                            ['Kontak Admin Akademik', 'headset', '#'],
+                        ];
+                    @endphp
+                    @foreach ($quickLinks as [$label, $icon, $href])
+                        <li>
+                            <a href="{{ $href }}" class="flex items-center gap-3 px-1 py-3 text-[13px] font-medium text-bark-700 hover:text-ember-600 transition @if (!$loop->last) border-b border-bark-100 @endif">
+                                @include('layouts.partials.icon', ['name' => $icon, 'class' => 'h-4 w-4 text-bark-400'])
+                                <span class="flex-1">{{ $label }}</span>
+                                @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4 text-bark-300'])
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     </div>
 

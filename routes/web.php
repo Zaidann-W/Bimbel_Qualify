@@ -16,6 +16,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
+use App\Http\Controllers\Tentor\AbsensiController;
+use App\Http\Controllers\Tentor\ProfilController;
 use App\Http\Controllers\Tentor\TentorDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -89,9 +91,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('tentor')->name('tentor.')->middleware('role:tentor')->group(function () {
         Route::get('/', [TentorDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/absensi', function () {
-            return view('tentor.absensi');
-        })->name('absensi');
+        Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi');
+        Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
 
         Route::get('/qualifix', function () {
             return view('tentor.qualifix');
@@ -101,9 +102,9 @@ Route::middleware('auth')->group(function () {
             return view('tentor.materi');
         })->name('materi');
 
-        Route::get('/profil', function () {
-            return view('tentor.profil');
-        })->name('profil');
+        Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+        Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
+        Route::put('/profil/password', [ProfilController::class, 'updatePassword'])->name('profil.password');
     });
 
     // Siswa routes
