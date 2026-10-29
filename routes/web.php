@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
+use App\Http\Controllers\Tentor\TentorDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,9 +87,7 @@ Route::middleware('auth')->group(function () {
 
     // Tentor routes
     Route::prefix('tentor')->name('tentor.')->middleware('role:tentor')->group(function () {
-        Route::get('/', function () {
-            return view('tentor.dashboard');
-        })->name('dashboard');
+        Route::get('/', [TentorDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/absensi', function () {
             return view('tentor.absensi');
