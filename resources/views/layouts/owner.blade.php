@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Portal Pemilik') — Qualify</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="min-h-screen bg-cream font-sans text-ink antialiased">
 <div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden">
