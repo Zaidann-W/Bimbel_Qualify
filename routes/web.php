@@ -14,12 +14,9 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
-
 use App\Http\Controllers\Owner\LaporanAbsensiController;
-
 use App\Http\Controllers\Owner\PemantauanMateriController;
 use App\Http\Controllers\Owner\PengaturanWebsiteController;
-
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -56,6 +53,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
 
     Route::get('/manajemen-materi', [ManajemenMateriController::class, 'index'])->name('manajemenMateri');
+    Route::post('/manajemen-materi', [ManajemenMateriController::class, 'store'])->name('manajemenMateri.store');
+    Route::put('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'update'])->name('manajemenMateri.update');
+    Route::delete('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'destroy'])->name('manajemenMateri.destroy');
 
     Route::get('/absensi-jadwal', [AbsensiJadwalController::class, 'index'])->name('absensiJadwal');
 
