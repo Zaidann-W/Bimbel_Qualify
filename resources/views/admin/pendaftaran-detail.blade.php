@@ -2,64 +2,79 @@
 
 @section('title', 'Detail Calon Siswa')
 
-{{-- Halaman masih memakai data mock UI sesuai rancangan docs/pendaftaran(detail)-admin.png --}}
 @section('content')
 @php
-    $kode = request()->route('kode');
+    $pendaftar = $pendaftar ?? null;
 
-    $berkas = [
-        [
-            'label' => 'Pas Foto 3x4 Siswa',
-            'pratinjau' => 'photo',
-            'file' => 'pas_photo_anindya_formal.jpg • 1.4 MB • Diunggah 28 Okt 2024',
-            'lencana' => ['Valid', 'bg-sandgold text-bronze'],
-        ],
-        [
-            'label' => 'Scan Rapor Terakhir (Sem 1–4)',
-            'pratinjau' => 'pdf',
-            'file' => 'rapor_smt14_anindya_jegalis.pdf • 8.2 MB',
-            'lencana' => ['Lengkap', 'bg-sandgold text-bronze'],
-        ],
-        [
-            'label' => 'Scan Kartu Keluarga & KTP Wali',
-            'pratinjau' => 'ktp',
-            'file' => 'kk_dan_ktp_hendra_gunawan.pdf • 2.7 MB • NIK terverifikasi',
-            'lencana' => ['Valid', 'bg-sandgold text-bronze'],
-        ],
-        [
-            'label' => 'Surat Komitmen Belajar & Tata Tertib',
-            'pratinjau' => 'surat',
-            'file' => 'pakta_integritas_bimbel_qualify.pdf • 1.1 MB',
-            'lencana' => ['Bermaterai', 'bg-sand text-muted'],
-        ],
+    if (! $pendaftar) {
+        abort(404, 'Calon siswa tidak ditemukan.');
+    }
+
+    $kode = $pendaftar->registration_number;
+    $batch = $pendaftar->batch;
+    $createdAt = $pendaftar->created_at;
+
+    $bulanId = [
+        'Jan' => 'Jan', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Apr',
+        'Mei' => 'Mei', 'Jun' => 'Jun', 'Jul' => 'Jul', 'Agu' => 'Agu',
+        'Sep' => 'Sep', 'Okt' => 'Okt', 'Nov' => 'Nov', 'Des' => 'Des',
     ];
 
-    $aksi_status = [
+    $tglDaftar = $createdAt
+        ? $createdAt->format('d') . ' ' . ($bulanId[$createdAt->format('M')] ?? $createdAt->format('M')) . ' ' . $createdAt->format('Y')
+        : '-';
+
+    $statusLabel = match ($pendaftar->status) {
+        'menunggu_review' => 'Menunggu Review',
+        'perlu_perbaikan' => 'Perlu Perbaikan Berkas',
+        'diterima' => 'Diterima Menjadi Siswa',
+        'ditolak' => 'Tolak Pendaftaran',
+        'batal' => 'Tolak Pendaftaran',
+        default => 'Menunggu Review',
+    };
+
+    $statusKelas = match ($pendaftar->status) {
+        'menunggu_review' => 'bg-sandgold text-bronze',
+        'perlu_perbaikan' => 'bg-ember-100 text-ember-700',
+        'diterima' => 'bg-sand text-muted',
+        'ditolak', 'batal' => 'bg-white text-ember-700 ring-1 ring-ember-200',
+        default => 'bg-sandgold text-bronze',
+    };
+
+    $statusAksi = [
         [
             'key' => 'review',
             'label' => 'Menunggu Review',
             'ket' => 'Pemeriksaan kelengkapan dokumen masih berlangsung.',
-            'aktif' => true,
+            'aktif' => $pendaftar->status === 'menunggu_review',
         ],
         [
             'key' => 'perbaikan',
             'label' => 'Perlu Perbaikan Berkas',
             'ket' => 'Kirim notifikasi untuk upload ulang scan KK / Rapor.',
-            'aktif' => false,
+            'aktif' => $pendaftar->status === 'perlu_perbaikan',
         ],
         [
             'key' => 'diterima',
             'label' => 'Diterima Menjadi Siswa',
-            'ket' => 'Generate ID QLF-241907 & kirim akun via WhatsApp.',
-            'aktif' => false,
+            'ket' => 'Generate ID QLF & kirim akun via WhatsApp.',
+            'aktif' => $pendaftar->status === 'diterima',
         ],
         [
             'key' => 'ditolak',
             'label' => 'Tolak Pendaftaran',
             'ket' => 'Kuota cabang penuh / nilai kualifikasi tidak mencukupi.',
-            'aktif' => false,
+            'aktif' => in_array($pendaftar->status, ['ditolak', 'batal']),
         ],
     ];
+
+    $jenjangKurikulum = $pendaftar->education_level
+        ? ($pendaftar->education_level . ' - ' . ($pendaftar->curriculum ?: '-'))
+        : '-';
+
+    $tglLahir = $pendaftar->birth_date
+        ? $pendaftar->birth_date->format('d M Y') . ', ' . $pendaftar->birth_place
+        : '-';
 @endphp
 
 <section class="bg-white px-4 pb-5 pt-5 sm:px-6">
@@ -79,7 +94,7 @@
         </p>
     </div>
 
-    {{-- Remah roti & aksi atas --}}
+    <?php /*  Remah roti & aksi atas */ ?>
     <div class="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-line pt-4">
         <p class="flex flex-wrap items-center gap-2 text-[12.5px] leading-snug">
             <a href="{{ route('admin.pendaftaran') }}" class="font-medium text-muted transition hover:text-espresso hover:underline">Pendaftaran Siswa</a>
@@ -90,7 +105,7 @@
         <div class="flex flex-wrap items-center gap-2.5">
             <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-[11.5px] font-semibold leading-none text-muted ring-1 ring-line">
                 <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-gold"></span>
-                Batch 2025/2026 Gelombang I
+                {{ $batch ? $batch->name : '-' }} {{ $batch ? 'Gelombang ' . $batch->wave_number : '' }}
             </span>
             <button type="button"
                     class="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
@@ -100,7 +115,7 @@
         </div>
     </div>
 
-    {{-- Kartu identitas calon siswa --}}
+    <?php /*  Kartu identitas calon siswa */ ?>
     <section class="mt-4 rounded-2xl border border-line border-t-[3px] border-t-gold bg-white p-5">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex min-w-0 items-start gap-4">
@@ -113,10 +128,10 @@
 
                 <div class="min-w-0">
                     <p class="flex flex-wrap items-center gap-2.5">
-                        <span class="text-[21px] font-extrabold leading-tight tracking-tight text-ink">Anindya Putri Rahayu</span>
-                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-sandgold px-2.5 py-1.5 text-[10.5px] font-bold leading-none text-bronze">
+                        <span class="text-[21px] font-extrabold leading-tight tracking-tight text-ink">{{ $pendaftar->full_name }}</span>
+                        <span class="inline-flex items-center gap-1.5 rounded-lg {{ $statusKelas }} text-[10.5px] font-bold leading-none">
                             <span class="h-1.5 w-1.5 rounded-full bg-bronze"></span>
-                            Menunggu Review
+                            {{ $statusLabel }}
                         </span>
                     </p>
                     <p class="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11.5px] leading-snug text-muted">
@@ -126,11 +141,11 @@
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5 text-bark-300'])
-                            Tgl Daftar: 28 Oktober 2024
+                            Tgl Daftar: {{ $tglDaftar }}
                         </span>
                         <span class="inline-flex items-center gap-1.5">
                             @include('layouts.partials.icon', ['name' => 'map-pin', 'class' => 'h-3.5 w-3.5 text-bark-300'])
-                            Cabang Kebayoran Baru
+                            {{ $batch ? $batch->name : 'Cabang' }}
                         </span>
                     </p>
                 </div>
@@ -160,10 +175,10 @@
 <div class="px-4 py-5 sm:px-6">
     <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
 
-        {{-- Kolom utama --}}
+        <?php /*  Kolom utama */ ?>
         <div class="space-y-5 xl:col-span-2">
 
-            {{-- Info calon siswa --}}
+            <?php /*  Info calon siswa */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
                     <div class="flex min-w-0 items-start gap-3">
@@ -175,47 +190,52 @@
                             <p class="mt-0.5 text-[11.5px] leading-snug text-muted">Data demografis tervalidasi dari rapor &amp; dokumen asli</p>
                         </div>
                     </div>
-                    <span class="shrink-0 rounded-md bg-sand px-2.5 py-1.5 text-[10.5px] font-bold leading-none text-muted">SMA Kelas 12 IPA</span>
+                    <span class="shrink-0 rounded-md bg-sand px-2.5 py-1.5 text-[10.5px] font-bold leading-none text-muted">
+                        {{ $pendaftar->education_level }} {{ $pendaftar->school_grade }}
+                    </span>
                 </header>
 
                 <dl class="mt-5 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ([
-                        ['NISN', '0067823910', false],
-                        ['Asal Sekolah', 'SMA N 8 Jakarta', false],
-                        ['Jenjang & Kurikulum', 'SMA - Kurikulum Merdeka', false],
-                        ['No. WhatsApp Siswa', '+62 812-8934-1120', true],
-                        ['Alamat Email', 'anindya.putri@gmail.com', false],
-                        ['Tempat, Tanggal Lahir', 'Jakarta, 14 Mei 2007', false],
-                    ] as [$label, $nilai, $link])
-                        <div class="min-w-0">
-                            <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">{{ $label }}</dt>
-                            <dd @class([
-                                'mt-1.5 break-words text-[13.5px] font-semibold leading-snug',
-                                'text-bronze' => $link,
-                                'text-ink' => ! $link,
-                            ])>
-                                @if ($link)
-                                    <span class="inline-flex items-center gap-1.5">
-                                        @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-3.5 w-3.5'])
-                                        {{ $nilai }}
-                                    </span>
-                                @else
-                                    {{ $nilai }}
-                                @endif
-                            </dd>
-                        </div>
-                    @endforeach
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">NISN</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->nisn ?: '-' }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Asal Sekolah</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->school_name ?: '-' }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Jenjang &amp; Kurikulum</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $jenjangKurikulum }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">No. WhatsApp Siswa</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-bronze">
+                            <span class="inline-flex items-center gap-1.5">
+                                @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-3.5 w-3.5'])
+                                {{ $pendaftar->phone_wa ?: '-' }}
+                            </span>
+                        </dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Alamat Email</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->email ?: '-' }}</dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Tempat, Tanggal Lahir</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $tglLahir }}</dd>
+                    </div>
 
                     <div class="min-w-0 sm:col-span-2 lg:col-span-3">
                         <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Alamat Domisili Siswa</dt>
                         <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-ink">
-                            Jl. Tebet Barat Raya No. 42B, RT 04 / RW 02, Kel. Tebet Barat, Kec. Tebet, Jakarta Selatan 12810
+                            {{ $pendaftar->address ?: '-' }}
                         </dd>
                     </div>
                 </dl>
             </section>
 
-            {{-- Orang tua / wali --}}
+            <?php /*  Orang tua / wali */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex min-w-0 items-start gap-3">
                     <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
@@ -230,25 +250,25 @@
                 <dl class="mt-5 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
                     <div class="min-w-0">
                         <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Nama Ayah / Wali</dt>
-                        <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-ink">Ir. Hendra Gunawan</dd>
+                        <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->guardian_name ?: '-' }}</dd>
                     </div>
                     <div class="min-w-0">
                         <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Pekerjaan</dt>
-                        <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-ink">Wiraswasta / Konsultan Konstruksi</dd>
+                        <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->guardian_occupation ?: '-' }}</dd>
                     </div>
                     <div class="min-w-0">
                         <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">No. WhatsApp Wali</dt>
                         <dd class="mt-1.5 text-[13.5px] font-semibold leading-snug text-bronze">
                             <span class="inline-flex items-center gap-1.5">
                                 @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-3.5 w-3.5'])
-                                0812-4455-8891
+                                {{ $pendaftar->guardian_phone ?: '-' }}
                             </span>
                         </dd>
                     </div>
                 </dl>
             </section>
 
-            {{-- Berkas --}}
+            <?php /*  Berkas */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
                     <div class="flex min-w-0 items-start gap-3">
@@ -260,30 +280,34 @@
                             <p class="mt-0.5 text-[11.5px] leading-snug text-muted">Tinjau keabsahan dokumen fisik yang diunggah oleh pendaftar</p>
                         </div>
                     </div>
-                    <span class="shrink-0 text-[11.5px] font-bold leading-none text-bronze">4 dari 4 Diunggah</span>
+                    <span class="shrink-0 text-[11.5px] font-bold leading-none text-bronze">
+                        {{ $pendaftar->documents->count() }} Dari 4 Diunggah
+                    </span>
                 </header>
 
                 <ul class="mt-5 space-y-3">
-                    @foreach ($berkas as $item)
+                    @forelse ($pendaftar->documents as $berkas)
+                        @php
+                            $labelMap = [
+                                'rapor' => 'Scan Rapor Terakhir',
+                                'pas_foto' => 'Pas Foto 3x4 Siswa',
+                                'kk_ktp' => 'Scan Kartu Keluarga &amp; KTP Wali',
+                                'surat_komitmen' => 'Surat Komitmen Belajar &amp; Tata Tertib',
+                            ];
+                            $label = $labelMap[$berkas->type] ?? ucfirst($berkas->type);
+                            $fileName = $berkas->file ? $berkas->file->original_name : '-';
+                        @endphp
                         <li class="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-line bg-cream px-4 py-3.5">
-                            @if ($item['pratinjau'] === 'photo')
-                                <span class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-sandgold text-bronze">
-                                    @include('layouts.partials.icon', ['name' => 'image', 'class' => 'h-5 w-5'])
-                                </span>
-                            @elseif ($item['pratinjau'] === 'pdf')
-                                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-line bg-white text-[10px] font-extrabold tracking-wide text-ember-700">PDF</span>
-                            @elseif ($item['pratinjau'] === 'ktp')
-                                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-line bg-white text-[10px] font-extrabold tracking-wide text-espresso">KTP/KK</span>
-                            @else
-                                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-line bg-white text-[10px] font-extrabold tracking-wide text-bark-500">SURAT</span>
-                            @endif
+                            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-line bg-white text-[10px] font-extrabold tracking-wide text-espresso">
+                                @php echo strtoupper(substr($berkas->type, 0, 3)); @endphp
+                            </span>
 
                             <div class="min-w-0 flex-1 basis-56">
                                 <p class="flex flex-wrap items-center gap-2">
-                                    <span class="text-[13.5px] font-bold leading-snug text-ink">{{ $item['label'] }}</span>
-                                    <span class="rounded-md px-2 py-1 text-[10px] font-bold leading-none {{ $item['lencana'][1] }}">{{ $item['lencana'][0] }}</span>
+                                    <span class="text-[13.5px] font-bold leading-snug text-ink">{{ $label }}</span>
+                                    <span class="rounded-md px-2 py-1 text-[10px] font-bold leading-none bg-sandgold text-bronze">{{ ucfirst($berkas->status) }}</span>
                                 </p>
-                                <p class="mt-1.5 truncate text-[11.5px] leading-snug text-muted">{{ $item['file'] }}</p>
+                                <p class="mt-1.5 truncate text-[11.5px] leading-snug text-muted">{{ $fileName }}</p>
                             </div>
 
                             <button type="button"
@@ -292,15 +316,19 @@
                                 Lihat
                             </button>
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="rounded-xl border border-line bg-cream px-4 py-3.5 text-center text-[12.5px] text-muted">
+                            Belum ada berkas yang diunggah.
+                        </li>
+                    @endforelse
                 </ul>
             </section>
         </div>
 
-        {{-- Kolom kanan --}}
+        <?php /*  Kolom kanan */ ?>
         <div class="space-y-5">
 
-            {{-- Keuangan --}}
+            <?php /*  Keuangan */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex min-w-0 items-start gap-3">
                     <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
@@ -316,36 +344,15 @@
                     <div class="rounded-xl border border-line bg-cream px-3.5 py-3">
                         <div class="flex items-start justify-between gap-3">
                             <p class="min-w-0 text-[11.5px] font-medium leading-snug text-muted">Biaya Formulir &amp; Tes</p>
-                            <span class="shrink-0 rounded-md bg-sandgold px-2 py-1 text-[10px] font-bold leading-none text-bronze">Lunas</span>
+                            <span class="shrink-0 rounded-md bg-sandgold px-2 py-1 text-[10px] font-bold leading-none text-bronze">Belum Dibayar</span>
                         </div>
-                        <p class="mt-1.5 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">Rp 350.000</p>
-                        <p class="mt-2 text-[11px] leading-snug text-muted">Transfer BCA <span class="text-bark-300">•</span> 28 Okt 2024</p>
-                    </div>
-
-                    <div class="rounded-xl border border-line bg-cream px-3.5 py-3">
-                        <div class="flex items-start justify-between gap-3">
-                            <p class="min-w-0 text-[11.5px] font-medium leading-snug text-muted">Uang Bimbingan Semester 1</p>
-                            <span class="shrink-0 rounded-md bg-ember-100 px-2 py-1 text-[10px] font-bold leading-none text-ember-700">Menunggu Approval</span>
-                        </div>
-                        <p class="mt-1.5 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">Rp 8.500.000</p>
-                        <p class="mt-2 text-[11px] leading-snug text-muted">VA BCA: <span class="font-semibold text-ink">8891 0281 9920</span></p>
-                    </div>
-
-                    <div class="rounded-xl bg-espresso px-4 py-4">
-                        <div class="flex items-center justify-between gap-3 text-[9.5px] font-bold uppercase leading-snug tracking-[0.12em] text-palegold">
-                            <span>Status Pembayaran Masuk</span>
-                            <span>Cicilan 1 / Lunas</span>
-                        </div>
-                        <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-bark-200">Total Tagihan Awal</p>
-                        <p class="mt-1.5 text-[23px] font-extrabold leading-none tracking-tight tabular-nums text-white">Rp 8.850.000</p>
-                        <p class="mt-3 border-t border-white/10 pt-3 text-[11px] leading-relaxed text-bark-200">
-                            Invoice resmi otomatis terbit setelah verifikasi disetujui.
-                        </p>
+                        <p class="mt-1.5 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">-</p>
+                        <p class="mt-2 text-[11px] leading-snug text-muted">Invoice akan terbit setelah verifikasi disetujui.</p>
                     </div>
                 </div>
             </section>
 
-            {{-- Aksi status --}}
+            <?php /*  Aksi status */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex min-w-0 items-start gap-3">
                     <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sand text-ink">
@@ -359,7 +366,7 @@
 
                 <fieldset class="mt-4 space-y-2.5">
                     <legend class="sr-only">Pilih status pendaftaran</legend>
-                    @foreach ($aksi_status as $opsi)
+                    @foreach ($statusAksi as $opsi)
                         <label @class([
                             'flex cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-3 transition',
                             'border-gold bg-sandgold' => $opsi['aktif'],

@@ -63,4 +63,19 @@ class Student extends Model
     {
         return $query->where('status', 'aktif');
     }
+
+    /**
+     * Dapatkan inisial nama siswa (huruf pertama nama depan dan belakang).
+     */
+    public function inisial(): string
+    {
+        $nama = trim($this->full_name ?? '');
+        $pecah = preg_split('/\s+/', $nama);
+
+        if (count($pecah) === 1) {
+            return strtoupper(mb_substr($nama, 0, 1));
+        }
+
+        return strtoupper(mb_substr($pecah[0], 0, 1).mb_substr(end($pecah), 0, 1));
+    }
 }
