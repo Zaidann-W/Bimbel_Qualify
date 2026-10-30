@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+use App\Http\Controllers\Owner\PemantauanMateriController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -136,9 +137,7 @@ Route::middleware('auth')->group(function () {
             return view('owner.laporan-absensi');
         })->name('laporanAbsensi');
 
-        Route::get('/pemantauan-materi', function () {
-            return view('owner.pemantauan-materi');
-        })->name('pemantauanMateri');
+        Route::get('/pemantauan-materi', [PemantauanMateriController::class, 'index'])->name('pemantauanMateri');
 
         Route::get('/pengaturan-website', function () {
             return view('owner.pengaturan-website');
