@@ -2,111 +2,28 @@
 
 @section('title', 'Data Siswa & Kelas')
 
-{{-- Seluruh baris di halaman ini masih mock UI sesuai rancangan docs/datasiswa-admin.png;
-     sambungkan ke modul siswa + rombel kelas begitu tersedia --}}
 @section('content')
 @php
     $status_pil = [
         'aktif' => ['label' => 'Aktif', 'kelas' => 'bg-sandgold text-bronze'],
         'cuti' => ['label' => 'Cuti', 'kelas' => 'bg-sand text-muted'],
+        'nonaktif' => ['label' => 'Nonaktif', 'kelas' => 'bg-white text-ink ring-1 ring-line'],
+        'lulus' => ['label' => 'Lulus', 'kelas' => 'bg-espresso text-white'],
     ];
 
-    $kpis = [
-        [
-            'label' => 'Total Siswa Aktif',
-            'nilai' => '342',
-            'satuan' => 'Siswa',
-            'nilai_kelas' => 'text-ink',
-            'ikon' => 'users',
-            'tile' => 'bg-sand text-ink',
-            'catatan' => 'Terdaftar semester ini',
-        ],
-        [
-            'label' => 'Siswa Baru',
-            'nilai' => '4',
-            'satuan' => 'Siswa',
-            'nilai_kelas' => 'text-bronze',
-            'ikon' => 'user-plus',
-            'tile' => 'bg-gold text-espresso',
-            'catatan' => 'Menunggu verifikasi berkas',
-        ],
-        [
-            'label' => 'Distribusi Jenjang',
-            'nilai' => '3',
-            'satuan' => 'Tingkatan',
-            'nilai_kelas' => 'text-ink',
-            'ikon' => 'graduation-cap',
-            'tile' => 'bg-sand text-ink',
-            'catatan' => 'SD (64) • SMP (128) • SMA (150)',
-        ],
+    $jenjangLabel = [
+        'SD' => 'Jenjang SD',
+        'SMP' => 'Jenjang SMP',
+        'SMA' => 'Jenjang SMA',
     ];
 
-    $siswa = [
-        [
-            'inisial' => 'AZ',
-            'avatar' => 'bg-espresso text-gold',
-            'nama' => 'Ahmad Zulfikar Ramadhan',
-            'nis' => 'QLF-2026-089',
-            'sekolah' => 'SMAN 1 Teladan',
-            'wali' => 'Drs. Hendro Wibowo',
-            'telepon' => '0812-3456-7890',
-            'jenjang' => 'sma',
-            'status' => 'aktif',
-        ],
-        [
-            'inisial' => 'CN',
-            'avatar' => 'bg-espresso text-gold',
-            'nama' => 'Clarissa Nabila Putri',
-            'nis' => 'QLF-2026-092',
-            'sekolah' => 'SMP 3 Kota Baru',
-            'wali' => 'Ibu Ratna Dewi',
-            'telepon' => '0813-8699-1122',
-            'jenjang' => 'smp',
-            'status' => 'aktif',
-        ],
-        [
-            'inisial' => 'MF',
-            'avatar' => 'bg-espresso text-gold',
-            'nama' => 'M. Fadhil Ar-Rayyan',
-            'nis' => 'QLF-2026-104',
-            'sekolah' => 'SMA Al-Azhar 1',
-            'wali' => 'Bpk. Bambang Soleh',
-            'telepon' => '0856-7788-9900',
-            'jenjang' => 'sma',
-            'status' => 'aktif',
-        ],
-        [
-            'inisial' => 'DS',
-            'avatar' => 'bg-sand text-bark-400',
-            'nama' => 'Devina Safitri',
-            'nis' => 'QLF-2026-045',
-            'sekolah' => 'SMP Negeri 5',
-            'wali' => 'Ibu Wahyuni Indah',
-            'telepon' => '0877-2233-4455',
-            'jenjang' => 'smp',
-            'status' => 'aktif',
-        ],
-        [
-            'inisial' => 'RA',
-            'avatar' => 'bg-sand text-bark-400',
-            'nama' => 'Rah Arya Pradana',
-            'nis' => 'QLF-2026-012',
-            'sekolah' => 'SMAN 8 Favorit',
-            'wali' => 'Bpk. Agus Santoso',
-            'telepon' => '0819-3344-5566',
-            'jenjang' => 'sma',
-            'status' => 'cuti',
-        ],
-    ];
-
-    $distribusi = [
-        ['jenjang' => 'Jenjang SMA', 'jumlah' => '150 Siswa (44%)', 'lebar' => 'w-[44%]'],
-        ['jenjang' => 'Jenjang SMP', 'jumlah' => '128 Siswa (37%)', 'lebar' => 'w-[37%]'],
-        ['jenjang' => 'Jenjang SD', 'jumlah' => '64 Siswa (19%)', 'lebar' => 'w-[19%]'],
-    ];
+    $inisialMap = [];
+    foreach ($siswa as $s) {
+        $inisialMap[$s->id] = $s->inisial();
+    }
 @endphp
 
-{{-- Kepala halaman --}}
+<?php /*  Kepala halaman */ ?>
 <section class="bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-2xl">
@@ -135,7 +52,7 @@
 
 <div class="space-y-5 px-4 py-5 sm:px-6">
 
-    {{-- Tiga angka pokok data siswa --}}
+    <?php /*  Tiga angka pokok data siswa */ ?>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @foreach ($kpis as $kpi)
             <article class="rounded-xl border border-line bg-white p-4">
@@ -156,10 +73,10 @@
 
     <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
 
-        {{-- Daftar siswa --}}
+        <?php /*  Daftar siswa */ ?>
         <section class="overflow-hidden rounded-2xl border border-line bg-white xl:col-span-2">
 
-            {{-- Pencarian & filter --}}
+            <?php /*  Pencarian & filter */ ?>
             <div class="flex flex-col gap-2.5 px-4 py-4 sm:flex-row sm:items-center sm:px-5">
                 <div class="relative min-w-0 flex-1">
                     <span class="pointer-events-none absolute inset-y-0 left-0 grid w-9 place-items-center text-bark-300">
@@ -187,8 +104,9 @@
                     <select id="datasiswa-status" aria-label="Filter status siswa"
                             class="w-full appearance-none rounded-lg border border-line bg-white py-2.5 pl-3 pr-9 text-[12.5px] font-semibold text-espresso transition hover:bg-sand focus:outline-none focus:ring-2 focus:ring-gold/30">
                         <option value="semua">Semua Status</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="cuti">Cuti</option>
+                        @foreach ($status_pil as $key => $info)
+                            <option value="{{ $key }}">{{ $info['label'] }}</option>
+                        @endforeach
                     </select>
                     <span class="pointer-events-none absolute inset-y-0 right-0 grid w-9 place-items-center text-bark-400">
                         @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-4 w-4'])
@@ -196,7 +114,7 @@
                 </div>
             </div>
 
-            {{-- Tabel --}}
+            <?php /*  Tabel */ ?>
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[640px] border-collapse text-left">
                     <thead>
@@ -208,27 +126,34 @@
                         </tr>
                     </thead>
                     <tbody id="datasiswa-body">
-                        @foreach ($siswa as $row)
-                            @php $status = $status_pil[$row['status']]; @endphp
-                            <tr data-baris data-jenjang="{{ $row['jenjang'] }}" data-status="{{ $row['status'] }}"
-                                data-cari="{{ strtolower($row['nama'] . ' ' . $row['nis'] . ' ' . $row['sekolah'] . ' ' . $row['wali'] . ' ' . $row['telepon']) }}"
+                        @forelse ($siswa as $row)
+                            @php
+                                $jenjang = $row->education_level ? strtolower($row->education_level) : 'sd';
+                                $status = $status_pil[$row->status] ?? $status_pil['nonaktif'];
+                                $wali = $row->guardians->where('pivot.is_primary_contact', true)->first()
+                                    ?? $row->guardians->first();
+                                $inisial = $inisialMap[$row->id] ?? strtoupper(substr($row->full_name, 0, 1) . substr($row->full_name, strrpos($row->full_name, ' ') + 1, 1));
+                                $avatarKelas = $row->status === 'aktif' ? 'bg-espresso text-gold' : 'bg-sand text-bark-400';
+                            @endphp
+                            <tr data-baris data-jenjang="{{ $jenjang }}" data-status="{{ $row->status }}"
+                                data-cari="{{ strtolower($row->full_name . ' ' . $row->nis . ' ' . $row->school_name . ' ' . ($wali ? $wali->name : '') . ' ' . $row->phone_wa) }}"
                                 class="border-t border-line align-top odd:bg-white even:bg-shell">
                                 <td class="px-5 py-4">
                                     <div class="flex items-start gap-3">
-                                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[12.5px] font-bold {{ $row['avatar'] }}" aria-hidden="true">
-                                            {{ $row['inisial'] }}
+                                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[12.5px] font-bold {{ $avatarKelas }}" aria-hidden="true">
+                                            {{ $inisial }}
                                         </span>
                                         <div class="min-w-0">
-                                            <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row['nama'] }}</p>
+                                            <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row->full_name }}</p>
                                             <p class="mt-1.5 text-[11.5px] leading-snug text-muted">
-                                                {{ $row['nis'] }} <span class="text-bark-300">•</span> {{ $row['sekolah'] }}
+                                                {{ $row->nis ?: '-' }} <span class="text-bark-300">•</span> {{ $row->school_name ?: '-' }}
                                             </p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-5 py-4">
-                                    <p class="text-[13px] font-medium leading-snug text-ink">{{ $row['wali'] }}</p>
-                                    <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row['telepon'] }}</p>
+                                    <p class="text-[13px] font-medium leading-snug text-ink">{{ $wali ? $wali->name : '-' }}</p>
+                                    <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row->phone_wa ?: '-' }}</p>
                                 </td>
                                 <td class="px-5 py-4">
                                     <span class="inline-flex rounded-lg px-2.5 py-1.5 text-[11px] font-bold leading-tight {{ $status['kelas'] }}">
@@ -241,55 +166,39 @@
                                            class="inline-flex shrink-0 items-center rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
                                             Detail
                                         </a>
-                                        <a href="#" aria-label="Edit data {{ $row['nama'] }}"
+                                        <a href="#" aria-label="Edit data {{ $row->full_name }}"
                                            class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-white text-bark-400 transition hover:bg-sand hover:text-espresso">
                                             @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-4 w-4'])
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
-
-                        <tr id="datasiswa-kosong" class="hidden border-t border-line">
-                            <td colspan="4" class="px-5 py-12 text-center">
-                                <p class="text-[13.5px] font-bold text-ink">Tidak ada siswa yang cocok</p>
-                                <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci pencarian, pilih Semua Jenjang, atau pilih Semua Status.</p>
-                            </td>
-                        </tr>
+                        @empty
+                            <tr id="datasiswa-kosong" class="hidden border-t border-line">
+                                <td colspan="4" class="px-5 py-12 text-center">
+                                    <p class="text-[13.5px] font-bold text-ink">Tidak ada siswa yang cocok</p>
+                                    <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci pencarian, pilih Semua Jenjang, atau pilih Semua Status.</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            {{-- Kaki tabel --}}
+            <?php /*  Kaki tabel */ ?>
             <footer class="flex flex-col gap-3 border-t border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-[12px] leading-snug text-muted">
-                    Menampilkan <span id="datasiswa-dari" class="font-bold text-ink">1 – 5</span>
-                    dari <span class="font-bold text-ink">342</span> Siswa Terdaftar
+                    Menampilkan <span id="datasiswa-dari" class="font-bold text-ink">{{ $siswa->firstItem() ?? 0 }} – {{ $siswa->lastItem() ?? 0 }}</span>
+                    dari <span class="font-bold text-ink">{{ $siswa->total() }}</span> Siswa Terdaftar
                 </p>
 
                 <nav class="flex items-center gap-1.5" aria-label="Navigasi halaman daftar siswa">
-                    <button type="button" aria-label="Halaman sebelumnya" disabled
-                            class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-bark-300">
-                        @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4 rotate-180'])
-                    </button>
-                    <button type="button" aria-current="page"
-                            class="grid h-8 w-8 place-items-center rounded-lg bg-espresso text-[12.5px] font-bold text-white">1</button>
-                    <button type="button"
-                            class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">2</button>
-                    <button type="button"
-                            class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">3</button>
-                    <span class="px-1 text-[12.5px] text-bark-300">…</span>
-                    <button type="button"
-                            class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">69</button>
-                    <button type="button" aria-label="Halaman berikutnya"
-                            class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-espresso transition hover:bg-sand">
-                        @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4'])
-                    </button>
+                    {{ $siswa->links() }}
                 </nav>
             </footer>
         </section>
 
-        {{-- Distribusi jenjang --}}
+        <?php /*  Distribusi jenjang */ ?>
         <section class="rounded-2xl border border-line bg-white p-5 self-start">
             <header class="flex items-center gap-2.5">
                 <span class="h-2 w-2 shrink-0 rounded-full bg-gold"></span>
@@ -297,7 +206,18 @@
             </header>
 
             <div class="mt-4 space-y-4">
-                @foreach ($distribusi as $bar)
+                @php
+                    $sd = App\Models\Student::where('education_level', 'SD')->count();
+                    $smp = App\Models\Student::where('education_level', 'SMP')->count();
+                    $sma = App\Models\Student::where('education_level', 'SMA')->count();
+                    $totalJenjang = $sd + $smp + $sma;
+                    $bars = [
+                        ['jenjang' => 'Jenjang SD', 'jumlah' => $sd . ' Siswa (' . ($totalJenjang ? round($sd / $totalJenjang * 100) : 0) . '%)', 'lebar' => $totalJenjang ? 'w-' . round($sd / $totalJenjang * 100) . '%' : 'w-0%'],
+                        ['jenjang' => 'Jenjang SMP', 'jumlah' => $smp . ' Siswa (' . ($totalJenjang ? round($smp / $totalJenjang * 100) : 0) . '%)', 'lebar' => $totalJenjang ? 'w-' . round($smp / $totalJenjang * 100) . '%' : 'w-0%'],
+                        ['jenjang' => 'Jenjang SMA', 'jumlah' => $sma . ' Siswa (' . ($totalJenjang ? round($sma / $totalJenjang * 100) : 0) . '%)', 'lebar' => $totalJenjang ? 'w-' . round($sma / $totalJenjang * 100) . '%' : 'w-0%'],
+                    ];
+                @endphp
+                @foreach ($bars as $bar)
                     <div>
                         <div class="flex items-baseline justify-between gap-3">
                             <p class="text-[12.5px] font-semibold leading-snug text-muted">{{ $bar['jenjang'] }}</p>

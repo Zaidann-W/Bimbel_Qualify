@@ -2,8 +2,6 @@
 
 @section('title', 'Pendaftaran Siswa')
 
-{{-- Halaman masih memakai data mock UI sesuai rancangan docs/pendaftaran-admin.png;
-     sambungkan ke tabel registrations + study_sessions begitu modul adisi aktif --}}
 @section('content')
 @php
     $status_pil = [
@@ -13,170 +11,30 @@
         'ditolak' => ['label' => 'Ditolak / Batal', 'kelas' => 'bg-white text-ember-700 ring-1 ring-ember-200'],
     ];
 
-    $kpis = [
-        [
-            'label' => 'Menunggu Verifikasi',
-            'nilai' => '12',
-            'satuan' => 'Calon Siswa',
-            'ikon' => 'clipboard-form',
-            'aksen' => 'border-t-gold',
-            'tile' => 'bg-sandgold text-bronze',
-            'bawah' => 'sla',
-        ],
-        [
-            'label' => 'Perlu Perbaikan',
-            'nilai' => '5',
-            'satuan' => 'Berkas',
-            'ikon' => 'refresh',
-            'aksen' => 'border-t-gold',
-            'tile' => 'bg-sand text-ink',
-            'bawah' => 'chip',
-        ],
-        [
-            'label' => 'Diterima Bulan Ini',
-            'nilai' => '48',
-            'satuan' => 'Siswa Baru',
-            'ikon' => 'users-check',
-            'aksen' => 'border-t-espresso',
-            'tile' => 'bg-espresso text-gold',
-            'bawah' => 'konversi',
-        ],
-        [
-            'label' => 'Ditolak / Batal',
-            'nilai' => '3',
-            'satuan' => 'Calon Siswa',
-            'ikon' => 'slash-circle',
-            'aksen' => 'border-t-line',
-            'tile' => 'bg-sand text-ink',
-            'bawah' => 'alasan',
-        ],
+    $statusAksi = [
+        'review' => ['label' => 'Review', 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
+        'perbaikan' => ['label' => 'Perbaiki', 'ikon' => 'refresh', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
+        'diterima' => ['label' => 'Selesai', 'ikon' => 'check-circle', 'kelas' => 'bg-sand text-bark-400'],
+        'ditolak' => ['label' => 'Lihat Alasan', 'ikon' => 'eye', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
     ];
 
-    $tabs = [
-        ['key' => 'semua', 'label' => 'Semua', 'jumlah' => '68', 'hitung' => true],
-        ['key' => 'review', 'label' => 'Menunggu Review', 'jumlah' => '12', 'hitung' => false],
-        ['key' => 'perbaikan', 'label' => 'Perlu Perbaikan', 'jumlah' => '5', 'hitung' => false],
-        ['key' => 'diterima', 'label' => 'Diterima', 'jumlah' => '48', 'hitung' => false],
-        ['key' => 'ditolak', 'label' => 'Ditolak', 'jumlah' => '3', 'hitung' => false],
+    $bulanId = [
+        'Jan' => 'Jan', 'Feb' => 'Feb', 'Mar' => 'Mar', 'Apr' => 'Apr',
+        'Mei' => 'Mei', 'Jun' => 'Jun', 'Jul' => 'Jul', 'Agu' => 'Agu',
+        'Sep' => 'Sep', 'Okt' => 'Okt', 'Nov' => 'Nov', 'Des' => 'Des',
     ];
 
-    $pendaftar = [
-        [
-            'kode' => 'REG-2025-0891',
-            'nama' => 'Anindya Putri Rahayu',
-            'sekolah' => 'SMA Negeri 8 Jakarta',
-            'kelas' => 'Kelas 12 IPA',
-            'wali' => 'Ir. Hendra Gunawan',
-            'wa' => '+62 812-8934-1120',
-            'nominal' => 'Rp 350.000',
-            'metode' => 'Transfer BCA (Lunas)',
-            'status' => 'review',
-            'tanggal' => '28 Okt 2024',
-            'periode' => 'hari',
-            'aksi' => ['label' => 'Review', 'ikon' => null, 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
-        ],
-        [
-            'kode' => 'REG-2025-0889',
-            'nama' => 'Aisyah Nurul Hikmah',
-            'sekolah' => 'SMAN 1 Yogyakarta',
-            'kelas' => 'Kelas 12',
-            'wali' => 'Ratna Susanti',
-            'wa' => '+62 813-2244-8890',
-            'nominal' => 'Rp 3.500.000',
-            'metode' => 'Transfer BCA (Lunas)',
-            'status' => 'review',
-            'tanggal' => '26 Okt 2024',
-            'periode' => 'minggu',
-            'aksi' => ['label' => 'Review', 'ikon' => null, 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
-        ],
-        [
-            'kode' => 'REG-2025-0887',
-            'nama' => 'Rayhan Pratama',
-            'sekolah' => 'SMP IT Al-Fityan',
-            'kelas' => 'Kelas 9',
-            'wali' => 'Siti Maryam',
-            'wa' => '+62 857-2210-4408',
-            'nominal' => 'Rp 8.850.000',
-            'metode' => 'VA BCA (Menunggu Approval)',
-            'status' => 'perbaikan',
-            'tanggal' => '27 Okt 2024',
-            'periode' => 'hari',
-            'aksi' => ['label' => 'Perbaiki', 'ikon' => 'refresh', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
-        ],
-        [
-            'kode' => 'REG-2025-0885',
-            'nama' => 'Nabila Az-Zahra',
-            'sekolah' => 'SMK Telkom Yogyakarta',
-            'kelas' => 'Kelas 10',
-            'wali' => 'Hendra Wijaya',
-            'wa' => '+62 812-3345-7781',
-            'nominal' => 'Rp 500.000',
-            'metode' => 'Transfer BRI (DP 20%)',
-            'status' => 'perbaikan',
-            'tanggal' => '25 Okt 2024',
-            'periode' => 'minggu',
-            'aksi' => ['label' => 'Perbaiki', 'ikon' => 'refresh', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
-        ],
-        [
-            'kode' => 'REG-2025-0882',
-            'nama' => 'Fakhri Daniswara',
-            'sekolah' => 'SMA De Britto',
-            'kelas' => 'Kelas 11',
-            'wali' => 'Bambang Setiawan',
-            'wa' => '+62 813-9087-1122',
-            'nominal' => 'Rp 4.200.000',
-            'metode' => 'Mandiri (Lunas) • NIS #2425-1108',
-            'status' => 'diterima',
-            'tanggal' => '24 Okt 2024',
-            'periode' => 'bulan',
-            'aksi' => ['label' => 'Selesai', 'ikon' => 'check-circle', 'kelas' => 'bg-sand text-bark-400'],
-        ],
-        [
-            'kode' => 'REG-2025-0879',
-            'nama' => 'Gilang Ramadhan',
-            'sekolah' => 'SMA Muhammadiyah 3',
-            'kelas' => 'Kelas 12',
-            'wali' => 'Suryani Dewi',
-            'wa' => '+62 895-6123-0090',
-            'nominal' => 'Rp 3.500.000',
-            'metode' => 'QRIS (Lunas) • NIS #2425-1096',
-            'status' => 'diterima',
-            'tanggal' => '22 Okt 2024',
-            'periode' => 'bulan',
-            'aksi' => ['label' => 'Selesai', 'ikon' => 'check-circle', 'kelas' => 'bg-sand text-bark-400'],
-        ],
-        [
-            'kode' => 'REG-2025-0876',
-            'nama' => 'Zahra Aulia Rahman',
-            'sekolah' => 'SMP Negeri 5 Sleman',
-            'kelas' => 'Kelas 9',
-            'wali' => 'Endang Purwanti',
-            'wa' => '+62 821-4455-8891',
-            'nominal' => 'Rp 8.850.000',
-            'metode' => 'VA Mandiri (Belum Dibayar)',
-            'status' => 'review',
-            'tanggal' => '21 Okt 2024',
-            'periode' => 'bulan',
-            'aksi' => ['label' => 'Review', 'ikon' => null, 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
-        ],
-        [
-            'kode' => 'REG-2025-0871',
-            'nama' => 'Bagas Adi Nugroho',
-            'sekolah' => 'SMA Kolese De Britto',
-            'kelas' => 'Kelas 11',
-            'wali' => 'Teguh Iman Santoso',
-            'wa' => '+62 877-3321-6654',
-            'nominal' => 'Rp 2.000.000',
-            'metode' => 'Tunai Kantor (Sisa DP)',
-            'status' => 'ditolak',
-            'tanggal' => '18 Okt 2024',
-            'periode' => 'bulan',
-            'aksi' => ['label' => 'Lihat Alasan', 'ikon' => 'eye', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
-        ],
-    ];
+    $statusKey = function ($status) {
+        return match ($status) {
+            'menunggu_review' => 'review',
+            'perlu_perbaikan' => 'perbaikan',
+            'diterima' => 'diterima',
+            default => 'ditolak',
+        };
+    };
 @endphp
 
-{{-- Kepala halaman --}}
+<?php /*  Kepala halaman */ ?>
 <section class="bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
         <div class="max-w-2xl">
@@ -209,7 +67,7 @@
         </div>
     </div>
 
-    {{-- Empat angka pokok admisi --}}
+    <?php /*  Empat angka pokok admisi */ ?>
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($kpis as $kpi)
             <article @class([
@@ -253,11 +111,11 @@
     </div>
 </section>
 
-{{-- Daftar pendaftar --}}
+<?php /*  Daftar pendaftar */ ?>
 <div class="px-4 py-5 sm:px-6">
     <section class="overflow-hidden rounded-2xl border border-line bg-white">
 
-        {{-- Tab status --}}
+        <?php /*  Tab status */ ?>
         <div class="flex flex-wrap items-center gap-2 px-4 pt-4 sm:px-5">
             @foreach ($tabs as $tab)
                 <button type="button" data-tab="{{ $tab['key'] }}" data-tab-btn
@@ -277,13 +135,13 @@
             @endforeach
         </div>
 
-        {{-- Pencarian & filter tanggal --}}
+        <?php /*  Pencarian & filter tanggal */ ?>
         <div class="flex flex-col gap-2.5 px-4 py-4 sm:flex-row sm:items-center sm:px-5">
             <div class="relative min-w-0 flex-1">
                 <span class="pointer-events-none absolute inset-y-0 left-0 grid w-9 place-items-center text-bark-300">
                     @include('layouts.partials.icon', ['name' => 'search', 'class' => 'h-4 w-4'])
                 </span>
-                <input type="search" id="pendaftaran-cari" aria-label="Cari calon siswa atau wali"
+                <input type="search" id="pendaftaran-cari" aria-label="Cari calon siswa atau wali, no. registrasi..."
                        placeholder="Cari nama calon siswa atau wali, no. registrasi..."
                        class="w-full rounded-lg border border-line bg-shell py-2.5 pl-9 pr-3 text-[12.5px] text-ink placeholder:text-bark-300 transition focus:border-gold focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold/30">
             </div>
@@ -294,7 +152,7 @@
                     <option value="semua">Semua Tanggal</option>
                     <option value="hari">24 Jam Terakhir</option>
                     <option value="minggu">7 Hari Terakhir</option>
-                    <option value="bulan">Bulan Oktober 2024</option>
+                    <option value="bulan">Bulan Ini</option>
                 </select>
                 <span class="pointer-events-none absolute inset-y-0 right-0 grid w-9 place-items-center text-bark-400">
                     @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4'])
@@ -302,7 +160,7 @@
             </div>
         </div>
 
-        {{-- Tabel --}}
+        <?php /*  Tabel */ ?>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[860px] border-collapse text-left">
                 <thead>
@@ -315,81 +173,75 @@
                     </tr>
                 </thead>
                 <tbody id="pendaftaran-body">
-                    @foreach ($pendaftar as $row)
-                        @php $status = $status_pil[$row['status']]; @endphp
-                        <tr data-baris data-status="{{ $row['status'] }}" data-periode="{{ $row['periode'] }}"
-                            data-cari="{{ strtolower($row['nama'] . ' ' . $row['wali'] . ' ' . $row['kode'] . ' ' . $row['sekolah']) }}"
+                    @forelse ($pendaftar as $row)
+                        @php
+                            $sk = $statusKey($row->status);
+                            $status = $status_pil[$sk] ?? $status_pil['ditolak'];
+                            $ak = $statusAksi[$sk] ?? $statusAksi['ditolak'];
+                            $kelas = $row->school_grade
+                                ? 'Kelas ' . $row->school_grade . ($row->education_level ? ' ' . $row->education_level : '')
+                                : '-';
+                            $tglId = $row->created_at
+                                ? $row->created_at->format('d') . ' ' . ($bulanId[$row->created_at->format('M')] ?? $row->created_at->format('M')) . ' ' . $row->created_at->format('Y')
+                                : '-';
+                        @endphp
+                        <tr data-baris data-status="{{ $sk }}" data-periode="bulan"
+                            data-cari="{{ strtolower($row->full_name . ' ' . $row->guardian_name . ' ' . $row->registration_number . ' ' . $row->school_name) }}"
                             class="border-t border-line align-top odd:bg-white even:bg-shell">
                             <td class="px-5 py-4">
-                                <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row['nama'] }}</p>
-                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row['sekolah'] }}</p>
-                                <p class="mt-0.5 text-[11.5px] leading-snug text-muted">{{ $row['kelas'] }}</p>
+                                <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row->full_name }}</p>
+                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row->school_name ?: '-' }}</p>
+                                <p class="mt-0.5 text-[11.5px] leading-snug text-muted">{{ $kelas }}</p>
                             </td>
                             <td class="px-5 py-4">
-                                <p class="text-[13px] font-medium leading-snug text-ink">{{ $row['wali'] }}</p>
-                                <a href="https://wa.me/{{ preg_replace('/\D/', '', $row['wa']) }}" target="_blank" rel="noopener"
+                                <p class="text-[13px] font-medium leading-snug text-ink">{{ $row->guardian_name ?: '-' }}</p>
+                                <a href="https://wa.me/{{ preg_replace('/\D/', '', $row->phone_wa ?? '') }}" target="_blank" rel="noopener"
                                    class="mt-1.5 inline-flex items-center gap-1.5 text-[11.5px] font-semibold leading-snug text-bronze transition hover:text-espresso hover:underline">
                                     @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-3.5 w-3.5'])
-                                    {{ $row['wa'] }}
+                                    {{ $row->phone_wa ?: '-' }}
                                 </a>
                             </td>
                             <td class="px-5 py-4">
-                                <p class="text-[13.5px] font-bold leading-snug tabular-nums text-ink">{{ $row['nominal'] }}</p>
-                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row['metode'] }}</p>
+                                <p class="text-[13.5px] font-bold leading-snug tabular-nums text-ink">-</p>
+                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">Belum ada tagihan</p>
                             </td>
                             <td class="px-5 py-4">
                                 <span class="inline-flex rounded-lg px-2.5 py-1.5 text-[11px] font-bold leading-tight {{ $status['kelas'] }}">
                                     {{ $status['label'] }}
                                 </span>
-                                <p class="mt-1.5 text-[11px] leading-snug text-muted">{{ $row['tanggal'] }} <span class="text-bark-300">•</span> {{ $row['kode'] }}</p>
+                                <p class="mt-1.5 text-[11px] leading-snug text-muted">{{ $tglId }} <span class="text-bark-300">•</span> {{ $row->registration_number }}</p>
                             </td>
                             <td class="px-5 py-4 text-right">
-                                <a href="{{ route('admin.pendaftaran.detail', $row['kode']) }}"
-                                   class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12.5px] font-semibold transition {{ $row['aksi']['kelas'] }}">
-                                    @if ($row['aksi']['ikon'])
-                                        @include('layouts.partials.icon', ['name' => $row['aksi']['ikon'], 'class' => 'h-4 w-4'])
+                                <a href="{{ route('admin.pendaftaran.detail', $row->registration_number) }}"
+                                   class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12.5px] font-semibold transition {{ $ak['kelas'] }}">
+                                    @if ($ak['ikon'])
+                                        @include('layouts.partials.icon', ['name' => $ak['ikon'], 'class' => 'h-4 w-4'])
                                     @endif
-                                    {{ $row['aksi']['label'] }}
+                                    {{ $ak['label'] }}
                                 </a>
                             </td>
                         </tr>
-                    @endforeach
-
-                    <tr id="pendaftaran-kosong" class="hidden border-t border-line">
-                        <td colspan="5" class="px-5 py-12 text-center">
-                            <p class="text-[13.5px] font-bold text-ink">Tidak ada pendaftar yang cocok</p>
-                            <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci pencarian, rentang tanggal, atau pilih tab Semua.</p>
-                        </td>
-                    </tr>
+                    @empty
+                        <tr id="pendaftaran-kosong" class="border-t border-line">
+                            <td colspan="5" class="px-5 py-12 text-center">
+                                <p class="text-[13.5px] font-bold text-ink">Tidak ada pendaftar yang cocok</p>
+                                <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci pencarian, rentang tanggal, atau pilih tab Semua.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- Kaki tabel --}}
+        <?php /*  Kaki tabel */ ?>
         <footer class="flex flex-col gap-3 border-t border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-[12px] leading-snug text-muted">
-                Menampilkan <span id="pendaftaran-dari" class="font-bold text-ink">1 – 8</span>
-                dari <span class="font-bold text-ink" id="pendaftaran-total">68</span> pendaftar aktif
+                Menampilkan <span class="font-bold text-ink">{{ $pendaftar->firstItem() ?? 0 }} – {{ $pendaftar->lastItem() ?? 0 }}</span>
+                dari <span class="font-bold text-ink">{{ $pendaftar->total() }}</span> pendaftar aktif
             </p>
 
             <nav class="flex items-center gap-1.5" aria-label="Navigasi halaman daftar pendaftar">
-                <button type="button" aria-label="Halaman sebelumnya" disabled
-                        class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-bark-300">
-                    @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4 rotate-180'])
-                </button>
-                <button type="button" aria-current="page"
-                        class="grid h-8 w-8 place-items-center rounded-lg bg-espresso text-[12.5px] font-bold text-white">1</button>
-                <button type="button"
-                        class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">2</button>
-                <button type="button"
-                        class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">3</button>
-                <span class="px-1 text-[12.5px] text-bark-300">…</span>
-                <button type="button"
-                        class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-[12.5px] font-semibold text-espresso transition hover:bg-sand">17</button>
-                <button type="button" aria-label="Halaman berikutnya"
-                        class="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-espresso transition hover:bg-sand">
-                    @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4'])
-                </button>
+                {{ $pendaftar->links() }}
             </nav>
         </footer>
     </section>
@@ -426,8 +278,12 @@
             });
 
             barisKosong.classList.toggle('hidden', tampil > 0);
-            labelDari.textContent = tampil === 0 ? '0' : `1 – ${tampil}`;
-            labelTotal.textContent = tabAktif === 'semua' && !kata && periode === 'semua' ? '68' : String(tampil);
+            if (labelDari) {
+                labelDari.textContent = tampil === 0 ? '0' : `1 – ${tampil}`;
+            }
+            if (labelTotal) {
+                labelTotal.textContent = tabAktif === 'semua' && !kata && periode === 'semua' ? baris.length : String(tampil);
+            }
         };
 
         tombolTab.forEach((tombol) => {
