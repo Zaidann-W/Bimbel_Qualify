@@ -2,128 +2,45 @@
 
 @section('title', 'Pemantauan Materi')
 
-{{-- Seluruh data di halaman ini masih mock UI sesuai rancangan docs/pemantauan-owner.png;
-     sambungkan ke modul materi & kurikulum (filter jenjang, pencarian, ekspor) begitu tersedia --}}
 @section('content')
 @php
     $statistik = [
         [
             'label' => 'Kesiapan Akademik',
-            'angka' => '78',
-            'satuan' => 'Modul',
-            'kecil' => false,
-            'ikon' => 'file-text',
-            'aksen' => 'bg-sandgold/60',
-            'penanda' => 'check-circle',
-            'catatan' => '100% kurikulum nasional terverifikasi',
+            'angka' => isset($statistik[0]['angka']) ? $statistik[0]['angka'] : '0',
+            'satuan' => isset($statistik[0]['satuan']) ? $statistik[0]['satuan'] : 'Modul',
+            'kecil' => isset($statistik[0]['kecil']) ? $statistik[0]['kecil'] : false,
+            'ikon' => isset($statistik[0]['ikon']) ? $statistik[0]['ikon'] : 'file-text',
+            'aksen' => isset($statistik[0]['aksen']) ? $statistik[0]['aksen'] : 'bg-sandgold/60',
+            'penanda' => isset($statistik[0]['penanda']) ? $statistik[0]['penanda'] : 'check-circle',
+            'catatan' => isset($statistik[0]['catatan']) ? $statistik[0]['catatan'] : '100% kurikulum nasional terverifikasi',
         ],
         [
             'label' => 'Evaluasi & Uji Coba',
-            'angka' => '28',
-            'satuan' => 'Paket Try Out',
-            'kecil' => false,
-            'ikon' => 'clipboard-form',
-            'aksen' => 'bg-shell',
-            'penanda' => 'dot',
-            'catatan' => 'Soal HOTS & format SNBT terbaru',
+            'angka' => isset($statistik[1]['angka']) ? $statistik[1]['angka'] : '0',
+            'satuan' => isset($statistik[1]['satuan']) ? $statistik[1]['satuan'] : 'Paket Try Out',
+            'kecil' => isset($statistik[1]['kecil']) ? $statistik[1]['kecil'] : false,
+            'ikon' => isset($statistik[1]['ikon']) ? $statistik[1]['ikon'] : 'clipboard-form',
+            'aksen' => isset($statistik[1]['aksen']) ? $statistik[1]['aksen'] : 'bg-shell',
+            'penanda' => isset($statistik[1]['penanda']) ? $statistik[1]['penanda'] : 'dot',
+            'catatan' => isset($statistik[1]['catatan']) ? $statistik[1]['catatan'] : 'Soal HOTS & format SNBT terbaru',
         ],
         [
             'label' => 'Pembaruan Terakhir',
-            'angka' => 'Hari Ini, 09:15',
-            'satuan' => null,
-            'kecil' => true,
-            'ikon' => 'refresh',
-            'aksen' => 'bg-sandgold/50',
-            'penanda' => 'clock',
-            'catatan' => 'Diunggah oleh Litbang Pusat',
+            'angka' => isset($statistik[2]['angka']) ? $statistik[2]['angka'] : 'Hari Ini, 09:15',
+            'satuan' => isset($statistik[2]['satuan']) ? $statistik[2]['satuan'] : null,
+            'kecil' => isset($statistik[2]['kecil']) ? $statistik[2]['kecil'] : true,
+            'ikon' => isset($statistik[2]['ikon']) ? $statistik[2]['ikon'] : 'refresh',
+            'aksen' => isset($statistik[2]['aksen']) ? $statistik[2]['aksen'] : 'bg-sandgold/50',
+            'penanda' => isset($statistik[2]['penanda']) ? $statistik[2]['penanda'] : 'clock',
+            'catatan' => isset($statistik[2]['catatan']) ? $statistik[2]['catatan'] : 'Diunggah oleh Admin',
         ],
     ];
 
-    $modul = [
-        [
-            'ikon' => 'sigma',
-            'judul' => 'Kalkulus Diferensial & Integral',
-            'mata' => 'Matematika Saintek • Silabus 2024/2025',
-            'jenjang_label' => '12 SMA & SNBT',
-            'jenjang' => '12-sma',
-            'diperbarui' => '10 Maret 2025',
-            'admin' => 'Admin Litbang',
-            'halaman' => '36',
-        ],
-        [
-            'ikon' => 'trending-up',
-            'judul' => 'Barisan & Deret Geometri Tak Hingga',
-            'mata' => 'Matematika Dasar & Penalaran Matematika',
-            'jenjang_label' => '12 SMA & Alumni',
-            'jenjang' => '12-sma',
-            'diperbarui' => '08 Maret 2025',
-            'admin' => 'Admin Litbang',
-            'halaman' => '28',
-        ],
-        [
-            'ikon' => 'compass',
-            'judul' => 'Dinamika Gerak & Usaha Energi',
-            'mata' => 'Fisika Terapan • Kurikulum Merdeka',
-            'jenjang_label' => '11 SMA Merdeka',
-            'jenjang' => '11-sma',
-            'diperbarui' => '04 Maret 2025',
-            'admin' => 'Admin Litbang',
-            'halaman' => '32',
-        ],
-        [
-            'ikon' => 'beaker',
-            'judul' => 'Termokimia & Laju Reaksi',
-            'mata' => 'Kimia Analisis • Modul Praktikum Terpadu',
-            'jenjang_label' => '11 SMA Merdeka',
-            'jenjang' => '11-sma',
-            'diperbarui' => '01 Maret 2025',
-            'admin' => 'Admin Litbang',
-            'halaman' => '26',
-        ],
-        [
-            'ikon' => 'leaf',
-            'judul' => 'Struktur Sel & Metabolisme',
-            'mata' => 'Biologi Fundamental • Fase E SMA',
-            'jenjang_label' => '10 SMA Fase E',
-            'jenjang' => '10-sma',
-            'diperbarui' => '26 Feb 2025',
-            'admin' => 'Admin Litbang',
-            'halaman' => '24',
-        ],
-        [
-            'ikon' => 'pen-line',
-            'judul' => 'Teks Argumentatif & Esai Kritis',
-            'mata' => 'Bahasa Indonesia • Fase F SMA',
-            'jenjang_label' => '12 SMA Fase F',
-            'jenjang' => '12-sma',
-            'diperbarui' => '22 Feb 2025',
-            'admin' => 'Admin Kurikulum',
-            'halaman' => '30',
-        ],
-        [
-            'ikon' => 'graduation-cap',
-            'judul' => 'Persiapan OSN Matematika SMP',
-            'mata' => 'Penalaran Matematika • Kurikulum Merdeka',
-            'jenjang_label' => 'Kelas SMP',
-            'jenjang' => 'smp',
-            'diperbarui' => '19 Feb 2025',
-            'admin' => 'Admin Kurikulum',
-            'halaman' => '18',
-        ],
-        [
-            'ikon' => 'wallet',
-            'judul' => 'Ekonomi Mikro & Kebijakan Harga',
-            'mata' => 'Ekonomi Pembangunan • Fase E SMA',
-            'jenjang_label' => '10 SMA Fase E',
-            'jenjang' => '10-sma',
-            'diperbarui' => '15 Feb 2025',
-            'admin' => 'Admin Kurikulum',
-            'halaman' => '26',
-        ],
-    ];
+    $modul = isset($modul) ? $modul : [];
 @endphp
 
-{{-- Kepala halaman + tiga angka pokok distribusi materi --}}
+ {{-- Kepala halaman + tiga angka pokok distribusi materi --}}
 <section class="rounded-b-2xl bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-xl">
@@ -143,7 +60,7 @@
             <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-gold"></span>
             <div class="leading-tight">
                 <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Integritas Dokumen</p>
-                <p class="mt-1 text-[13px] font-bold text-ink">Sinkron &amp; Terproteksi</p>
+                <p class="mt-1 text-[13px] font-bold text-ink">Sinkron & Terproteksi</p>
             </div>
         </div>
     </div>
@@ -181,7 +98,7 @@
     </div>
 </section>
 
-{{-- Tabel pemantauan modul --}}
+ {{-- Tabel pemantauan modul --}}
 <div class="px-4 py-5 sm:px-6">
     <section class="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(20,20,20,0.05)]">
         <div class="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
@@ -190,7 +107,7 @@
             <div class="relative w-full lg:w-[340px]">
                 @include('layouts.partials.icon', ['name' => 'search', 'class' => 'pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bark-300'])
                 <input type="search" data-modul-search placeholder="Cari modul materi, topik, atau mata pelajaran..." aria-label="Cari modul materi, topik, atau mata pelajaran"
-                       class="w-full rounded-lg border border-line bg-shell py-2.5 pl-9 pr-3 text-[12.5px] text-ink placeholder:text-bark-300 transition hover:bg-sand focus:border-gold focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold/30">
+                       class="w-full rounded-lg border border-line bg-shell py-2.5 pl-9 pr-3 text-[12.5px] text-ink placeholder:text-bark-300 transition:hover:bg-sand focus:border-gold focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold/30">
             </div>
 
             <div class="flex flex-wrap items-center gap-2.5">
@@ -201,7 +118,7 @@
                     <select data-jenjang-filter aria-label="Saring modul berdasarkan jenjang kelas"
                             class="w-full appearance-none rounded-lg border border-line bg-white py-2.5 pl-9 pr-9 text-[12.5px] font-semibold text-ink transition hover:bg-bark-50 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30">
                         <option value="semua">Semua Jenjang Kelas</option>
-                        <option value="12-sma">12 SMA — SNBT, Alumni &amp; Fase F</option>
+                        <option value="12-sma">12 SMA — SNBT, Alumni & Fase F</option>
                         <option value="11-sma">11 SMA — Kurikulum Merdeka</option>
                         <option value="10-sma">10 SMA — Fase E</option>
                         <option value="smp">Kelas SMP</option>
@@ -220,7 +137,7 @@
             <table class="w-full min-w-[860px] text-left">
                 <thead>
                     <tr class="border-b border-line">
-                        <th scope="col" class="px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Judul Modul &amp; Mata Pelajaran</th>
+                        <th scope="col" class="px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Judul Modul & Mata Pelajaran</th>
                         <th scope="col" class="px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Target Jenjang</th>
                         <th scope="col" class="px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Tanggal Diperbarui</th>
                         <th scope="col" class="px-5 py-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Admin Pengelola</th>
@@ -289,7 +206,7 @@
         <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-bark-50 px-5 py-3.5">
             <p class="flex items-center gap-2 text-[11.5px] leading-relaxed text-muted">
                 @include('layouts.partials.icon', ['name' => 'shield-check', 'class' => 'h-4 w-4 text-gold'])
-                Protected View <span class="text-bark-300">•</span> Read-Only Siswa &amp; Tentor
+                Protected View <span class="text-bark-300">•</span> Read-Only Siswa & Tentor
             </p>
             <p class="text-[11.5px] text-muted" aria-live="polite">
                 Menampilkan <span data-row-count class="font-bold tabular-nums text-ink">{{ count($modul) }}</span> dari 78 modul terdaftar
