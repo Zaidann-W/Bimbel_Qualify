@@ -19,6 +19,11 @@ class Enrollment extends Model
         'status',
     ];
 
+    protected $casts = [
+        'started_on' => 'date',
+        'ended_on' => 'date',
+    ];
+
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');

@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Str;
+use App\Models\Enrollment;
+use App\Models\LeaveRequest;
+use App\Models\QualifixTicket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DashboardService
 {
@@ -57,6 +60,7 @@ class DashboardService
     public function todayEnrollmentCount(): int
     {
         $today = Carbon::today()->toDateString();
+
         return DB::table('enrollments')
             ->whereDate('started_on', '<=', $today)
             ->where(function ($query) use ($today) {
@@ -82,6 +86,7 @@ class DashboardService
     public function todayClassSessionsCount(): int
     {
         $today = Carbon::today()->toDateString();
+
         return DB::table('class_sessions')
             ->whereDate('session_date', $today)
             ->count();
@@ -93,6 +98,7 @@ class DashboardService
     public function todayStudentAttendanceCount(): int
     {
         $today = Carbon::today()->toDateString();
+
         return DB::table('student_attendance')
             ->whereDate('created_at', $today)
             ->where('status', 'hadir')
@@ -105,6 +111,7 @@ class DashboardService
     public function todayTutorAttendanceCount(): int
     {
         $today = Carbon::today()->toDateString();
+
         return DB::table('tutor_attendance')
             ->whereDate('check_in_at', $today)
             ->where('status', 'hadir')
@@ -137,6 +144,7 @@ class DashboardService
     public function todayQualifixCount(): int
     {
         $today = Carbon::today()->toDateString();
+
         return DB::table('qualifix_tickets')
             ->whereDate('submitted_at', $today)
             ->count();
@@ -224,7 +232,7 @@ class DashboardService
         $activities = [];
 
         // Recent leave requests
-        $recentLeaves = DB::table('leave_requests')
+        $recentLeaves = LeaveRequest::with('student')
             ->latest()
             ->take(3)
             ->get();
@@ -232,52 +240,56 @@ class DashboardService
         foreach ($recentLeaves as $leave) {
             $activities[] = [
                 'type' => 'leave',
-                'title' => "Permintaan izin " . ($leave->type ?? '-') . " untuk " . ($leave->student ? $leave->student->user->name : '-'),
+                'title' => 'Permintaan izin '.($leave->type ?? '-').' untuk '.($leave->student?->full_name ?? '-'),
                 'description' => $leave->reason ?? '-',
-                'time' => $leave->created_at->diffForHumans(),
+                'time' => $leave->created_at?->diffForHumans(),
+                'timestamp' => $leave->created_at?->getTimestamp(),
                 'status' => $leave->status,
             ];
         }
 
         // Recent qualifix tickets
-        $recentTickets = DB::table('qualifix_tickets')
-            ->latest()
+        $recentTickets = QualifixTicket::latest()
             ->take(3)
             ->get();
 
         foreach ($recentTickets as $ticket) {
+            $waktu = $ticket->submitted_at ?? $ticket->created_at;
+
             $activities[] = [
                 'type' => 'qualifix',
-                'title' => "Tiket QualiFix: " . ($ticket->title ?? '-'),
+                'title' => 'Tiket QualiFix: '.($ticket->title ?? '-'),
                 'description' => Str::limit($ticket->question ?? '-', 50),
-                'time' => $ticket->submitted_at->diffForHumans(),
+                'time' => $waktu?->diffForHumans(),
+                'timestamp' => $waktu?->getTimestamp(),
                 'status' => $ticket->status,
             ];
         }
 
         // Recent enrollments
-        $recentEnrollments = DB::table('enrollments')
+        $recentEnrollments = Enrollment::with(['student', 'classGroup'])
             ->latest('started_on')
             ->take(3)
             ->get();
 
         foreach ($recentEnrollments as $enrollment) {
-            $studentName = $enrollment->student ? ($enrollment->student->user ? $enrollment->student->user->name : 'Tidak diketahui') : 'Tidak diketahui';
-            $classCode = $enrollment->classGroup ? $enrollment->classGroup->code : '-';
-
             $activities[] = [
                 'type' => 'enrollment',
-                'title' => "Enrollment {$studentName}",
-                'description' => "Kelas {$classCode}",
-                'time' => $enrollment->started_on->diffForHumans(),
+                'title' => 'Enrollment '.($enrollment->student?->full_name ?? 'Tidak diketahui'),
+                'description' => 'Kelas '.($enrollment->classGroup?->code ?? '-'),
+                'time' => $enrollment->started_on?->diffForHumans(),
+                'timestamp' => $enrollment->started_on?->getTimestamp(),
                 'status' => $enrollment->status,
             ];
         }
 
         // Sort by time and take the 5 most recent
-        usort($activities, fn($a, $b) => strtotime($b['time']) <=> strtotime($a['time']));
+        usort($activities, fn ($a, $b) => ($b['timestamp'] ?? 0) <=> ($a['timestamp'] ?? 0));
 
-        return array_slice($activities, 0, 5);
+        return array_map(
+            fn (array $row): array => array_diff_key($row, ['timestamp' => true]),
+            array_slice($activities, 0, 5),
+        );
     }
 
     /**
