@@ -130,9 +130,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('owner')->name('owner.')->middleware('role:owner')->group(function () {
         Route::get('/', [OwnerDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/laporan-keuangan', function () {
-            return view('owner.laporan-keuangan');
-        })->name('laporanKeuangan');
+        Route::get('/laporan-keuangan', [OwnerDashboardController::class, 'laporanKeuangan'])->name('laporanKeuangan');
 
         Route::get('/laporan-absensi', function () {
             return view('owner.laporan-absensi');
