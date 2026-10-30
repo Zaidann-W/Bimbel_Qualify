@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\ClassGroup;
 use App\Models\Enrollment;
 use App\Models\Guardian;
@@ -12,17 +11,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-=======
-use App\Models\Student;
-use Illuminate\Http\Request;
->>>>>>> origin/main
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DataSiswaController extends Controller
 {
     /**
-     * Tampilkan database induk siswa dan informasi kelas (data dari DB).
+     * Tampilkan database induk siswa dan informasi kelas.
      */
     public function index(Request $request): View|StreamedResponse
     {
@@ -278,40 +273,6 @@ class DataSiswaController extends Controller
             [
                 'label' => 'Total Siswa Aktif',
                 'nilai' => number_format($aktif, 0, ',', '.'),
-    public function index(Request $request): View
-    {
-        $query = Student::with(['user', 'guardians'])
-            ->orderByDesc('created_at');
-
-        // Pencarian nama, NIS, NISN, email, atau sekolah.
-        if ($request->filled('q')) {
-            $kata = $request->q;
-            $query->where(function ($q) use ($kata) {
-                $q->where('full_name', 'like', "%{$kata}%")
-                    ->orWhere('nis', 'like', "%{$kata}%")
-                    ->orWhere('nisn', 'like', "%{$kata}%")
-                    ->orWhere('email', 'like', "%{$kata}%")
-                    ->orWhere('school_name', 'like', "%{$kata}%");
-            });
-        }
-
-        // Filter jenjang (SD/SMP/SMA).
-        if ($request->filled('jenjang') && $request->jenjang !== 'semua') {
-            $query->where('education_level', strtoupper($request->jenjang));
-        }
-
-        // Filter status.
-        if ($request->filled('status') && $request->status !== 'semua') {
-            $query->where('status', $request->status);
-        }
-
-        $siswa = $query->paginate(10)->withQueryString();
-
-        // Angka pokok data siswa (KPI) dari DB.
-        $kpis = [
-            [
-                'label' => 'Total Siswa Aktif',
-                'nilai' => Student::active()->count(),
                 'satuan' => 'Siswa',
                 'nilai_kelas' => 'text-ink',
                 'ikon' => 'users',
@@ -320,35 +281,20 @@ class DataSiswaController extends Controller
             ],
             [
                 'label' => 'Siswa Baru',
-
                 'nilai' => number_format($baru, 0, ',', '.'),
-=======
-                'nilai' => Student::where('status', 'aktif')
-                    ->whereMonth('created_at', now()->month)
-                    ->count(),
->>>>>>> origin/main
                 'satuan' => 'Siswa',
                 'nilai_kelas' => 'text-bronze',
                 'ikon' => 'user-plus',
                 'tile' => 'bg-gold text-espresso',
-
                 'catatan' => 'Terdaftar bulan ini',
             ],
             [
                 'label' => 'Distribusi Jenjang',
                 'nilai' => (string) collect($distribusi)->where('jumlah_raw', '>', 0)->count(),
-=======
-                'catatan' => 'Menunggu verifikasi berkas',
-            ],
-            [
-                'label' => 'Distribusi Jenjang',
-                'nilai' => Student::distinct('education_level')->count('education_level'),
->>>>>>> origin/main
                 'satuan' => 'Tingkatan',
                 'nilai_kelas' => 'text-ink',
                 'ikon' => 'graduation-cap',
                 'tile' => 'bg-sand text-ink',
-
                 'catatan' => collect($distribusi)
                     ->map(fn (array $row): string => str_replace('Jenjang ', '', $row['jenjang']).' ('.$row['jumlah_raw'].')')
                     ->implode(' • '),
@@ -380,24 +326,5 @@ class DataSiswaController extends Controller
                 ];
             })
             ->all();
-=======
-                'catatan' => $this->distribusiCatatan(),
-            ],
-        ];
-
-        return view('admin.datasiswa', compact('siswa', 'kpis'));
-    }
-
-    /**
-     * Catatan distribusi siswa per jenjang untuk KPI.
-     */
-    protected function distribusiCatatan(): string
-    {
-        $sd = Student::where('education_level', 'SD')->count();
-        $smp = Student::where('education_level', 'SMP')->count();
-        $sma = Student::where('education_level', 'SMA')->count();
-
-        return "SD ({$sd}) • SMP ({$smp}) • SMA ({$sma})";
->>>>>>> origin/main
     }
 }
