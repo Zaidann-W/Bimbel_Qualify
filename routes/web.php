@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AbsensiJadwalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataSiswaController;
+use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KeuanganController;
 use App\Http\Controllers\Admin\LaporanPengaturanController;
 use App\Http\Controllers\Admin\ManajemenMateriController;
@@ -14,12 +15,9 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
-
 use App\Http\Controllers\Owner\LaporanAbsensiController;
-
 use App\Http\Controllers\Owner\PemantauanMateriController;
 use App\Http\Controllers\Owner\PengaturanWebsiteController;
-
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -52,6 +50,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/pendaftaran/{kode}', [PendaftaranController::class, 'show'])->name('pendaftaran.detail');
 
     Route::get('/data-siswa', [DataSiswaController::class, 'index'])->name('dataSiswa');
+    Route::get('/data-siswa/create', [DataSiswaController::class, 'create'])->name('dataSiswa.create');
+    Route::post('/data-siswa', [DataSiswaController::class, 'store'])->name('dataSiswa.store');
+    Route::get('/data-siswa/{student}', [DataSiswaController::class, 'show'])->name('dataSiswa.show');
+    Route::get('/data-siswa/{student}/edit', [DataSiswaController::class, 'edit'])->name('dataSiswa.edit');
+    Route::put('/data-siswa/{student}', [DataSiswaController::class, 'update'])->name('dataSiswa.update');
+    Route::delete('/data-siswa/{student}', [DataSiswaController::class, 'destroy'])->name('dataSiswa.destroy');
+
+    Route::get('/kelas', [KelasController::class, 'index'])->name('kelas');
+    Route::get('/kelas/create', [KelasController::class, 'create'])->name('kelas.create');
+    Route::post('/kelas', [KelasController::class, 'store'])->name('kelas.store');
+    Route::get('/kelas/{classGroup}/edit', [KelasController::class, 'edit'])->name('kelas.edit');
+    Route::put('/kelas/{classGroup}', [KelasController::class, 'update'])->name('kelas.update');
+    Route::delete('/kelas/{classGroup}', [KelasController::class, 'destroy'])->name('kelas.destroy');
 
     Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
 

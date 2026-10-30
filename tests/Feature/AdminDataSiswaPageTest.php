@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -10,6 +11,15 @@ beforeEach(function () {
 });
 
 test('data siswa returns a successful response', function () {
+    DB::table('students')->insert([
+        'full_name' => 'Ahmad Zulfikar Ramadhan',
+        'nis' => 'QLF-2026-089',
+        'education_level' => 'SMA',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
     $response = $this->get('/admin/data-siswa');
 
     $response->assertStatus(200);
