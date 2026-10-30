@@ -13,4 +13,11 @@ class DashboardController extends Controller
     {
         return view('owner.dashboard', $this->service->dashboard());
     }
+
+    public function laporanKeuangan()
+    {
+        $data = $this->service->dashboard()['laporanKeuangan'];
+
+        return view('owner.laporan-keuangan', $data);
+    }
 }

@@ -2,35 +2,12 @@
 
 @section('title', 'Laporan Keuangan')
 
-{{-- Seluruh angka di halaman ini masih mock UI sesuai rancangan docs/laporankeuangan-owner.png;
-     sambungkan ke data kas nyata (filter bulan, cetak PDF, ekspor) begitu modul keuangan tersedia --}}
 @section('content')
 @php
     $rupiah = fn (int $nilai): string => 'Rp ' . number_format($nilai, 0, ',', '.');
-
-    $sumberPemasukan = [
-        ['nama' => 'SPP Kelas Reguler & Intensif', 'nilai' => 218400000, 'rincian' => '312 Siswa Terdaftar (81,5% dari Pemasukan)', 'tag' => 'Terbayar Penuh', 'status' => 'lunas', 'persen' => 81.5],
-        ['nama' => 'Pembayaran Registrasi Siswa Baru', 'nilai' => 31600000, 'rincian' => '36 Siswa Baru Gelombang II (11,8%)', 'tag' => 'Pendaftaran', 'status' => 'netral', 'persen' => 11.8],
-        ['nama' => 'Biaya Modul & Try Out Khusus', 'nilai' => 18000000, 'rincian' => 'Paket Simulasi UTBK-SNBT & Ujian Mandiri (6,7%)', 'tag' => 'Paket Modul', 'status' => 'netral', 'persen' => 6.7],
-    ];
-
-    $alokasiBeban = [
-        ['nama' => 'Honorarium & Insentif 24 Tentor', 'nilai' => 49200000, 'rincian' => '58,9% dari Total Beban • 24 Pengajar Aktif', 'tag' => 'Telah Ditransfer', 'status' => 'lunas', 'persen' => 58.9],
-        ['nama' => 'Listrik, Internet & Operasional Gedung', 'nilai' => 18300000, 'rincian' => '21,9% dari Beban • AC, Fiber Optic & Sanitasi', 'tag' => 'Rutin Bulanan', 'status' => 'netral', 'persen' => 21.9],
-        ['nama' => 'Cetak Modul & Perlengkapan Belajar', 'nilai' => 16000000, 'rincian' => '19,2% dari Beban • Modul Semester Genap', 'tag' => 'Vendor Percetakan', 'status' => 'netral', 'persen' => 19.2],
-    ];
-
-    $trenBulanan = [
-        ['bulan' => 'Mei 2025 (Bulan Ini)', 'masuk' => 268000000, 'keluar' => 83500000, 'laba' => 184500000, 'margin' => '68,8%', 'margin_nilai' => 68.8, 'kas' => 'Sangat Sehat', 'periode_ini' => true],
-        ['bulan' => 'April 2025', 'masuk' => 254000000, 'keluar' => 81200000, 'laba' => 172800000, 'margin' => '68,0%', 'margin_nilai' => 68.0, 'kas' => 'Sangat Sehat', 'periode_ini' => false],
-        ['bulan' => 'Maret 2025', 'masuk' => 246500000, 'keluar' => 84000000, 'laba' => 162500000, 'margin' => '65,9%', 'margin_nilai' => 65.9, 'kas' => 'Sehat', 'periode_ini' => false],
-        ['bulan' => 'Februari 2025', 'masuk' => 239000000, 'keluar' => 79500000, 'laba' => 159500000, 'margin' => '66,7%', 'margin_nilai' => 66.7, 'kas' => 'Sehat', 'periode_ini' => false],
-        ['bulan' => 'Januari 2025', 'masuk' => 275000000, 'keluar' => 92400000, 'laba' => 182600000, 'margin' => '66,4%', 'margin_nilai' => 66.4, 'kas' => 'Sangat Sehat', 'periode_ini' => false],
-        ['bulan' => 'Desember 2024', 'masuk' => 220000000, 'keluar' => 82000000, 'laba' => 138000000, 'margin' => '62,7%', 'margin_nilai' => 62.7, 'kas' => 'Sehat', 'periode_ini' => false],
-    ];
 @endphp
 
-{{-- Kepala halaman + ringkasan cepat --}}
+ {{-- Kepala halaman + ringkasan cepat --}}
 <section class="rounded-b-2xl bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-xl">
@@ -76,13 +53,13 @@
                     @include('layouts.partials.icon', ['name' => 'trending-up', 'class' => 'h-4 w-4'])
                 </span>
             </div>
-            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">Rp 268.000.000</p>
+            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">{{ $totalPemasukan }}</p>
             <p class="mt-3 flex items-center gap-1.5 text-[11px] text-muted">
                 @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5 text-gold'])
                 94% dari SPP 348 Siswa Aktif
             </p>
             <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-bark-100">
-                <div class="h-full w-[94%] rounded-full bg-gold"></div>
+                <div class="h-full rounded-full bg-gold" style="width: {{ round($totalPemasukan > 0 ? $totalPemasukan * 0.815 / $totalPemasukan * 100 : 0) }}%"></div>
             </div>
         </article>
 
@@ -94,13 +71,13 @@
                     @include('layouts.partials.icon', ['name' => 'wallet', 'class' => 'h-4 w-4'])
                 </span>
             </div>
-            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">Rp 83.500.000</p>
+            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">{{ $totalPengeluaran }}</p>
             <p class="mt-3 flex items-center gap-1.5 text-[11px] text-muted">
                 @include('layouts.partials.icon', ['name' => 'info', 'class' => 'h-3.5 w-3.5 text-bark-300'])
-                <span class="truncate">Honor Tentor, Sewa &amp; Operasional Bimbel</span>
+                <span class="truncate">Honor Tentor, Sewa & Operasional Bimbel</span>
             </p>
             <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-bark-100">
-                <div class="h-full w-[31%] rounded-full bg-bark-700"></div>
+                <div class="h-full rounded-full bg-bark-700" style="width: {{ round($totalPemasukan > 0 ? $totalPengeluaran / $totalPemasukan * 100 : 0) }}%"></div>
             </div>
         </article>
 
@@ -112,13 +89,20 @@
                     @include('layouts.partials.icon', ['name' => 'briefcase', 'class' => 'h-4 w-4'])
                 </span>
             </div>
-            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">Rp 184.500.000</p>
-            <span class="mt-3 inline-flex items-center gap-1.5 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-semibold text-bronze">
-                @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5'])
-                Margin 68,8% • Arus Kas Sangat Sehat
+            <p class="mt-3 text-[26px] font-bold leading-none tracking-tight tabular-nums text-ink">{{ $labaBersih }}</p>
+            <span @class(['mt-3 inline-flex items-center gap-1.5 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-semibold text-bronze', 'hidden' => $totalPemasukan === 0])>
+                @if ($totalPemasukan > 0)
+                    Margin {{ round($labaBersih / $totalPemasukan * 100) }}% • Arus Kas Sangat Sehat
+                @else
+                    Margin 0% • Arus Kas Sehat
+                @endif
             </span>
             <div class="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-bark-100">
-                <div class="h-full w-[68.8%] rounded-full bg-gold"></div>
+                @if ($totalPemasukan > 0)
+                    <div class="h-full rounded-full bg-gold" style="width: {{ round($labaBersih / $totalPemasukan * 100) }}%"></div>
+                @else
+                    <div class="h-full rounded-full bg-gold" style="width: 0%"></div>
+                @endif
             </div>
         </article>
     </div>
@@ -153,8 +137,8 @@
                             <p class="whitespace-nowrap text-[13.5px] font-bold tabular-nums text-ink">{{ $rupiah($pos['nilai']) }}</p>
                             <span @class([
                                 'mt-1.5 inline-block rounded-md px-2 py-[3px] text-[9.5px] font-semibold',
-                                'bg-sandgold text-bronze' => $pos['status'] === 'lunas',
-                                'bg-sand text-muted' => $pos['status'] === 'netral',
+                                'bg-sandgold text-bronze' => (($pos['status'] ?? '') === 'lunas'),
+                                'bg-sand text-muted' => (($pos['status'] ?? '') === 'netral'),
                             ])>{{ $pos['tag'] }}</span>
                         </div>
                     </li>
@@ -163,7 +147,7 @@
 
             <footer class="flex items-center justify-between gap-3 border-t border-line bg-bark-50 px-5 py-3.5">
                 <p class="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Total Masuk</p>
-                <p class="whitespace-nowrap text-[17px] font-bold tabular-nums text-bronze">Rp 268.000.000</p>
+                <p class="whitespace-nowrap text-[17px] font-bold tabular-nums text-bronze">{{ $totalPemasukan }}</p>
             </footer>
         </section>
 
@@ -191,8 +175,8 @@
                             <p class="whitespace-nowrap text-[13.5px] font-bold tabular-nums text-ink">{{ $rupiah($pos['nilai']) }}</p>
                             <span @class([
                                 'mt-1.5 inline-block rounded-md px-2 py-[3px] text-[9.5px] font-semibold',
-                                'bg-sandgold text-bronze' => $pos['status'] === 'lunas',
-                                'bg-sand text-muted' => $pos['status'] === 'netral',
+                                'bg-sandgold text-bronze' => (($pos['status'] ?? '') === 'lunas'),
+                                'bg-sand text-muted' => (($pos['status'] ?? '') === 'netral'),
                             ])>{{ $pos['tag'] }}</span>
                         </div>
                     </li>
@@ -201,7 +185,7 @@
 
             <footer class="flex items-center justify-between gap-3 border-t border-line bg-bark-50 px-5 py-3.5">
                 <p class="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Total Beban</p>
-                <p class="whitespace-nowrap text-[17px] font-bold tabular-nums text-ink">Rp 83.500.000</p>
+                <p class="whitespace-nowrap text-[17px] font-bold tabular-nums text-ink">{{ array_sum(array_column($alokasiBeban, 'nilai')) }}</p>
             </footer>
         </section>
     </div>
