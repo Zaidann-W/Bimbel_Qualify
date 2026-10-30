@@ -67,6 +67,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/keuangan', [KeuanganController::class, 'index'])->name('keuangan');
 
     Route::get('/manajemen-materi', [ManajemenMateriController::class, 'index'])->name('manajemenMateri');
+    Route::post('/manajemen-materi', [ManajemenMateriController::class, 'store'])->name('manajemenMateri.store');
+    Route::put('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'update'])->name('manajemenMateri.update');
+    Route::delete('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'destroy'])->name('manajemenMateri.destroy');
 
     Route::get('/absensi-jadwal', [AbsensiJadwalController::class, 'index'])->name('absensiJadwal');
 
