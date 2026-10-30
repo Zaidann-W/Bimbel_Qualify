@@ -14,7 +14,12 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+
 use App\Http\Controllers\Owner\LaporanAbsensiController;
+
+use App\Http\Controllers\Owner\PemantauanMateriController;
+use App\Http\Controllers\Owner\PengaturanWebsiteController;
+
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -135,13 +140,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/laporan-absensi', [LaporanAbsensiController::class, 'index'])->name('laporanAbsensi');
 
-        Route::get('/pemantauan-materi', function () {
-            return view('owner.pemantauan-materi');
-        })->name('pemantauanMateri');
+        Route::get('/pemantauan-materi', [PemantauanMateriController::class, 'index'])->name('pemantauanMateri');
 
-        Route::get('/pengaturan-website', function () {
-            return view('owner.pengaturan-website');
-        })->name('pengaturanWebsite');
+        Route::get('/pengaturan-website', [PengaturanWebsiteController::class, 'index'])->name('pengaturanWebsite');
+
+        Route::post('/pengaturan-website', [PengaturanWebsiteController::class, 'update'])->name('pengaturanWebsite.update');
     });
 
     // Manager routes

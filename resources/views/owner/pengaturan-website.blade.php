@@ -412,12 +412,62 @@
             tombolSimpan.disabled = true;
             labelSimpan.textContent = 'Menyimpan...';
 
-            window.setTimeout(() => {
+            // Kumpulkan data dari form identitas
+            const formData = {};
+            const inputFields = form.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"]');
+            inputFields.forEach(input => {
+                const key = input.id;
+                const value = input.value.trim();
+                if (key && value) {
+                    formData[key] = value;
+                }
+            });
+
+            // Kumpulkan data dari testimoni
+            const testimoniData = [];
+            const testimoniCards = daftarTestimoni?.querySelectorAll('[data-testimoni]');
+            if (testimoniCards) {
+                testimoniCards.forEach(card => {
+                    const tk = card.querySelector('[data-tayang]');
+                    testimoniData.push({
+                        id: card.dataset.id || '',
+                        inisial: card.querySelector('.h-11.w-11')?.textContent.trim() || '',
+                        nama: card.querySelector('p.font-bold')?.textContent.trim() || '',
+                        meta: card.querySelector('p.font-semibold')?.textContent.trim() || '',
+                        rating: 5 - [...card.querySelectorAll('[class*="star"]')].length,
+                        kutipan: card.querySelector('blockquote')?.textContent.trim().replace(/^[“"']+|["']+$/g, '') || '',
+                        diinput: card.querySelector('span:first-child')?.textContent.replace('Diinput: ', '') || '',
+                        kategori: card.querySelector('span:last-child')?.textContent.replace('Kategori: ', '') || '',
+                        tayang: tk ? tk.checked : true,
+                        ekstra: card.dataset.ekstra === '1'
+                    });
+                });
+            }
+
+            window.fetch('/owner/pengaturan-website', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    identitas: formData,
+                    testimoni: testimoniData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
                 tombolSimpan.disabled = false;
                 labelSimpan.textContent = labelAwalSimpan;
                 tandaiTersimpan();
-                beriToast('Perubahan tersimpan dan langsung tayang di website publik.');
-            }, 650);
+                beriToast(data.message || 'Perubahan tersimpan dan langsung tayang di website publik.');
+            })
+            .catch(error => {
+                tombolSimpan.disabled = false;
+                labelSimpan.textContent = labelAwalSimpan;
+                beriToast('Gagal menyimpan perubahan. Silakan coba lagi.');
+                console.error('Error:', error);
+            });
         };
 
         form?.addEventListener('submit', (event) => {
