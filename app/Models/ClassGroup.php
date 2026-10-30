@@ -32,6 +32,11 @@ class ClassGroup extends Model
         return $this->hasMany(Enrollment::class);
     }
 
+    public function scheduleRules()
+    {
+        return $this->hasMany(ScheduleRule::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'aktif');
