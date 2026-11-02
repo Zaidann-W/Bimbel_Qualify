@@ -2,29 +2,7 @@
 
 @section('title', 'Kehadiran Anak - Orang tua')
 
-{{-- shortcut: filter bulan/status, search, pagination, Ajukan Izin, dan Ganti Nomor WhatsApp masih mock UI; sambungkan ke backend presensi --}}
 @section('content')
-@php
-    $stats = [
-        ['Kehadiran Fisik', '38', '/40 Sesi', 'Sangat Disiplin', 'check-circle', 'bg-emerald-50 text-emerald-600', 'bg-emerald-50 text-emerald-600'],
-        ['Izin', '2', 'Sesi', null, 'info', 'bg-ember-50 text-ember-600', null],
-        ['Sakit', '0', 'Sesi', null, 'help-circle', 'bg-bark-100 text-bark-500', null],
-        ['Alpa / Tanpa Izin', '0', 'Sesi', null, 'x', 'bg-rose-50 text-rose-500', null],
-    ];
-
-    // [hariTgl, masuk, masukTone, mapel, tentor, ruang, status, statusTone, nilai, catatan]
-    $riwayat = [
-        ['Rabu, 12 Mar 2025', 'Masuk 15.24 WIB • (Sesi Sore)', 'text-emerald-600', 'Fisika Saintek', 'Kak Sarah Anastasia, S.Pd', 'Ruang Eureka (Lt. 2)',
-         'Hadir Tepat Waktu', 'bg-emerald-50 text-emerald-600', 'Kak Hendra: 92/100', 'Laporan sesi terkirim ke WhatsApp'],
-        ['Senin, 10 Mar 2025', 'Masuk 15.20 WIB • (Sesi Sore)', 'text-emerald-600', 'Matematika IPA', 'Kak Hendra Wijaya, M. Sc', 'Ruang Newton (Lt. 1)',
-         'Hadir Tepat Waktu', 'bg-emerald-50 text-emerald-600', 'Kak Hendra: 88/100', 'Integral Tentu & Tak Tentu, Aryanti'],
-        ['Jumat, 07 Mar 2025', 'Izin (Orang Tua Mengajukan)', 'text-ember-600', 'Kimia Intensif', 'Kak Citra Larasati, S. Si', 'Ruang Curie (Lt. 3)',
-         'Izin Lomba OSN', 'bg-amber-50 text-amber-600', 'Diizinkan Disesuaikan', 'Sertifikat lomba diunggah via WhatsApp'],
-        ['Rabu, 05 Mar 2025', 'Masuk 15.25 WIB • (Sesi Sore)', 'text-emerald-600', 'Biologi UTBK', 'Eva Rosary Halim, S.Pd', 'Ruang Eureka (Lt. 2)',
-         'Hadir Tepat Waktu', 'bg-emerald-50 text-emerald-600', 'Kak Hendra: 96/100', 'Genetika & Hereditas, Aurora'],
-    ];
-@endphp
-
 <div class="space-y-5">
 
     {{-- Header --}}
@@ -41,20 +19,20 @@
 
     {{-- Stat cards --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach ($stats as [$label, $value, $unit, $badge, $icon, $tone, $badgeTone])
+        @foreach ($stats as $stat)
             <div class="rounded-2xl border border-bark-100 bg-white p-4">
                 <div class="flex items-start justify-between gap-2">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">{{ $label }}</p>
-                    <div @class(['grid h-8 w-8 shrink-0 place-items-center rounded-lg', $tone])>
-                        @include('layouts.partials.icon', ['name' => $icon, 'class' => 'h-4 w-4'])
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">{{ $stat['label'] }}</p>
+                    <div @class(['grid h-8 w-8 shrink-0 place-items-center rounded-lg', $stat['tone']])>
+                        @include('layouts.partials.icon', ['name' => $stat['icon'], 'class' => 'h-4 w-4'])
                     </div>
                 </div>
                 <div class="mt-2 flex items-baseline gap-1.5">
-                    <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $value }}</span>
-                    <span class="text-[11.5px] font-medium text-bark-400">{{ $unit }}</span>
+                    <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $stat['value'] }}</span>
+                    <span class="text-[11.5px] font-medium text-bark-400">{{ $stat['unit'] }}</span>
                 </div>
-                @if ($badge)
-                    <span @class(['mt-3 inline-flex rounded-md px-2 py-1 text-[10.5px] font-bold', $badgeTone])>{{ $badge }}</span>
+                @if ($stat['badge'] !== null)
+                    <span @class(['mt-3 inline-flex rounded-md px-2 py-1 text-[10.5px] font-bold', $stat['badgeTone']])>{{ $stat['badge'] }}</span>
                 @endif
             </div>
         @endforeach
@@ -65,10 +43,15 @@
         <div class="min-w-[240px] flex-1">
             <div class="flex items-center justify-between gap-2">
                 <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">Rasio Kehadiran Periode Ini</p>
-                <p class="text-[15px] font-bold text-emerald-600">95%</p>
+                @php
+                    $totalSesi = array_sum(array_map(fn ($a) => (int) ($a['presensi']['total_sesi'] ?? 0), $anak ?? []));
+                    $totalHadir = array_sum(array_map(fn ($a) => (int) ($a['presensi']['hadir'] ?? 0), $anak ?? []));
+                    $persen = $totalSesi === 0 ? 0 : round($totalHadir / $totalSesi * 100);
+                @endphp
+                <p class="text-[15px] font-bold text-emerald-600">{{ $persen }}%</p>
             </div>
             <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-bark-100">
-                <div class="h-full rounded-full bg-emerald-500" style="width: 95%"></div>
+                <div class="h-full rounded-full bg-emerald-500" style="width: {{ $persen }}%"></div>
             </div>
         </div>
         <div class="flex flex-wrap gap-6">
@@ -98,17 +81,24 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">Kehadiran Terakhir</p>
-                    <p class="mt-1 text-[15.5px] font-bold text-white">Rabu, 12 Maret 2025 • Pukul 15:24 WIB</p>
-                    <p class="mt-0.5 text-[12px] text-bark-300">Fisika Saintek di <span class="font-semibold text-gold">Ruang Eureka (Lantai 2)</span> • Ananda sudah berada di dalam ruang kelas tercatat.</p>
+                    @if ($terakhir)
+                        <p class="mt-1 text-[15.5px] font-bold text-white">{{ $terakhir['tanggal_label'] }} • Pukul {{ $terakhir['check_in_time']?->format('H:i') ?? '-' }} WIB</p>
+                        <p class="mt-0.5 text-[12px] text-bark-300">{{ $terakhir['mapel'] }} di <span class="font-semibold text-gold">{{ $terakhir['ruang'] }}</span> • {{ $terakhir['anak'] }} sudah berada di dalam ruang kelas tercatat.</p>
+                    @else
+                        <p class="mt-1 text-[15.5px] font-bold text-white">Belum ada data presensi</p>
+                        <p class="mt-0.5 text-[12px] text-bark-300">Data presensi akan muncul setelah ada sesi belajar yang tercatat.</p>
+                    @endif
                 </div>
             </div>
-            <div class="flex items-center gap-2.5 rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-2.5">
-                @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-5 w-5 text-emerald-400'])
-                <div class="leading-tight">
-                    <p class="text-[10px] font-bold uppercase tracking-wide text-emerald-300/90">Status Presensi</p>
-                    <p class="mt-0.5 text-[14px] font-bold text-white">Tepat Waktu</p>
+            @if ($terakhir && $terakhir['status'] === 'Hadir')
+                <div class="flex items-center gap-2.5 rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-2.5">
+                    @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-5 w-5 text-emerald-400'])
+                    <div class="leading-tight">
+                        <p class="text-[10px] font-bold uppercase tracking-wide text-emerald-300/90">Status Presensi</p>
+                        <p class="mt-0.5 text-[14px] font-bold text-white">Tepat Waktu</p>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 
@@ -122,7 +112,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
                     @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5'])
-                    Bulan Maret 2025
+                    Semua Bulan
                     @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5'])
                 </button>
                 <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
@@ -149,43 +139,52 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-bark-100">
-                    @foreach ($riwayat as [$tgl, $masuk, $masukTone, $mapel, $tentor, $ruang, $status, $statusTone, $nilai, $catatan])
-                        <tr class="transition hover:bg-bark-50/60">
-                            <td class="px-5 py-3.5 align-top">
-                                <p class="text-[13px] font-bold text-bark-800">{{ $tgl }}</p>
-                                <p @class(['mt-0.5 text-[11.5px] font-semibold', $masukTone])>{{ $masuk }}</p>
-                            </td>
-                            <td class="px-4 py-3.5 align-top">
-                                <p class="text-[13px] font-bold text-bark-800">{{ $mapel }}</p>
-                                <p class="mt-0.5 text-[11.5px] text-bark-400">{{ $tentor }}</p>
-                            </td>
-                            <td class="px-4 py-3.5 align-top">
-                                <span class="inline-flex items-center gap-1.5 text-[12px] text-bark-500">
-                                    @include('layouts.partials.icon', ['name' => 'building', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-                                    {{ $ruang }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3.5 align-top">
-                                <span @class(['inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold', $statusTone])>
-                                    <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
-                                    {{ $status }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3.5 align-top">
-                                <p class="text-[12.5px] font-semibold text-bark-700">{{ $nilai }}</p>
-                                <p class="mt-0.5 text-[11.5px] text-bark-400">{{ $catatan }}</p>
-                            </td>
+                    @if (count($riwayat ?? []) > 0)
+                        @foreach ($riwayat as $row)
+                            <tr class="transition hover:bg-bark-50/60">
+                                <td class="px-5 py-3.5 align-top">
+                                    <p class="text-[13px] font-bold text-bark-800">{{ $row['tanggal_label'] }}</p>
+                                    <p @class(['mt-0.5 text-[11.5px] font-semibold', $row['masuk_tone']])>{{ $row['masuk'] }}</p>
+                                </td>
+                                <td class="px-4 py-3.5 align-top">
+                                    <p class="text-[13px] font-bold text-bark-800">{{ $row['mapel'] }}</p>
+                                    <p class="mt-0.5 text-[11.5px] text-bark-400">{{ $row['tentor'] }}</p>
+                                </td>
+                                <td class="px-4 py-3.5 align-top">
+                                    <span class="inline-flex items-center gap-1.5 text-[12px] text-bark-500">
+                                        @include('layouts.partials.icon', ['name' => 'building', 'class' => 'h-3.5 w-3.5 text-bark-400'])
+                                        {{ $row['ruang'] }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3.5 align-top">
+                                    <span @class(['inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold', $row['status_tone']])>
+                                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                                        {{ $row['status'] }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3.5 align-top">
+                                    <p class="text-[12.5px] font-semibold text-bark-700">{{ $row['anak'] }}</p>
+                                    <p class="mt-0.5 text-[11.5px] text-bark-400">{{ $row['catatan'] }}</p>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="5" class="px-5 py-8 text-center text-bark-400">Belum ada data kehadiran.</td>
                         </tr>
-                    @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
 
         <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-bark-100 px-5 py-3.5">
-            <p class="text-[11.5px] text-bark-400">Menampilkan 1 – 4 dari total 40 sesi belajar semester ini.</p>
+            @php
+                $totalRows = count($riwayat ?? []);
+            @endphp
+            <p class="text-[11.5px] text-bark-400">Menampilkan 1 – {{ $totalRows }} dari total {{ $totalRows }} sesi belajar.</p>
             <div class="flex items-center gap-1.5">
                 <button type="button" class="rounded-lg border border-bark-200 bg-white px-3 py-1.5 text-[11.5px] font-semibold text-bark-500 transition hover:bg-bark-50">Sebelumnya</button>
-                @foreach ([1, 2, 3] as $p)
+                @foreach ([1] as $p)
                     <button type="button"
                             @class([
                                 'h-7 w-7 rounded-lg text-[11.5px] font-bold transition',
@@ -193,8 +192,6 @@
                                 'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => $p !== 1,
                             ])>{{ $p }}</button>
                 @endforeach
-                <span class="px-1 text-[11.5px] text-bark-400">…</span>
-                <button type="button" class="h-7 w-7 rounded-lg border border-bark-200 bg-white text-[11.5px] font-bold text-bark-500 transition hover:bg-bark-50">10</button>
                 <button type="button" class="rounded-lg border border-bark-200 bg-white px-3 py-1.5 text-[11.5px] font-semibold text-bark-500 transition hover:bg-bark-50">Selanjutnya</button>
             </div>
         </footer>
