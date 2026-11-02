@@ -31,9 +31,7 @@
                 $nav = [
                     ['Dashboard', 'layout-grid', route('ortu.dashboard'), request()->routeIs('ortu.dashboard*')],
                     ['Kehadiran Anak', 'clipboard-check', route('ortu.kehadiran'), request()->routeIs('ortu.kehadiran*')],
-                    ['Informasi Anak', 'book-open', route('ortu.informasi'), request()->routeIs('ortu.informasi*')],
                     ['Pembayaran', 'credit-card', route('ortu.pembayaran'), request()->routeIs('ortu.pembayaran*')],
-                    ['Pendaftaran', 'clipboard-form', route('ortu.pendaftaran'), request()->routeIs('ortu.pendaftaran*')],
                     ['Profil Saya', 'user', route('ortu.profil'), request()->routeIs('ortu.profil*')],
                 ];
             @endphp
