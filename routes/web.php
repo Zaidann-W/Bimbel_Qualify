@@ -206,17 +206,9 @@ Route::middleware('auth')->group(function () {
             return view('wali.kehadiran');
         })->name('kehadiran');
 
-        Route::get('/informasi', function () {
-            return view('wali.informasi');
-        })->name('informasi');
-
         Route::get('/pembayaran', function () {
             return view('wali.pembayaran');
         })->name('pembayaran');
-
-        Route::get('/pendaftaran', function () {
-            return view('wali.pendaftaran');
-        })->name('pendaftaran');
 
         Route::get('/profil', function () {
             return view('wali.profil');
