@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Ortu\DashboardController as OrtuDashboardController;
 use App\Http\Controllers\Ortu\KehadiranController as OrtuKehadiranController;
+use App\Http\Controllers\Ortu\ProfilController as OrtuProfilController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LaporanAbsensiController;
 use App\Http\Controllers\Owner\PemantauanMateriController;
@@ -208,9 +209,7 @@ Route::middleware('auth')->group(function () {
             return view('wali.pembayaran');
         })->name('pembayaran');
 
-        Route::get('/profil', function () {
-            return view('wali.profil');
-        })->name('profil');
+        Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
     });
 
     // Wali routes (alias untuk role ortu, supaya URL dan named route 'wali.*' tetap bisa diakses)
@@ -223,8 +222,6 @@ Route::middleware('auth')->group(function () {
             return view('wali.pembayaran');
         })->name('pembayaran');
 
-        Route::get('/profil', function () {
-            return view('wali.profil');
-        })->name('profil');
+        Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
     });
 });
