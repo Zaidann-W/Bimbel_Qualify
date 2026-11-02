@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Ortu\DashboardController as OrtuDashboardController;
+use App\Http\Controllers\Ortu\KehadiranController as OrtuKehadiranController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LaporanAbsensiController;
 use App\Http\Controllers\Owner\PemantauanMateriController;
@@ -201,9 +202,22 @@ Route::middleware('auth')->group(function () {
     Route::prefix('ortu')->name('ortu.')->middleware('role:ortu')->group(function () {
         Route::get('/', [OrtuDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/kehadiran', function () {
-            return view('wali.kehadiran');
-        })->name('kehadiran');
+        Route::get('/kehadiran', [OrtuKehadiranController::class, 'index'])->name('kehadiran');
+
+        Route::get('/pembayaran', function () {
+            return view('wali.pembayaran');
+        })->name('pembayaran');
+
+        Route::get('/profil', function () {
+            return view('wali.profil');
+        })->name('profil');
+    });
+
+    // Wali routes (alias untuk role ortu, supaya URL dan named route 'wali.*' tetap bisa diakses)
+    Route::prefix('wali')->name('wali.')->middleware('role:ortu')->group(function () {
+        Route::get('/', [OrtuDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/kehadiran', [OrtuKehadiranController::class, 'index'])->name('kehadiran');
 
         Route::get('/pembayaran', function () {
             return view('wali.pembayaran');
