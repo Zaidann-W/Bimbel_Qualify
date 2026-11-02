@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegistrasiController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Ortu\DashboardController as OrtuDashboardController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LaporanAbsensiController;
 use App\Http\Controllers\Owner\PemantauanMateriController;
@@ -198,9 +199,7 @@ Route::middleware('auth')->group(function () {
 
     // Ortu (Wali) routes
     Route::prefix('ortu')->name('ortu.')->middleware('role:ortu')->group(function () {
-        Route::get('/', function () {
-            return view('wali.dashboard');
-        })->name('dashboard');
+        Route::get('/', [OrtuDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/kehadiran', function () {
             return view('wali.kehadiran');
