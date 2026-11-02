@@ -33,6 +33,11 @@ class QualifixTicket extends Model
         return $this->belongsTo(Student::class, 'student_id');
     }
 
+    public function classGroup()
+    {
+        return $this->belongsTo(ClassGroup::class, 'class_group_id');
+    }
+
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');

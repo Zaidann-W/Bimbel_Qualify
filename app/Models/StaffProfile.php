@@ -31,6 +31,14 @@ class StaffProfile extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Tiket Klinik PR (QualiFix) yang ditangani oleh staf ini.
+     */
+    public function qualificTickets()
+    {
+        return $this->belongsToMany(QualifixTicket::class, 'qualifix_assignments', 'staff_id', 'ticket_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'aktif');
