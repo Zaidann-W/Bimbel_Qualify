@@ -2,16 +2,7 @@
 
 @section('title', 'Profil Saya - Orang tua')
 
-{{-- shortcut: Simpan Perubahan, Ubah Sandi, toggle notifikasi, dan Hubungi Helpdesk masih mock UI; sambungkan ke backend akun wali --}}
 @section('content')
-@php
-    // [inisial, nama, sub, chip teks, chip gaya, chip ikon]
-    $anak = [
-        ['AP', 'Aisyah Putri Azzahra', 'Kelas 12 IPA • SPP Lunas', 'Siswa Aktif', 'emerald', 'check-circle'],
-        ['AR', 'Anindya Putri Rahayu', 'Kelas 10 SMA • Calon Siswa', 'Cek Berkas', 'gold', 'chevron-right'],
-    ];
-@endphp
-
 <div class="space-y-5">
 
     {{-- Header --}}
@@ -25,7 +16,7 @@
             <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">Kelola data kontak orang tua dan pantau status keterhubungan akun putra-putri Anda dalam satu tampilan terpadu.</p>
         </div>
         <p class="shrink-0 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[11.5px] text-bark-400">
-            ID Wali: <span class="font-bold text-bark-700">WAL-2024-0419</span>
+            ID Wali: <span class="font-bold text-bark-700">{{ $idWali ?? '-' }}</span>
         </p>
     </div>
 
@@ -33,19 +24,21 @@
     <section class="rounded-2xl border border-bark-100 bg-white px-5 py-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex min-w-0 items-center gap-3.5">
-                <div class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-espresso text-[17px] font-bold text-white">HG</div>
+                <div class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-espresso text-[17px] font-bold text-white">
+                    {{ $guardian ? strtoupper(mb_substr($guardian->name, 0, 1)) : '-' }}
+                </div>
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
-                        <h2 class="text-[16.5px] font-bold text-bark-800">Ir. Hendra Gunawan</h2>
+                        <h2 class="text-[16.5px] font-bold text-bark-800">{{ $guardian->name ?? '-' }}</h2>
                         <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10.5px] font-bold text-emerald-600">
                             @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3 w-3'])
                             Akun Wali Terverifikasi
                         </span>
                     </div>
                     <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-bark-500">
-                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'map-pin', 'class' => 'h-3.5 w-3.5'])Cabang Menteng</span>
-                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'phone', 'class' => 'h-3.5 w-3.5'])+62 812-4455-8891</span>
-                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'mail', 'class' => 'h-3.5 w-3.5'])hendra.gunawan@email.com</span>
+                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'map-pin', 'class' => 'h-3.5 w-3.5']){{ $guardian->address ?? '-' }}</span>
+                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'phone', 'class' => 'h-3.5 w-3.5']){{ $guardian->phone_wa ?? '-' }}</span>
+                        <span class="inline-flex items-center gap-1.5">@include('layouts.partials.icon', ['name' => 'mail', 'class' => 'h-3.5 w-3.5']){{ $guardian->email ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -70,42 +63,43 @@
                         <p class="mt-0.5 max-w-xs text-[11.5px] leading-relaxed text-bark-400">Nomor aktif untuk penempatan presensi dan laporan belajar</p>
                     </div>
                 </div>
-                <p class="shrink-0 text-[10.5px] text-bark-400">Update 12 Feb 2025</p>
+                <p class="shrink-0 text-[10.5px] text-bark-400">Data dari profil akun wali</p>
             </header>
 
             <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label class="block">
                     <span class="text-[11px] font-bold text-bark-500">Nama Lengkap Wali</span>
-                    <input type="text" value="Ir. Hendra Gunawan" readonly class="mt-1 w-full rounded-lg border border-bark-200 bg-bark-50/60 px-3 py-2 text-[13px] text-bark-700 focus:outline-none">
+                    <input type="text" value="{{ $guardian->name ?? '-' }}" readonly class="mt-1 w-full rounded-lg border border-bark-200 bg-bark-50/60 px-3 py-2 text-[13px] text-bark-700 focus:outline-none">
                 </label>
                 <label class="block">
                     <span class="text-[11px] font-bold text-bark-500">Hubungan Keluarga</span>
-                    <input type="text" value="Ayah Kandung" readonly class="mt-1 w-full rounded-lg border border-bark-200 bg-bark-50/60 px-3 py-2 text-[13px] text-bark-700 focus:outline-none">
+                    <input type="text" value="{{ $hubunganUtama ?? '-' }}" readonly class="mt-1 w-full rounded-lg border border-bark-200 bg-bark-50/60 px-3 py-2 text-[13px] text-bark-700 focus:outline-none">
                 </label>
                 <label class="block">
                     <span class="flex items-center gap-1.5 text-[11px] font-bold text-bark-500">Nomor WhatsApp <span class="rounded bg-gold/25 px-1.5 py-[1px] text-[9.5px] font-bold text-espresso">Utama</span></span>
                     <span class="relative mt-1 block">
                         @include('layouts.partials.icon', ['name' => 'phone', 'class' => 'pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-bark-300'])
-                        <input type="text" value="+62 812-4455-8891" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
+                        <input type="text" value="{{ $guardian->phone_wa ?? '-' }}" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
                     </span>
                 </label>
                 <label class="block">
                     <span class="text-[11px] font-bold text-bark-500">Alamat Email</span>
                     <span class="relative mt-1 block">
                         @include('layouts.partials.icon', ['name' => 'mail', 'class' => 'pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-bark-300'])
-                        <input type="text" value="hendra.gunawan@email.com" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
+                        <input type="text" value="{{ $guardian->email ?? '-' }}" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
                     </span>
                 </label>
                 <label class="block sm:col-span-2">
                     <span class="text-[11px] font-bold text-bark-500">Alamat Tempat Tinggal</span>
                     <span class="relative mt-1 block">
                         @include('layouts.partials.icon', ['name' => 'map-pin', 'class' => 'pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-bark-300'])
-                        <input type="text" value="Jl. Gandaria Tengah III No. 14, Kebayoran Baru, Jakarta Selatan" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
+                        <input type="text" value="{{ $guardian->address ?? '-' }}" readonly class="w-full rounded-lg border border-bark-200 bg-bark-50/60 py-2 pl-9 pr-3 text-[13px] text-bark-700 focus:outline-none">
                     </span>
                 </label>
             </div>
 
             <div class="mt-4 flex justify-end">
+                {{-- shortcut: Simpan Perubahan masih mock UI, sambungkan ke backend akun wali --}}
                 <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-espresso px-4 py-2.5 text-[12.5px] font-bold text-white transition hover:bg-bark-900">
                     @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4'])
                     Simpan Perubahan
@@ -119,27 +113,29 @@
             <section class="rounded-2xl border border-bark-100 bg-white px-4 py-4">
                 <header class="flex items-center justify-between gap-2">
                     <h2 class="text-[13.5px] font-bold text-bark-800">Putra-Putri Terhubung</h2>
-                    <span class="rounded-full bg-bark-100 px-2.5 py-1 text-[10.5px] font-bold text-bark-500">2 Siswa</span>
+                    <span class="rounded-full bg-bark-100 px-2.5 py-1 text-[10.5px] font-bold text-bark-500">{{ $children->count() }} Siswa</span>
                 </header>
 
                 <div class="mt-3 space-y-2">
-                    @foreach ($anak as [$inisial, $nama, $sub, $chip, $gaya, $ikon])
+                    @forelse ($children as $child)
                         <div class="flex items-center gap-2.5 rounded-xl border border-bark-100 bg-white px-3 py-2.5 transition hover:bg-bark-50">
-                            <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-bark-800 text-[11.5px] font-bold text-white">{{ $inisial }}</div>
+                            <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-bark-800 text-[11.5px] font-bold text-white">{{ $child->inisial() }}</div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-[12.5px] font-bold text-bark-800">{{ $nama }}</p>
-                                <p class="mt-0.5 truncate text-[10.5px] text-bark-400">{{ $sub }}</p>
+                                <p class="truncate text-[12.5px] font-bold text-bark-800">{{ $child->full_name }}</p>
+                                <p class="mt-0.5 truncate text-[10.5px] text-bark-400">Kelas {{ $child->school_grade }} {{ $child->major }} • {{ $child->school_name }}</p>
                             </div>
                             <span @class([
                                 'inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold',
-                                'bg-emerald-50 text-emerald-600' => $gaya === 'emerald',
-                                'bg-gold/25 text-espresso' => $gaya === 'gold',
+                                'bg-emerald-50 text-emerald-600' => $child->status === 'aktif',
+                                'bg-gold/25 text-espresso' => $child->status !== 'aktif',
                             ])>
-                                @include('layouts.partials.icon', ['name' => $ikon, 'class' => 'h-3 w-3'])
-                                {{ $chip }}
+                                @include('layouts.partials.icon', ['name' => $child->status === 'aktif' ? 'check-circle' : 'chevron-right', 'class' => 'h-3 w-3'])
+                                {{ $child->status === 'aktif' ? 'Siswa Aktif' : 'Belum Aktif' }}
                             </span>
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="text-[11.5px] text-bark-400">Belum ada siswa yang terhubung dengan akun wali ini.</p>
+                    @endforelse
                 </div>
             </section>
 
@@ -153,6 +149,7 @@
                         <p class="mt-0.5 text-[11px] text-bark-400">•••••••••••••••••• <span class="font-semibold text-bark-500">• Terakhir diubah 30 hari lalu</span></p>
                     </div>
                 </div>
+                {{-- shortcut: Ubah Sandi masih mock UI, sambungkan ke backend akun wali --}}
                 <button type="button" class="shrink-0 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[11.5px] font-bold text-bark-600 transition hover:bg-bark-50">Ubah Sandi</button>
             </section>
 
@@ -177,6 +174,7 @@
                 <p class="mt-0.5 text-[11.5px] text-bark-400">Presensi tap-in/out harian dan ringkasan nilai modul belajar</p>
             </div>
         </div>
+        {{-- shortcut: toggle notifikasi masih mock UI, sambungkan ke backend akun wali --}}
         <button type="button" role="switch" aria-checked="true" aria-label="Notifikasi otomatis WhatsApp" class="relative h-6 w-11 shrink-0 rounded-full bg-gold transition">
             <span class="absolute right-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow"></span>
         </button>
