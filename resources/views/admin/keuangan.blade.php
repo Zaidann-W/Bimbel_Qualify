@@ -6,81 +6,18 @@
      sambungkan ke tabel transaksi + tagihan SPP begitu modul keuangan aktif --}}
 @section('content')
 @php
-    $rupiah = fn (int $nilai): string => 'Rp ' . number_format($nilai, 0, ',', '.');
+    $rupiah = fn (float $nilai): string => 'Rp ' . number_format($nilai, 0, ',', '.');
 
     $status_pil = [
         'lunas' => ['label' => 'Lunas', 'kelas' => 'bg-forest-100 text-forest-700'],
-        'terarsip' => ['label' => 'Terarsip', 'kelas' => 'bg-sand text-muted'],
+        'belum_bayar' => ['label' => 'Belum Bayar', 'kelas' => 'bg-ember-100 text-ember-700'],
+        'sebagian' => ['label' => 'Sebagian', 'kelas' => 'bg-gold text-espresso'],
+        'batal' => ['label' => 'Batal', 'kelas' => 'bg-bark-100 text-bark-700'],
     ];
 
-    $tabs = [
-        ['key' => 'semua', 'label' => 'Semua', 'jumlah' => '6'],
-        ['key' => 'masuk', 'label' => 'Pemasukan', 'jumlah' => '4'],
-        ['key' => 'keluar', 'label' => 'Pengeluaran', 'jumlah' => '2'],
-    ];
-
-    $transaksi = [
-        [
-            'waktu' => '13:45 WIB',
-            'keterangan' => 'SPP Bulan Oktober 2024',
-            'pihak' => 'Siti Aliyah • 10 SMA IPA',
-            'metode' => 'Bank BCA',
-            'nominal' => 850000,
-            'arah' => 'masuk',
-            'status' => 'lunas',
-        ],
-        [
-            'waktu' => '11:20 WIB',
-            'keterangan' => 'Pendaftaran & DP Tryout UTBK',
-            'pihak' => 'Ananda Rizky Saputra • 12 SMA',
-            'metode' => 'Tunai Kasir',
-            'nominal' => 1150000,
-            'arah' => 'masuk',
-            'status' => 'lunas',
-        ],
-        [
-            'waktu' => '10:05 WIB',
-            'keterangan' => 'Fotokopi & Binding Drill Soal',
-            'pihak' => 'Percetakan Prima Jaya',
-            'metode' => 'Kas Kecil',
-            'nominal' => -250000,
-            'arah' => 'keluar',
-            'status' => 'terarsip',
-        ],
-        [
-            'waktu' => '09:12 WIB',
-            'keterangan' => 'SPP Oktober & Paket Klinik PR',
-            'pihak' => 'Dimas Wahyu • 9 SMP',
-            'metode' => 'QRIS',
-            'nominal' => 1500000,
-            'arah' => 'masuk',
-            'status' => 'lunas',
-        ],
-        [
-            'waktu' => '08:30 WIB',
-            'keterangan' => 'Cicilan SPP Semester Ganjil',
-            'pihak' => 'Nabila Nuraini • 11 SMA IPS',
-            'metode' => 'Bank BCA',
-            'nominal' => 1350000,
-            'arah' => 'masuk',
-            'status' => 'lunas',
-        ],
-        [
-            'waktu' => '08:00 WIB',
-            'keterangan' => 'Konsumsi & Air Galon Guru',
-            'pihak' => 'Toko Berkah Mandiri',
-            'metode' => 'Kas Kecil',
-            'nominal' => -135000,
-            'arah' => 'keluar',
-            'status' => 'terarsip',
-        ],
-    ];
-
-    $tagihan = [
-        ['nama' => 'Fajar Ramadhan', 'kelas' => '12 IPS', 'nominal' => 850000, 'tempo' => 'Lewat 4 hari'],
-        ['nama' => 'Kirana Naura', 'kelas' => '9 SMP', 'nominal' => 350000, 'tempo' => 'Jatuh tempo hari ini'],
-        ['nama' => 'Muhammad Rafi', 'kelas' => '10 IPA', 'nominal' => 800000, 'tempo' => 'Lewat 2 hari'],
-    ];
+    $totalMasukNum = $totalMasuk ?? 0;
+    $totalKeluarNum = $totalKeluar ?? 0;
+    $saldoBersihNum = $saldoBersih ?? 0;
 @endphp
 
 {{-- Kepala halaman --}}
@@ -140,9 +77,9 @@
                 <p class="text-[10.5px] font-bold uppercase leading-snug tracking-[0.12em] text-muted">Total Pemasukan</p>
             </div>
             <p class="mt-3 text-[27px] font-extrabold leading-none tracking-tight tabular-nums text-ink">
-                {{ $rupiah(4850000) }}
+                {{ $rupiah($totalMasukNum) }}
             </p>
-            <p class="mt-3 text-[11.5px] font-semibold leading-snug text-forest-600">4 transaksi masuk hari ini</p>
+            <p class="mt-3 text-[11.5px] font-semibold leading-snug text-forest-600">{{ count($transaksi ?? []) }} transaksi masuk</p>
         </article>
 
         <article class="rounded-xl border border-line border-t-[3px] border-t-ember-400 bg-white p-4">
@@ -151,7 +88,7 @@
                 <p class="text-[10.5px] font-bold uppercase leading-snug tracking-[0.12em] text-muted">Pengeluaran Kas</p>
             </div>
             <p class="mt-3 text-[27px] font-extrabold leading-none tracking-tight tabular-nums text-ember-700">
-                {{ $rupiah(385000) }}
+                {{ $rupiah($totalKeluarNum) }}
             </p>
             <p class="mt-3 text-[11.5px] font-medium leading-snug text-muted">Kas kecil operasional</p>
         </article>
@@ -162,7 +99,7 @@
                 <p class="text-[10.5px] font-bold uppercase leading-snug tracking-[0.12em] text-bark-200">Saldo Bersih</p>
             </div>
             <p class="mt-3 text-[27px] font-extrabold leading-none tracking-tight tabular-nums text-white">
-                {{ $rupiah(4465000) }}
+                {{ $rupiah($saldoBersihNum) }}
             </p>
             <p class="mt-3 flex items-center gap-1.5 text-[11.5px] font-medium leading-snug text-bark-300">
                 @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5 shrink-0 text-gold'])
@@ -220,40 +157,45 @@
                     </tr>
                 </thead>
                 <tbody id="keuangan-body">
-                    @foreach ($transaksi as $row)
-                        @php $status = $status_pil[$row['status']]; @endphp
-                        <tr data-baris data-arah="{{ $row['arah'] }}"
-                            data-cari="{{ strtolower($row['keterangan'] . ' ' . $row['pihak'] . ' ' . $row['metode']) }}"
-                            class="border-t border-line align-top odd:bg-white even:bg-shell">
-                            <td class="px-5 py-4">
-                                <p class="text-[13px] font-bold leading-snug tabular-nums text-ink">{{ $row['waktu'] }}</p>
-                                <p class="mt-1 text-[11.5px] leading-snug text-muted">Hari ini</p>
-                            </td>
-                            <td class="px-5 py-4">
-                                <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row['keterangan'] }}</p>
-                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row['pihak'] }}</p>
-                            </td>
-                            <td class="px-5 py-4">
-                                <p class="text-[13px] font-medium leading-snug text-ink">{{ $row['metode'] }}</p>
-                            </td>
-                            <td class="px-5 py-4 text-right">
-                                <p @class([
-                                    'text-[13.5px] font-bold leading-snug tabular-nums',
-                                    'text-forest-700' => $row['arah'] === 'masuk',
-                                    'text-ember-700' => $row['arah'] === 'keluar',
-                                ])>
-                                    {{ $row['arah'] === 'masuk' ? '+' : '-' }} {{ $rupiah(abs($row['nominal'])) }}
-                                </p>
-                            </td>
-                            <td class="px-5 py-4">
-                                <span class="inline-flex rounded-lg px-2.5 py-1.5 text-[11px] font-bold leading-tight {{ $status['kelas'] }}">
-                                    {{ $status['label'] }}
-                                </span>
+                    @if (empty($transaksi))
+                        <tr id="keuangan-kosong" class="border-t border-line">
+                            <td colspan="5" class="px-5 py-12 text-center">
+                                <p class="text-[13.5px] font-bold text-ink">Tidak ada transaksi yang cocok</p>
+                                <p class="mt-1.5 text-[12.5px] text-muted">Belum ada data tagihan SPP atau pembayaran.</p>
                             </td>
                         </tr>
-                    @endforeach
+                    @else
+                        @foreach ($transaksi as $row)
+                            @php $status = $status_pil[$row['status']] ?? ['label' => ucfirst($row['status']), 'kelas' => 'bg-sand text-muted']; @endphp
+                            <tr data-baris data-arah="masuk"
+                                data-cari="{{ strtolower($row['keterangan'] . ' ' . $row['pihak'] . ' ' . $row['metode']) }}"
+                                class="border-t border-line align-top odd:bg-white even:bg-shell">
+                                <td class="px-5 py-4">
+                                    <p class="text-[13px] font-bold leading-snug tabular-nums text-ink">{{ $row['waktu'] }}</p>
+                                    <p class="mt-1 text-[11.5px] leading-snug text-muted">{{ $row['invoice_number'] ?? '-' }}</p>
+                                </td>
+                                <td class="px-5 py-4">
+                                    <p class="text-[13.5px] font-bold leading-snug text-ink">{{ $row['keterangan'] }}</p>
+                                    <p class="mt-1.5 text-[11.5px] leading-snug text-muted">{{ $row['pihak'] }}</p>
+                                </td>
+                                <td class="px-5 py-4">
+                                    <p class="text-[13px] font-medium leading-snug text-ink">{{ $row['metode'] }}</p>
+                                </td>
+                                <td class="px-5 py-4 text-right">
+                                    <p class="text-[13.5px] font-bold leading-snug tabular-nums text-forest-700">
+                                        + {{ $rupiah($row['nominal']) }}
+                                    </p>
+                                </td>
+                                <td class="px-5 py-4">
+                                    <span class="inline-flex rounded-lg px-2.5 py-1.5 text-[11px] font-bold leading-tight {{ $status['kelas'] }}">
+                                        {{ $status['label'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
 
-                    <tr id="keuangan-kosong" class="hidden border-t border-line">
+                    <tr id="keuangan-kosong" @if (! empty($transaksi)) class="hidden" @endif class="border-t border-line">
                         <td colspan="5" class="px-5 py-12 text-center">
                             <p class="text-[13.5px] font-bold text-ink">Tidak ada transaksi yang cocok</p>
                             <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci pencarian atau pilih tab Semua untuk melihat seluruh arus kas hari ini.</p>
@@ -266,7 +208,7 @@
         {{-- Kaki tabel --}}
         <footer class="flex flex-col gap-3 border-t border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-[12px] leading-snug text-muted">
-                Menampilkan <span id="keuangan-dari" class="font-bold text-ink">6</span> transaksi hari ini
+                Menampilkan <span id="keuangan-dari" class="font-bold text-ink">{{ count($transaksi ?? []) }}</span> transaksi
             </p>
 
             <nav class="flex items-center gap-1.5" aria-label="Navigasi halaman buku transaksi">
@@ -326,29 +268,37 @@
         </div>
 
         <ul class="mt-2">
-            @foreach ($tagihan as $tunggak)
-                <li class="flex flex-wrap items-center gap-3 border-t border-line py-3.5">
-                    <div class="min-w-0 flex-1">
-                        <p class="text-[13px] font-bold leading-snug text-ink">
-                            {{ $tunggak['nama'] }}
-                            <span class="font-medium text-muted">({{ $tunggak['kelas'] }})</span>
-                        </p>
-                        <p class="mt-1 text-[12px] font-semibold leading-snug text-ember-700">
-                            {{ $rupiah($tunggak['nominal']) }}
-                            <span class="font-medium"> • {{ $tunggak['tempo'] }}</span>
-                        </p>
-                    </div>
-                    <button type="button" data-pengingat
-                            class="shrink-0 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12px] font-semibold text-espresso transition hover:bg-sand">
-                        Kirim Pengingat
-                    </button>
+            @if (empty($tagihan))
+                <li class="border-t border-line py-3.5">
+                    <td colspan="5" class="px-5 py-12 text-center">
+                        <p class="text-[13.5px] font-bold text-ink">Tidak ada tagihan yang belum lunas</p>
+                    </td>
                 </li>
-            @endforeach
+            @else
+                @foreach ($tagihan as $tunggak)
+                    <li class="flex flex-wrap items-center gap-3 border-t border-line py-3.5">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[13px] font-bold leading-snug text-ink">
+                                {{ $tunggak['nama'] }}
+                                <span class="font-medium text-muted">({{ $tunggak['kelas'] }})</span>
+                            </p>
+                            <p class="mt-1 text-[12px] font-semibold leading-snug text-ember-700">
+                                {{ $rupiah($tunggak['nominal']) }}
+                                <span class="font-medium"> • {{ $tunggak['tempo'] }}</span>
+                            </p>
+                        </div>
+                        <button type="button" data-pengingat
+                                class="shrink-0 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12px] font-semibold text-espresso transition hover:bg-sand">
+                            Kirim Pengingat
+                        </button>
+                    </li>
+                @endforeach
+            @endif
         </ul>
 
         <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
             <p class="text-[12px] leading-snug text-muted">
-                Total tertunggak: <span class="font-bold text-ember-700">{{ $rupiah(2000000) }}</span>
+                Total tertunggak: <span class="font-bold text-ember-700">{{ $rupiah(array_sum(array_column($tagihan ?? [], 'nominal'))) }}</span>
             </p>
             <button type="button" data-pengingat
                     class="inline-flex items-center gap-2 rounded-lg bg-espresso px-4 py-2.5 text-[12.5px] font-semibold text-white transition hover:bg-bark-800">
