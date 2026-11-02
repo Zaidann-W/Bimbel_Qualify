@@ -5,9 +5,12 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataSiswaController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KeuanganController;
+use App\Http\Controllers\Admin\LaporanKeuanganController;
 use App\Http\Controllers\Admin\LaporanPengaturanController;
+use App\Http\Controllers\Admin\LaporanPresensiController;
 use App\Http\Controllers\Admin\ManajemenMateriController;
 use App\Http\Controllers\Admin\PendaftaranController;
+use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\QualifixController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -76,6 +79,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/qualifix', [QualifixController::class, 'index'])->name('qualifix');
 
     Route::get('/laporan-pengaturan', [LaporanPengaturanController::class, 'index'])->name('laporanPengaturan');
+
+    Route::get('/laporan-keuangan', [LaporanKeuanganController::class, 'index'])->name('laporanKeuangan');
+    Route::get('/laporan-keuangan/export', [LaporanKeuanganController::class, 'export'])->name('laporanKeuangan.export');
+
+    Route::get('/laporan-presensi', [LaporanPresensiController::class, 'index'])->name('laporanPresensi');
+    Route::get('/laporan-presensi/export', [LaporanPresensiController::class, 'export'])->name('laporanPresensi.export');
+
+    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
 Route::get('/registrasi', [RegistrasiController::class, 'create'])
