@@ -209,6 +209,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran', [OrtuPembayaranController::class, 'index'])->name('pembayaran');
 
         Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
+        Route::put('/profil', [OrtuProfilController::class, 'update'])->name('profil.update');
+        Route::put('/profil/password', [OrtuProfilController::class, 'updatePassword'])->name('profil.password');
     });
 
     // Wali routes (alias untuk role ortu, supaya URL dan named route 'wali.*' tetap bisa diakses)
@@ -220,5 +222,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran', [OrtuPembayaranController::class, 'index'])->name('pembayaran');
 
         Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
+        Route::put('/profil', [OrtuProfilController::class, 'update'])->name('profil.update');
+        Route::put('/profil/password', [OrtuProfilController::class, 'updatePassword'])->name('profil.password');
     });
 });
