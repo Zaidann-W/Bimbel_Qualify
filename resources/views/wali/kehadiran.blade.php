@@ -207,7 +207,7 @@
                 <h3 class="text-[14.5px] font-bold text-bark-800">Perlu Izin atau Sakit untuk Ananda?</h3>
                 <p class="mt-1 text-[12px] leading-relaxed text-bark-500">Pemberitahuan izin disarankan sebelum hari dimulai agar status anak tetap tercatat di rekap (presensi) harian.</p>
                 <div class="mt-3 flex flex-wrap items-center gap-3">
-                    <button type="button" class="rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-bold text-white transition hover:bg-ember-600">
+                    <button type="button" data-ortu-izin-open class="rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-bold text-white transition hover:bg-ember-600">
                         Ajukan Izin Sekarang
                     </button>
                     <a href="#" class="inline-flex items-center gap-1 text-[12px] font-bold text-bark-600 hover:text-bark-800">
@@ -238,5 +238,8 @@
             </div>
         </section>
     </div>
+
+    {{-- Overlay pengajuan izin --}}
+    <x-izin-ortu-modal :anak="$anak ?? []" :sesi="$sesi_mendatang ?? []" />
 </div>
 @endsection

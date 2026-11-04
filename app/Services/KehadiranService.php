@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\ClassSession;
+use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\SessionAttendance;
 use App\Models\Student;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class KehadiranService
@@ -20,7 +23,8 @@ class KehadiranService
      *     anak: array<int, array<string, mixed>>,
      *     stats: array<int, array<string, mixed>>,
      *     riwayat: array<int, array<string, mixed>>,
-     *     terakhir: array<string, mixed>|null
+     *     terakhir: array<string, mixed>|null,
+     *     sesi_mendatang: array<int, array<string, mixed>>
      * }
      */
     public function kehadiran(): array
@@ -42,6 +46,7 @@ class KehadiranService
         $stats = $this->statCards($anak);
         $riwayat = $this->riwayatSemua($anak);
         $terakhir = $this->presensiTerakhir($anak);
+        $sesiMendatang = $this->sesiMendatang($anak);
 
         return [
             'guardian' => $guardian === null ? null : [
@@ -56,6 +61,7 @@ class KehadiranService
             'stats' => $stats,
             'riwayat' => $riwayat,
             'terakhir' => $terakhir,
+            'sesi_mendatang' => $sesiMendatang,
         ];
     }
 
@@ -83,6 +89,58 @@ class KehadiranService
             'presensi' => $this->presensiSiswa($siswa),
             'riwayat' => $this->riwayatSiswa($siswa),
         ])->toArray();
+    }
+
+    /**
+     * Dapatkan sesi kelas mendatang anak pertama (mulai hari ini) sebagai pilihan
+     * sesi pada form pengajuan izin orang tua.
+     *
+     * @param  array<int, array<string, mixed>>  $anak
+     * @return array<int, array<string, mixed>>
+     */
+    private function sesiMendatang(array $anak): array
+    {
+        $siswa = $anak[0] ?? null;
+
+        if ($siswa === null) {
+            return [];
+        }
+
+        $classGroupId = Enrollment::where('student_id', $siswa['id'])
+            ->where('status', 'aktif')
+            ->value('class_group_id');
+
+        if ($classGroupId === null) {
+            return [];
+        }
+
+        return ClassSession::with('subject')
+            ->where('class_group_id', $classGroupId)
+            ->whereDate('session_date', '>=', today())
+            ->where('status', '!=', 'dibatalkan')
+            ->orderBy('session_date')
+            ->orderBy('start_time')
+            ->limit(12)
+            ->get()
+            ->map(fn (ClassSession $sesi): array => [
+                'id' => $sesi->id,
+                'tanggal' => $sesi->session_date,
+                'label' => sprintf(
+                    '%s (%s, %s)',
+                    $sesi->subject?->name ?? ($sesi->topic ?? 'Sesi Kelas'),
+                    Carbon::parse($sesi->session_date)->locale('id')->translatedFormat('j M'),
+                    $this->jam($sesi->start_time),
+                ),
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Format jam sesi "H.i" dari string waktu database.
+     */
+    private function jam(?string $waktu): string
+    {
+        return $waktu === null ? '-' : str_replace(':', '.', substr($waktu, 0, 5));
     }
 
     /**
