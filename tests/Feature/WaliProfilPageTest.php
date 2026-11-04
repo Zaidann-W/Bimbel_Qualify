@@ -5,6 +5,7 @@ use App\Models\Student;
 use App\Models\StudentGuardian;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
@@ -14,6 +15,7 @@ beforeEach(function () {
         'status' => 'aktif',
         'name' => 'Ir. Hendra Gunawan',
         'email' => 'hendra.gunawan@email.com',
+        'password' => Hash::make('password123'),
     ]);
 
     $this->actingAs($this->user);
@@ -104,4 +106,61 @@ test('profil orang tua menampilkan daftar anak yang terhubung dari database', fu
 
 test('profil orang tua is reachable from its named route', function () {
     $this->get(route('wali.profil'))->assertStatus(200);
+});
+
+test('profil orang tua dapat memperbarui data diri guardian', function () {
+    $response = $this->put(route('wali.profil'), [
+        'name' => 'Ir. Hendra Gunawan Updated',
+        'occupation' => 'Wirausaha',
+        'phone_wa' => '+62 812-9999-0000',
+        'email' => 'hendra.updated@email.com',
+        'address' => 'Jl. Sudirman No. 100, Jakarta Pusat',
+    ]);
+
+    $response->assertStatus(302);
+    $response->assertSessionHas('success');
+
+    $this->guardian->refresh();
+    expect($this->guardian->name)->toBe('Ir. Hendra Gunawan Updated');
+    expect($this->guardian->occupation)->toBe('Wirausaha');
+    expect($this->guardian->phone_wa)->toBe('+62 812-9999-0000');
+    expect($this->guardian->email)->toBe('hendra.updated@email.com');
+    expect($this->guardian->address)->toBe('Jl. Sudirman No. 100, Jakarta Pusat');
+});
+
+test('profil orang tua validasi input update data diri', function () {
+    $this->put(route('wali.profil'), [
+        'name' => '',
+        'phone_wa' => '',
+    ])->assertSessionHasErrors(['name', 'email', 'phone_wa']);
+});
+
+test('profil orang tua dapat mengubah kata sandi', function () {
+    $response = $this->put(route('wali.profil.password'), [
+        'current_password' => 'password123',
+        'password' => 'barupassword123',
+        'password_confirmation' => 'barupassword123',
+    ]);
+
+    $response->assertStatus(302);
+    $response->assertSessionHas('success');
+
+    $this->user->refresh();
+    expect(Hash::check('barupassword123', $this->user->password))->toBeTrue();
+});
+
+test('profil orang tua menolak kata sandi saat ini yang salah', function () {
+    $this->put(route('wali.profil.password'), [
+        'current_password' => 'salah123',
+        'password' => 'barupassword123',
+        'password_confirmation' => 'barupassword123',
+    ])->assertSessionHasErrors(['current_password']);
+});
+
+test('profil orang tua validasi konfirmasi kata sandi baru', function () {
+    $this->put(route('wali.profil.password'), [
+        'current_password' => 'password123',
+        'password' => 'barupassword123',
+        'password_confirmation' => 'tidaksama',
+    ])->assertSessionHasErrors(['password']);
 });
