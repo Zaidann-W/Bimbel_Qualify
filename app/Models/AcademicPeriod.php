@@ -34,4 +34,12 @@ class AcademicPeriod extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Tahun awal tahun ajaran yang sedang berjalan (tahun ajaran berjalan Juli–Juni).
+     */
+    public static function currentYearStart(): int
+    {
+        return now()->month >= 7 ? now()->year : now()->year - 1;
+    }
 }
