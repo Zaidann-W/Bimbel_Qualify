@@ -38,7 +38,7 @@ beforeEach(function () {
 function registrasiPayload(): array
 {
     return [
-        'anti_spam_honeypot' => 'terisi',
+        'anti_spam_honeypot' => '',
         'nama_lengkap' => 'Budi Santoso',
         'nama_panggilan' => 'Budi',
         'tanggal_lahir' => '2012-05-12',
@@ -171,6 +171,18 @@ test('registration rejects an application that already exists', function () {
         ->assertSessionHasErrors('duplicate');
 
     expect(Application::count())->toBe(1);
+});
+
+test('registration is rejected when the anti-spam honeypot field is filled', function () {
+    $payload = registrasiPayload();
+    $payload['anti_spam_honeypot'] = 'diisi-bot';
+
+    $this->from(route('registrasi'))
+        ->post(route('registrasi.simpan'), $payload)
+        ->assertRedirect(route('registrasi'))
+        ->assertSessionHasErrors(['anti_spam_honeypot' => 'Validasi keamanan gagal. Silakan coba lagi.']);
+
+    expect(Application::count())->toBe(0);
 });
 
 test('confirmation page redirects to the form without a submitted registration', function () {

@@ -442,7 +442,7 @@
 
                         <div class="mt-7" data-field>
                             <label class="-m-1 flex cursor-pointer items-start gap-3 rounded-xl p-1" data-control-surface>
-                                <input type="checkbox" name="setuju" data-label="persetujuan" required class="peer sr-only">
+                                <input type="checkbox" name="setuju" value="1" data-label="persetujuan" required class="peer sr-only">
                                 <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border-2 border-line bg-shell text-transparent transition-colors peer-checked:border-espresso peer-checked:bg-espresso peer-checked:text-gold peer-focus-visible:ring-4 peer-focus-visible:ring-gold/40" aria-hidden="true">
                                     @include('partials.icon', ['name' => 'check', 'size' => 12, 'stroke' => 3.2])
                                 </span>

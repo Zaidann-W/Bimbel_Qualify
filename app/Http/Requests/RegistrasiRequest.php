@@ -31,7 +31,7 @@ class RegistrasiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'anti_spam_honeypot' => ['required', 'string', 'min:1'],
+            'anti_spam_honeypot' => ['nullable', 'max:0'],
             'nama_lengkap' => ['required', 'string', 'max:150'],
             'nama_panggilan' => ['required', 'string', 'max:50'],
             'tanggal_lahir' => ['required', 'date'],
@@ -57,9 +57,7 @@ class RegistrasiRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'anti_spam_honeypot.required' => 'Validasi keamanan gagal. Silakan coba lagi.',
-            'anti_spam_honeypot.string' => 'Validasi keamanan gagal. Silakan coba lagi.',
-            'anti_spam_honeypot.min' => 'Validasi keamanan gagal. Silakan coba lagi.',
+            'anti_spam_honeypot.max' => 'Validasi keamanan gagal. Silakan coba lagi.',
             'nama_lengkap.required' => 'Nama lengkap siswa wajib diisi.',
             'nama_panggilan.required' => 'Nama panggilan siswa wajib diisi.',
             'tanggal_lahir.required' => 'Tanggal lahir siswa wajib diisi.',
