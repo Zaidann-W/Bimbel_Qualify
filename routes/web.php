@@ -21,6 +21,7 @@ use App\Http\Controllers\Ortu\DashboardController as OrtuDashboardController;
 use App\Http\Controllers\Ortu\KehadiranController as OrtuKehadiranController;
 use App\Http\Controllers\Ortu\PembayaranController as OrtuPembayaranController;
 use App\Http\Controllers\Ortu\ProfilController as OrtuProfilController;
+use App\Http\Controllers\Ortu\XenditInvoiceController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LaporanAbsensiController;
 use App\Http\Controllers\Owner\PemantauanMateriController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Tentor\AbsensiController;
 use App\Http\Controllers\Tentor\ProfilController;
 use App\Http\Controllers\Tentor\TentorDashboardController;
 use App\Http\Controllers\Tentor\TentorQualifixController;
+use App\Http\Controllers\XenditWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -208,6 +210,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/pembayaran', [OrtuPembayaranController::class, 'index'])->name('pembayaran');
 
+        Route::post('/pembayaran/xendit/invoice', [XenditInvoiceController::class, 'store'])->name('pembayaran.xendit.invoice');
+
         Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
         Route::put('/profil', [OrtuProfilController::class, 'update'])->name('profil.update');
         Route::put('/profil/password', [OrtuProfilController::class, 'updatePassword'])->name('profil.password');
@@ -221,8 +225,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/pembayaran', [OrtuPembayaranController::class, 'index'])->name('pembayaran');
 
+        Route::post('/pembayaran/xendit/invoice', [XenditInvoiceController::class, 'store'])->name('pembayaran.xendit.invoice');
+
         Route::get('/profil', [OrtuProfilController::class, 'index'])->name('profil');
         Route::put('/profil', [OrtuProfilController::class, 'update'])->name('profil.update');
         Route::put('/profil/password', [OrtuProfilController::class, 'updatePassword'])->name('profil.password');
     });
 });
+
+Route::post('/webhook/xendit', [XenditWebhookController::class, 'handle'])->name('webhook.xendit');
