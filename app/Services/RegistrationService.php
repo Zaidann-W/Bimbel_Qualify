@@ -3,22 +3,23 @@
 namespace App\Services;
 
 use App\Http\Requests\RegistrasiRequest;
+use App\Models\AdmissionBatch;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationStatusHistory;
+use App\Models\File;
 use App\Models\StudyShift;
-use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class RegistrationService
 {
     /**
      * Process the registration form submission.
      *
-     * @param  \App\Http\Requests\RegistrasiRequest  $request
      * @return array{'registration_number' => string, 'application_id' => int}
      */
     public function register(RegistrasiRequest $request): array
@@ -29,6 +30,12 @@ class RegistrationService
 
             // Determine batch_id based on active admission batch
             $batchId = $this->determineBatchId();
+
+            if ($batchId === null) {
+                throw ValidationException::withMessages([
+                    'pendaftaran' => RegistrasiRequest::PESAN_PENDAFTARAN_TUTUP,
+                ]);
+            }
 
             // Generate unique registration number
             $registrationNumber = $this->generateRegistrationNumber();
@@ -85,9 +92,6 @@ class RegistrationService
 
     /**
      * Check rate limit for the registration submission.
-     *
-     * @param  \App\Http\Requests\RegistrasiRequest  $request
-     * @return void
      */
     protected function checkRateLimit(RegistrasiRequest $request): void
     {
@@ -95,7 +99,7 @@ class RegistrationService
 
         if (RateLimiter::tooManyAttempts($key, 5, 60)) {
             $retryAfter = RateLimiter::availableIn($key);
-            throw new \HttpException(429, 'Terlalu banyak permintaan registrasi. Silakan coba lagi dalam ' . $retryAfter . ' detik.');
+            throw new \HttpException(429, 'Terlalu banyak permintaan registrasi. Silakan coba lagi dalam '.$retryAfter.' detik.');
         }
 
         RateLimiter::hit($key);
@@ -108,23 +112,19 @@ class RegistrationService
      */
     protected function determineBatchId(): ?int
     {
-        return StudyShift::firstWhere(function ($query) {
-            $query->whereRaw('opens_at <= curdate() AND closes_at >= curdate()');
-        })?.admissionBatch?->id;
+        return AdmissionBatch::current()?->id;
     }
 
     /**
      * Generate unique registration number in format REG-{tahun}-{4 digit urut}.
-     *
-     * @return string
      */
     protected function generateRegistrationNumber(): string
     {
         $year = now()->format('Y');
-        $prefix = 'REG-' . $year . '-';
+        $prefix = 'REG-'.$year.'-';
 
         // Try to find the last registration number with this year prefix
-        $last = Application::where('registration_number', 'like', $prefix . '%')
+        $last = Application::where('registration_number', 'like', $prefix.'%')
             ->orderBy('registration_number', 'desc')
             ->value('registration_number');
 
@@ -146,7 +146,7 @@ class RegistrationService
         $attempts = 0;
 
         while (! $unique && $attempts < 100) {
-            $candidate = $prefix . $formattedCounter;
+            $candidate = $prefix.$formattedCounter;
             $exists = Application::where('registration_number', $candidate)->exists();
 
             if (! $exists) {
@@ -158,13 +158,11 @@ class RegistrationService
             $attempts++;
         }
 
-        return $prefix . $formattedCounter;
+        return $prefix.$formattedCounter;
     }
 
     /**
      * Map kelas value to school_grade.
-     *
-     * @return string|null
      */
     protected function mapKelasToGrade(string $kelas): ?string
     {
@@ -185,8 +183,6 @@ class RegistrationService
 
     /**
      * Map kelas value to education_level.
-     *
-     * @return string|null
      */
     protected function mapKelasToEducationLevel(string $kelas): ?string
     {
@@ -207,12 +203,15 @@ class RegistrationService
 
     /**
      * Map sesi value to study_shift_id.
-     *
-     * @return int|null
      */
     protected function mapSesiToStudyShiftId(string $sesi): ?int
     {
-        $shift = StudyShift::where('name', $sesi)->first();
+        $map = [
+            'sore' => 'Sesi Sore',
+            'malam' => 'Sesi Malam',
+        ];
+
+        $shift = StudyShift::where('name', $map[$sesi] ?? $sesi)->first();
 
         return $shift?->id;
     }
@@ -220,10 +219,9 @@ class RegistrationService
     /**
      * Handle file uploads for rapor documents.
      *
-     * @param  \App\Models\Application  $application
-     * @param  \Illuminate\Http\UploadedFile|null  $raporGanjil
-     * @param  \Illuminate\Http\UploadedFile|null  $raporGenap
-     * @return void
+     * @param  Application  $application
+     * @param  UploadedFile|null  $raporGanjil
+     * @param  UploadedFile|null  $raporGenap
      */
     protected function handleFileUploads($application, $raporGanjil, $raporGenap): void
     {
@@ -244,12 +242,8 @@ class RegistrationService
     /**
      * Store a single document and create application_document row.
      *
-     * @param  \App\Models\Application  $application
-     * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string  $typeLabel
-     * @param  int  $maxSize
-     * @param  array  $allowedMimes
-     * @return void
+     * @param  Application  $application
+     * @param  UploadedFile  $file
      */
     protected function storeDocument($application, $file, string $typeLabel, int $maxSize, array $allowedMimes): void
     {
@@ -267,7 +261,7 @@ class RegistrationService
         $path = $file->store('applications/documents', 'private');
 
         // Create file record
-        $fileModel = \App\Models\File::create([
+        $fileModel = File::create([
             'original_name' => $file->getClientOriginalName(),
             'path' => $path,
             'mime_type' => $file->getMimeType() ?: 'application/octet-stream',

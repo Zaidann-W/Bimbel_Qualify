@@ -67,6 +67,11 @@ class Application extends Model
         return $this->hasMany(ApplicationDocument::class);
     }
 
+    public function statusHistories()
+    {
+        return $this->hasMany(ApplicationStatusHistory::class);
+    }
+
     public function scopePendingReview($query)
     {
         return $query->whereIn('status', ['menunggu_review', 'perlu_perbaikan']);

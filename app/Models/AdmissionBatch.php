@@ -30,6 +30,36 @@ class AdmissionBatch extends Model
         return $this->belongsTo(AcademicPeriod::class);
     }
 
+    /**
+     * Gelombang yang jendela pendaftarannya terbuka pada hari ini.
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereDate('opens_at', '<=', now())
+            ->whereDate('closes_at', '>=', now())
+            ->orderByDesc('wave_number')
+            ->orderByDesc('opens_at');
+    }
+
+    /**
+     * Gelombang pendaftaran yang sedang berjalan, jika ada.
+     */
+    public static function current(): ?self
+    {
+        return static::active()->with('academicPeriod')->first();
+    }
+
+    /**
+     * Gelombang pendaftaran berikutnya yang belum dibuka, jika ada.
+     */
+    public static function next(): ?self
+    {
+        return static::whereDate('opens_at', '>', now())
+            ->with('academicPeriod')
+            ->orderBy('opens_at')
+            ->first();
+    }
+
     public function applications()
     {
         return $this->hasMany(Application::class, 'batch_id');

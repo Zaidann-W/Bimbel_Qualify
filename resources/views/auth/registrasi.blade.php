@@ -40,10 +40,18 @@
                 <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold text-espresso">
                     @include('partials.icon', ['name' => 'calendar', 'size' => 21, 'stroke' => 1.9])
                 </span>
-                <p class="text-[15.5px] sm:text-[16.5px] font-bold text-ink">Pendaftaran Tahun Ajaran 2025/2026</p>
-                <span class="sm:ml-auto inline-flex items-center gap-2 bg-espresso rounded-full px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.11em] text-[#f0e2c6]">
-                    <span class="h-1.5 w-1.5 rounded-full bg-gold motion-safe:animate-pulse" aria-hidden="true"></span>
-                    Gelombang Aktif
+                <p class="text-[15.5px] sm:text-[16.5px] font-bold text-ink">Pendaftaran Tahun Ajaran {{ $tahunAjaran }}</p>
+                <span @class([
+                    'sm:ml-auto inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.11em]',
+                    'bg-espresso text-[#f0e2c6]' => (bool) $gelombangAktif,
+                    'bg-ember-700 text-white' => ! $gelombangAktif,
+                ])>
+                    @if ($gelombangAktif)
+                        <span class="h-1.5 w-1.5 rounded-full bg-gold motion-safe:animate-pulse" aria-hidden="true"></span>
+                        Gelombang {{ $gelombangAktif->wave_number }} Aktif
+                    @else
+                        Pendaftaran Ditutup
+                    @endif
                 </span>
             </div>
 
@@ -80,6 +88,22 @@
                 </div>
             </div>
 
+            {{-- Error validasi dari server: pesan yang menempel pada kolom ditampilkan lewat JS --}}
+            @if ($errors->any())
+                <div class="mt-6 rounded-2xl border border-ember-400/70 bg-ember-50 px-5 py-4 sm:px-6" role="alert">
+                    <p class="flex items-center gap-2 text-[15px] font-bold text-ember-700">
+                        @include('partials.icon', ['name' => 'info', 'size' => 18])
+                        Pendaftaran belum dapat diproses
+                    </p>
+                    <ul class="mt-2 list-disc space-y-1 pl-5 text-[14px] leading-[1.6] text-ember-800">
+                        @foreach ($errors->all() as $pesan)
+                            <li>{{ $pesan }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if ($gelombangAktif)
             <form
                 id="form-pendaftaran"
                 action="{{ route('registrasi') }}"
@@ -505,6 +529,30 @@
                     </div>
                 </aside>
             </form>
+            @else
+                {{-- Formulir diganti panel penutupan saat tidak ada gelombang yang terbuka --}}
+                <div class="mt-6 rounded-[24px] border border-line/60 bg-paper p-8 sm:p-12 text-center shadow-[0_10px_30px_-22px_rgba(42,26,14,0.35)]" role="status">
+                    <span class="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sand text-bronze">
+                        @include('partials.icon', ['name' => 'clock', 'size' => 26, 'stroke' => 1.9])
+                    </span>
+                    <h2 class="mt-6 text-[26px] sm:text-[28px] font-extrabold leading-tight text-ink">Pendaftaran Ditutup</h2>
+                    <p class="mt-4 mx-auto max-w-[560px] text-[15.5px] leading-[1.75] text-muted">
+                        {{ $pesanPendaftaranTutup }}
+                        @if ($gelombangBerikutnya)
+                            Gelombang {{ $gelombangBerikutnya->wave_number }} dijadwalkan dibuka pada
+                            {{ $gelombangBerikutnya->opens_at->translatedFormat('d F Y') }}.
+                        @endif
+                    </p>
+                    <div class="mt-8 flex flex-wrap justify-center gap-3">
+                        <a
+                            href="{{ url('/') }}"
+                            class="inline-flex items-center bg-espresso hover:bg-[#3a2515] text-paper font-bold text-[15px] px-6 py-3.5 rounded-xl transition-colors"
+                        >
+                            Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
     </section>
 @endsection
@@ -697,6 +745,28 @@
                 });
 
                 input.addEventListener('change', render);
+            });
+
+            // Error validasi dari server: pesan untuk kolom tertentu ditampilkan
+            // pada kotak errornya; sisanya sudah tercetak di ringkasan atas formulir.
+            var pesanServer = @json($errors->toArray());
+
+            Object.keys(pesanServer).forEach(function (kunci) {
+                var kontrol = form.querySelector('[name="' + kunci + '"]');
+
+                if (! kontrol || ! pesanServer[kunci].length) {
+                    return;
+                }
+
+                var kotak = kotakError(kontrol);
+
+                if (kotak) {
+                    kotak.textContent = pesanServer[kunci][0];
+                    kotak.classList.remove('hidden');
+                }
+
+                gayaError(permukaan(kontrol), true);
+                kontrol.setAttribute('aria-invalid', 'true');
             });
 
             form.addEventListener('submit', function (event) {

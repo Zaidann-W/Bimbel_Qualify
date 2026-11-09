@@ -2,12 +2,19 @@
 
 namespace App\Http\Requests;
 
+use App\Models\AdmissionBatch;
+use App\Models\Application;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Validator;
 
 class RegistrasiRequest extends FormRequest
 {
+    /**
+     * Pesan penolakan saat tidak ada gelombang pendaftaran yang sedang terbuka.
+     */
+    public const PESAN_PENDAFTARAN_TUTUP = 'Pendaftaran gelombang ini sedang ditutup. Silakan tunggu pengumuman gelombang berikutnya.';
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,10 +30,8 @@ class RegistrasiRequest extends FormRequest
      */
     public function rules(): array
     {
-        $nisnExists = $this->filled('nisn');
-
         return [
-            'anti_spam_honeypot' => ['required','string','min:1'],
+            'anti_spam_honeypot' => ['required', 'string', 'min:1'],
             'nama_lengkap' => ['required', 'string', 'max:150'],
             'nama_panggilan' => ['required', 'string', 'max:50'],
             'tanggal_lahir' => ['required', 'date'],
@@ -103,30 +108,43 @@ class RegistrasiRequest extends FormRequest
     }
 
     /**
-     * Configure the validator backend.
+     * Checks that depend on other fields or on application state.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
+     * @return array<int, \Closure(Validator): void>
      */
-    protected function withValidator($validator)
+    public function after(): array
     {
-        $validator->after(function ($validator) {
+        return [
+            // Pendaftaran hanya diterima selama masih ada gelombang yang terbuka.
+            function (Validator $validator) {
+                if (! AdmissionBatch::active()->exists()) {
+                    $validator->errors()->add('pendaftaran', self::PESAN_PENDAFTARAN_TUTUP);
+                }
+            },
+
             // Check for duplicate NISN or nama_lengkap + tanggal_lahir
-            $query = Application::where('status', 'menunggu_review')
-                ->orWhere('status', 'diterima');
+            function (Validator $validator) {
+                if ($validator->errors()->any()) {
+                    return;
+                }
 
-            if ($nisnExists) {
-                $query->where('nisn', $this->nisn);
-            }
+                $query = Application::whereIn('status', ['menunggu_review', 'diterima']);
 
-            $existing = $query->where('full_name', $this->nama_lengkap)
-                ->where('student_birth_date', $this->tanggal_lahir)
-                ->first();
+                if ($this->filled('nisn')) {
+                    $query->where('nisn', $this->nisn);
+                }
 
-            if ($existing) {
-                $validator->errors()->add('duplicate',
-                    'Sudah ada pendaftaran dengan NISN yang sama atau kombinasi nama lengkap + tanggal lahir yang sama.');
-            }
-        });
+                $existing = $query->where('full_name', $this->nama_lengkap)
+                    ->whereDate('birth_date', $this->tanggal_lahir)
+                    ->first();
+
+                if ($existing) {
+                    $validator->errors()->add(
+                        'duplicate',
+                        'Sudah ada pendaftaran dengan NISN yang sama atau kombinasi nama lengkap + tanggal lahir yang sama.'
+                    );
+                }
+            },
+        ];
     }
 }
