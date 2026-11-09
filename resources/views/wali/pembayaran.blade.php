@@ -72,7 +72,9 @@
                 @else
                     <p class="text-[11.5px] text-bark-600">Tagihan berjalan: <span class="font-bold text-bark-800">-</span></p>
                 @endif
-                <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-bold text-white transition hover:bg-ember-600 {{ $terdekat ? '' : 'opacity-50 cursor-not-allowed' }}">
+                <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-bold text-white transition hover:bg-ember-600 {{ $terdekat ? '' : 'opacity-50 cursor-not-allowed' }}"
+                    data-xendit-invoice-id="{{ $terdekat['id'] ?? '' }}"
+                    {{ $terdekat ? '' : 'disabled' }}>
                     @include('layouts.partials.icon', ['name' => 'zap', 'class' => 'h-3.5 w-3.5'])
                     Bayar Instan Gateway
                 </button>
@@ -168,7 +170,8 @@
                                                 Kwitansi
                                             </button>
                                         @else
-                                            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3 py-2 text-[11.5px] font-bold text-white transition hover:bg-ember-600">
+                                            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3 py-2 text-[11.5px] font-bold text-white transition hover:bg-ember-600"
+                                                data-xendit-invoice-id="{{ $tagihan['id'] }}">
                                                 @include('layouts.partials.icon', ['name' => 'zap', 'class' => 'h-3.5 w-3.5'])
                                                 Bayar Instan
                                             </button>
@@ -249,4 +252,55 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        var buttons = document.querySelectorAll('button[data-xendit-invoice-id]');
+        var endpoint = '{{ route('ortu.pembayaran.xendit.invoice') }}';
+        var token = '{{ csrf_token() }}';
+
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var invoiceId = button.getAttribute('data-xendit-invoice-id');
+
+                if (!invoiceId) {
+                    return;
+                }
+
+                var originalHtml = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = 'Memproses…';
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify({ invoice_id: parseInt(invoiceId, 10) }),
+                })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.json().then(function (err) {
+                            throw new Error(err.message || 'Gagal membuat invoice pembayaran.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data && data.data && data.data.invoice_url) {
+                        window.location.href = data.data.invoice_url;
+                    } else {
+                        throw new Error('URL pembayaran tidak diterima dari server.');
+                    }
+                })
+                .catch(function (error) {
+                    alert(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                });
+            });
+        });
+    })();
 @endsection

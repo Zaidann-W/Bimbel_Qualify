@@ -16,7 +16,25 @@ class Payment extends Model
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
         'verified_at' => 'datetime',
+        'gateway_response' => 'array',
+        'xendit_callback_at' => 'datetime',
     ];
+
+    /**
+     * Scope untuk pembayaran yang berasal dari Xendit.
+     */
+    public function scopeHasXendit($query)
+    {
+        return $query->whereNotNull('xendit_payment_id');
+    }
+
+    /**
+     * Scope untuk pembayaran berdasarkan xendit_payment_id.
+     */
+    public function scopeByXenditPaymentId($query, string $xenditPaymentId)
+    {
+        return $query->where('xendit_payment_id', $xenditPaymentId);
+    }
 
     public function invoice(): BelongsTo
     {
