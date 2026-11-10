@@ -39,12 +39,19 @@ class Application extends Model
         'reviewed_by',
         'reviewed_at',
         'student_id',
+        'payment_status',
+        'payment_proof_path',
+        'payment_verified_at',
+        'payment_verified_by',
+        'accounts_created',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
+        'payment_verified_at' => 'datetime',
+        'accounts_created' => 'boolean',
     ];
 
     public function student()

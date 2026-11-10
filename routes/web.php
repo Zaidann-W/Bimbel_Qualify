@@ -26,6 +26,8 @@ use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LaporanAbsensiController;
 use App\Http\Controllers\Owner\PemantauanMateriController;
 use App\Http\Controllers\Owner\PengaturanWebsiteController;
+use App\Http\Controllers\PendaftaranBuatAkunController;
+use App\Http\Controllers\PendaftaranPembayaranController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
@@ -57,6 +59,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran');
     Route::get('/pendaftaran/{kode}', [PendaftaranController::class, 'show'])->name('pendaftaran.detail');
+
+    Route::patch('/pendaftaran/{kode}/status', [PendaftaranController::class, 'updateStatus'])->name('pendaftaran.status');
+    Route::patch('/pendaftaran/{kode}/pembayaran', [PendaftaranController::class, 'updatePembayaran'])->name('pendaftaran.pembayaran');
 
     Route::get('/data-siswa', [DataSiswaController::class, 'index'])->name('dataSiswa');
     Route::get('/data-siswa/create', [DataSiswaController::class, 'create'])->name('dataSiswa.create');
@@ -104,6 +109,18 @@ Route::post('/registrasi', [RegistrasiController::class, 'store'])
 
 Route::get('/registrasi/konfirmasi', [RegistrasiController::class, 'konfirmasi'])
     ->name('registrasi.konfirmasi');
+
+// Payment & account creation after admin approval
+Route::get('/pendaftaran/{kode}/bayar', [PendaftaranPembayaranController::class, 'show'])
+    ->name('pendaftaran.bayar');
+Route::post('/pendaftaran/{kode}/bayar', [PendaftaranPembayaranController::class, 'store'])
+    ->name('pendaftaran.bayar.simpan');
+Route::get('/pendaftaran/{kode}/buat-akun', [PendaftaranBuatAkunController::class, 'show'])
+    ->name('pendaftaran.buatAkun');
+Route::post('/pendaftaran/{kode}/buat-akun', [PendaftaranBuatAkunController::class, 'store'])
+    ->name('pendaftaran.buatAkun.simpan');
+Route::get('/pendaftaran/{kode}/berhasil', [PendaftaranBuatAkunController::class, 'berhasil'])
+    ->name('pendaftaran.berhasil');
 
 // Login routes
 Route::middleware('guest')->group(function () {

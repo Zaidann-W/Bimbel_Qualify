@@ -152,21 +152,44 @@
             </div>
 
             <div class="flex shrink-0 flex-wrap gap-2">
-                <button type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
-                    @include('layouts.partials.icon', ['name' => 'x', 'class' => 'h-4 w-4 text-ember-600'])
-                    Tolak Pendaftaran
-                </button>
-                <button type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-gold bg-sandgold px-3.5 py-2.5 text-[12.5px] font-semibold text-bronze transition hover:bg-palegold">
-                    @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-4 w-4'])
-                    Minta Perbaikan Berkas
-                </button>
-                <button type="button"
-                        class="inline-flex items-center gap-2 rounded-lg bg-gold px-3.5 py-2.5 text-[12.5px] font-bold text-espresso transition hover:bg-palegold">
-                    @include('layouts.partials.icon', ['name' => 'user-check', 'class' => 'h-4 w-4'])
-                    Terima &amp; Terbitkan Akun
-                </button>
+                <form action="{{ route('admin.pendaftaran.status', $pendaftar->registration_number) }}" method="POST" class="inline">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="status" value="ditolak">
+                    <textarea name="review_note" placeholder="Alasan penolakan..." class="hidden"></textarea>
+                    <button type="submit"
+                            onclick="return confirm('Yakin ingin menolak pendaftaran ini?')"
+                            class="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
+                        @include('layouts.partials.icon', ['name' => 'x', 'class' => 'h-4 w-4 text-ember-600'])
+                        Tolak Pendaftaran
+                    </button>
+                </form>
+
+                <form action="{{ route('admin.pendaftaran.status', $pendaftar->registration_number) }}" method="POST" class="inline">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="status" value="perlu_perbaikan">
+                    <textarea name="review_note" placeholder="Apa yang perlu diperbaiki..." class="hidden"></textarea>
+                    <button type="submit"
+                            onclick="return confirm('Yakin ingin meminta perbaikan berkas?')"
+                            class="inline-flex items-center gap-2 rounded-lg border border-gold bg-sandgold px-3.5 py-2.5 text-[12.5px] font-semibold text-bronze transition hover:bg-palegold">
+                        @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-4 w-4'])
+                        Minta Perbaikan Berkas
+                    </button>
+                </form>
+
+                <form action="{{ route('admin.pendaftaran.status', $pendaftar->registration_number) }}" method="POST" class="inline">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="status" value="diterima">
+                    <textarea name="review_note" placeholder="Catatan (opsional)..." class="hidden"></textarea>
+                    <button type="submit"
+                            onclick="return confirm('Yakin ingin menerima pendaftaran ini?')"
+                            class="inline-flex items-center gap-2 rounded-lg bg-gold px-3.5 py-2.5 text-[12.5px] font-bold text-espresso transition hover:bg-palegold">
+                        @include('layouts.partials.icon', ['name' => 'user-check', 'class' => 'h-4 w-4'])
+                        Terima &amp; Terbitkan Akun
+                    </button>
+                </form>
             </div>
         </div>
     </section>
