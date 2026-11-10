@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\ApplicationStatusHistory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PendaftaranController extends Controller
@@ -111,5 +114,99 @@ class PendaftaranController extends Controller
             ->firstOrFail();
 
         return view('admin.pendaftaran-detail', compact('pendaftar'));
+    }
+
+    /**
+     * Update status aplikasi (diterima / ditolak / perlu_perbaikan) oleh admin.
+     */
+    public function updateStatus(Request $request, string $kode): RedirectResponse
+    {
+        $application = Application::where('registration_number', $kode)->firstOrFail();
+
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:diterima,ditolak,perlu_perbaikan'],
+            'review_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        // review_note wajib untuk ditolak dan perlu_perbaikan
+        if (in_array($validated['status'], ['ditolak', 'perlu_perbaikan'], true)
+            && empty($validated['review_note'])) {
+            return back()->withErrors([
+                'review_note' => 'Catatan review wajib diisi untuk status ini.',
+            ])->withInput();
+        }
+
+        // Validasi transisi: hanya dari menunggu_review atau perlu_perbaikan
+        $allowedFrom = ['menunggu_review', 'perlu_perbaikan'];
+        if (! in_array($application->status, $allowedFrom, true)) {
+            return back()->withErrors([
+                'status' => 'Status tidak dapat diubah dari '.$application->status.'.',
+            ])->withInput();
+        }
+
+        $oldStatus = $application->status;
+
+        DB::transaction(function () use ($application, $validated, $oldStatus) {
+            $application->update([
+                'status' => $validated['status'],
+                'status_reason' => $validated['review_note'] ?? null,
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+
+            ApplicationStatusHistory::create([
+                'application_id' => $application->id,
+                'old_status' => $oldStatus,
+                'new_status' => $validated['status'],
+                'reason' => $validated['review_note'] ?? null,
+                'changed_by' => auth()->id(),
+            ]);
+        });
+
+        $statusLabel = match ($validated['status']) {
+            'diterima' => 'Diterima',
+            'ditolak' => 'Ditolak',
+            'perlu_perbaikan' => 'Perlu Perbaikan',
+            default => $validated['status'],
+        };
+
+        return redirect()->route('admin.pendaftaran.detail', $kode)
+            ->with('success', "Status pendaftaran berhasil diubah menjadi {$statusLabel}.");
+    }
+
+    /**
+     * Admin verifikasi pembayaran (lunas / ditolak).
+     */
+    public function updatePembayaran(Request $request, string $kode): RedirectResponse
+    {
+        $application = Application::where('registration_number', $kode)->firstOrFail();
+
+        $validated = $request->validate([
+            'payment_status' => ['required', 'string', 'in:lunas,ditolak'],
+            'review_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        if ($application->payment_status === 'lunas') {
+            return back()->withErrors([
+                'payment_status' => 'Pembayaran sudah lunas.',
+            ])->withInput();
+        }
+
+        DB::transaction(function () use ($application, $validated) {
+            $application->update([
+                'payment_status' => $validated['payment_status'],
+                'payment_verified_at' => now(),
+                'payment_verified_by' => auth()->id(),
+            ]);
+
+            if ($validated['payment_status'] === 'lunas') {
+                $application->update(['status_reason' => $validated['review_note'] ?? 'Pembayaran lunas.']);
+            }
+        });
+
+        $label = $validated['payment_status'] === 'lunas' ? 'Lunas' : 'Ditolak';
+
+        return redirect()->route('admin.pendaftaran.detail', $kode)
+            ->with('success', "Status pembayaran berhasil diubah menjadi {$label}.");
     }
 }
