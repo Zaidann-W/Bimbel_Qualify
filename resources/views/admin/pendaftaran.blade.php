@@ -12,7 +12,7 @@
     ];
 
     $statusAksi = [
-        'review' => ['label' => 'Review', 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
+        'review' => ['label' => 'Review', 'ikon' => 'clock', 'kelas' => 'bg-espresso text-white hover:bg-bark-800'],
         'perbaikan' => ['label' => 'Perbaiki', 'ikon' => 'refresh', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
         'diterima' => ['label' => 'Selesai', 'ikon' => 'check-circle', 'kelas' => 'bg-sand text-bark-400'],
         'ditolak' => ['label' => 'Lihat Alasan', 'ikon' => 'eye', 'kelas' => 'border border-line bg-white text-espresso hover:bg-sand'],
@@ -214,7 +214,7 @@
                             <td class="px-5 py-4 text-right">
                                 <a href="{{ route('admin.pendaftaran.detail', $row->registration_number) }}"
                                    class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12.5px] font-semibold transition {{ $ak['kelas'] }}">
-                                    @if ($ak['ikon'])
+                                    @if ($ak['ikon'] ?? null)
                                         @include('layouts.partials.icon', ['name' => $ak['ikon'], 'class' => 'h-4 w-4'])
                                     @endif
                                     {{ $ak['label'] }}
