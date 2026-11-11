@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AcademicPeriod;
+use App\Models\AdmissionBatch;
+use App\Models\Application;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -54,4 +57,58 @@ test('guest cannot access pendaftaran page', function () {
     $this->app['auth']->forgetGuards();
 
     $this->get(route('admin.pendaftaran'))->assertRedirect(route('login'));
+});
+
+test('pendaftaran list renders action buttons for every status without error', function () {
+    $period = AcademicPeriod::create([
+        'academic_year' => '2025/2026',
+        'semester' => 'ganjil',
+        'starts_on' => now()->subMonths(3),
+        'ends_on' => now()->addMonths(3),
+        'is_active' => true,
+    ]);
+
+    $batch = AdmissionBatch::create([
+        'academic_period_id' => $period->id,
+        'name' => 'Gelombang 1',
+        'wave_number' => 1,
+        'opens_at' => now()->subDay(),
+        'closes_at' => now()->addDay(),
+        'quota' => 100,
+    ]);
+
+    $statuses = [
+        'menunggu_review' => 'Review',
+        'perlu_perbaikan' => 'Perbaiki',
+        'diterima' => 'Selesai',
+        'ditolak' => 'Lihat Alasan',
+    ];
+
+    foreach (array_keys($statuses) as $index => $status) {
+        Application::create([
+            'registration_number' => 'REG-2026-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+            'batch_id' => $batch->id,
+            'full_name' => 'Siswa '.$status,
+            'nickname' => 'Siswa',
+            'birth_date' => '2012-05-12',
+            'school_name' => 'SDN Contoh 1',
+            'school_grade' => '7',
+            'education_level' => 'SMP',
+            'phone_wa' => '081234567890',
+            'address' => 'Jl. Pendidikan No. 1',
+            'guardian_name' => 'Wali '.$status,
+            'guardian_phone' => '081234567891',
+            'group_wa' => '081234567892',
+            'status' => $status,
+            'submitted_at' => now(),
+        ]);
+    }
+
+    $response = $this->get(route('admin.pendaftaran'));
+
+    $response->assertStatus(200);
+
+    foreach ($statuses as $status => $label) {
+        $response->assertSee($label);
+    }
 });
