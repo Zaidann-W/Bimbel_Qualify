@@ -32,21 +32,6 @@
             <h1 class="mt-2 text-[26px] font-bold tracking-tight text-ink">Dashboard Ringkasan Operasional &amp; Bisnis</h1>
             <p class="mt-1.5 text-[13px] leading-relaxed text-muted">Konsolidasi performa finansial, disiplin presensi, kesiapan materi belajar, dan visibilitas portal publik Bimbel QUALIFY.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-semibold text-bronze">
-                @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5 text-gold'])
-                {{ now()->locale('id')->translatedFormat('F Y') }}
-                <span class="rounded bg-sandgold px-1.5 py-0.5 text-[10px] font-bold text-bronze">Genap</span>
-            </span>
-            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-semibold text-ink transition hover:bg-sand">
-                @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-                Sinkronisasi
-            </button>
-            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-gold px-3.5 py-2 text-[12px] font-bold text-espresso shadow-sm transition hover:bg-bronze hover:text-white">
-                @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-3.5 w-3.5'])
-                Ekspor Ringkasan
-            </button>
-        </div>
     </div>
 
     {{-- Stat cards --}}
@@ -222,46 +207,6 @@
             <footer class="mt-4 border-t border-line pt-3 flex items-center justify-between text-[11px]">
                 <span class="text-bark-400">Dilindungi enkripsi NIK</span>
                 <a href="{{ route('owner.pemantauanMateri') }}" class="font-bold text-bronze hover:text-ember-600 transition">Kelola Modul &rarr;</a>
-            </footer>
-        </section>
-
-        {{-- Website & Pendaftaran --}}
-        <section class="rounded-2xl border border-line bg-white p-5">
-            <header class="mb-4 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="grid h-8 w-8 place-items-center rounded-lg bg-sandgold text-bronze">
-                        @include('layouts.partials.icon', ['name' => 'globe', 'class' => 'h-4 w-4'])
-                    </div>
-                    <h3 class="text-[14px] font-bold text-ink">Website &amp; Pendaftaran</h3>
-                </div>
-                <span class="rounded-full bg-forest-50 px-2 py-0.5 text-[10px] font-bold text-forest-600">SSL Aktif</span>
-            </header>
-
-            <div class="space-y-3">
-                <div class="flex items-center justify-between rounded-lg bg-cream px-3 py-2.5">
-                    <div>
-                        <p class="text-[11px] text-bark-400">Status Server Publik</p>
-                        <p class="text-[13px] font-semibold text-ink">bimbelqualify.com</p>
-                    </div>
-                    <span class="rounded-full bg-forest-50 px-2 py-0.5 text-[10px] font-bold text-forest-600">Online 99.9%</span>
-                </div>
-                <div class="rounded-lg bg-cream px-3 py-2.5">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-[11px] text-bark-400">Kapasitas Kursi Tersisa</p>
-                            <p class="text-[16px] font-bold text-ink">{{ $website['capacityPercent'] }}%</p>
-                        </div>
-                        <span class="text-[11px] font-medium text-bark-400">{{ $website['capacityUsed'] }} kursi terisi dari {{ $website['capacityTotal'] }}</span>
-                    </div>
-                    <div class="mt-2 h-1.5 w-full rounded-full bg-bark-100">
-                        <div class="h-1.5 rounded-full bg-gold" style="width: {{ min(100, $website['capacityPercent']) }}%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="mt-4 border-t border-line pt-3 flex items-center justify-between text-[11px]">
-                <span class="text-bark-400">Google SEO #1 Bandung</span>
-                <a href="{{ route('owner.pengaturanWebsite') }}" class="font-bold text-bronze hover:text-ember-600 transition">Sunting Pengaturan &rarr;</a>
             </footer>
         </section>
     </div>

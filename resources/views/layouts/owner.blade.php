@@ -89,11 +89,6 @@
             </button>
 
             <div class="flex min-w-0 items-center gap-3">
-                <p class="flex min-w-0 items-center gap-1.5 truncate text-[12.5px] text-muted">
-                    Portal Pemilik
-                    @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3 w-3 text-bark-200'])
-                    <span class="font-semibold text-ink">Monitoring Eksekutif</span>
-                </p>
                 <span class="hidden h-5 w-px bg-line md:block"></span>
                 <span class="hidden items-center gap-1.5 whitespace-nowrap text-[12px] font-semibold text-bronze md:inline-flex">
                     @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5 text-gold'])
@@ -107,21 +102,6 @@
                     <span class="hidden sm:inline">Hari ini: 24 Mei 2025</span>
                     <span class="sm:hidden">24 Mei 2025</span>
                     @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-                </button>
-
-                <span class="hidden items-center gap-1.5 text-[11.5px] text-muted lg:inline-flex">
-                    @include('layouts.partials.icon', ['name' => 'cloud', 'class' => 'h-4 w-4 text-bark-300'])
-                    Sinkronisasi Otomatis
-                </span>
-
-                <button type="button" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand sm:px-3">
-                    @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-4 w-4 text-bronze'])
-                    Ekspor Data
-                </button>
-
-                <button type="button" class="relative grid h-9 w-9 shrink-0 place-items-center rounded-lg text-bark-500 transition hover:bg-bark-50" aria-label="Notifikasi">
-                    @include('layouts.partials.icon', ['name' => 'bell', 'class' => 'h-5 w-5'])
-                    <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-500 ring-2 ring-white"></span>
                 </button>
 
                 <div class="flex shrink-0 items-center gap-2">

@@ -11,10 +11,6 @@
             <h1 class="text-[24px] font-bold tracking-tight text-bark-800">Monitoring Kehadiran &amp; Presensi Ananda</h1>
             <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">Pantau status kehadiran real-time lewat notifikasi presensi dan rekam jejak yang transparan.</p>
         </div>
-        <button type="button" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-sm transition hover:bg-emerald-700">
-            @include('layouts.partials.icon', ['name' => 'phone', 'class' => 'h-4 w-4'])
-            Hubungi Admin Bimbel
-        </button>
     </div>
 
     {{-- Stat cards --}}

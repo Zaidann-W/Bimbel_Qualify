@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             RegistrationSupportSeeder::class,
             StudySessionSeeder::class,
+            FinanceSeeder::class,
             OrtuDashboardDemoSeeder::class,
         ]);
     }

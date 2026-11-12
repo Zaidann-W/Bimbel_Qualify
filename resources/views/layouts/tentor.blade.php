@@ -82,12 +82,6 @@
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
 
-            <div class="relative flex-1 max-w-sm">
-                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bark-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Cari siswa, NIS, kelas, transaksi…"
-                       class="w-full rounded-full border border-bark-100 bg-white py-2.5 pl-9 pr-3 text-[13px] text-bark-800 placeholder:text-bark-300 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
-            </div>
-
             <div class="ml-auto flex items-center gap-3">
                 <button type="button" class="relative grid h-9 w-9 place-items-center rounded-lg text-bark-500 hover:bg-bark-100" aria-label="Notifikasi">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-2.1A2 2 0 0 1 18 13.8V10a6 6 0 1 0-12 0v3.8a2 2 0 0 1-.6 1.1L4 17h5m6 0a3 3 0 1 1-6 0"/></svg>

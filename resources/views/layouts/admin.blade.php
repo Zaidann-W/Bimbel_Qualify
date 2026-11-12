@@ -102,17 +102,10 @@
                     <span class="pointer-events-none absolute inset-y-0 left-0 grid w-9 place-items-center text-bark-300">
                         @include('layouts.partials.icon', ['name' => 'search', 'class' => 'h-4 w-4'])
                     </span>
-                    <input type="search" name="q" aria-label="Cari siswa, NIS, kelas, atau transaksi"
-                           placeholder="Cari siswa, NIS, kelas, transaksi..."
-                           class="w-full rounded-lg border border-transparent bg-shell py-2.5 pl-9 pr-3 text-[12.5px] text-ink placeholder:text-bark-300 transition hover:bg-sand focus:border-gold focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold/30">
                 </div>
             </form>
 
             <div class="ml-auto flex min-w-0 shrink items-center justify-end gap-2 sm:gap-3">
-                <button type="button" class="relative grid h-9 w-9 shrink-0 place-items-center rounded-lg text-bark-500 transition hover:bg-bark-50" aria-label="Notifikasi">
-                    @include('layouts.partials.icon', ['name' => 'bell', 'class' => 'h-5 w-5'])
-                    <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-500 ring-2 ring-white"></span>
-                </button>
 
                 <span class="hidden h-5 w-px bg-line sm:block"></span>
 

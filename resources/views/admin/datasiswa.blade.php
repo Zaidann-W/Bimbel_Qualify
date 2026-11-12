@@ -25,18 +25,6 @@
             </p>
         </div>
 
-        <div class="flex shrink-0 flex-col gap-2.5 sm:flex-row">
-            <a href="{{ route('admin.dataSiswa', array_merge(request()->query(), ['export' => 'csv'])) }}"
-               class="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-4 py-3 text-[13px] font-semibold text-espresso transition hover:bg-sand">
-                @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-4 w-4 text-bronze'])
-                Ekspor Data
-            </a>
-            <a href="{{ route('admin.dataSiswa.create') }}"
-               class="inline-flex items-center justify-center gap-2 rounded-lg bg-espresso px-4 py-3 text-[13px] font-semibold text-white transition hover:bg-bark-800">
-                @include('layouts.partials.icon', ['name' => 'user-plus', 'class' => 'h-4 w-4 text-gold'])
-                Tambah Siswa
-            </a>
-        </div>
     </div>
 
     @if (session('status'))

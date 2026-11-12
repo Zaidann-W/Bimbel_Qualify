@@ -65,18 +65,6 @@
                     @endif
                 </div>
             </div>
-
-            {{-- Status sinkronisasi --}}
-            <div class="flex shrink-0 items-center gap-3 rounded-xl border border-bark-100 bg-bark-50 px-3.5 py-3">
-                <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-[11.5px] font-bold text-espresso transition hover:brightness-95">
-                    @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-3.5 w-3.5'])
-                    Sinkron
-                </button>
-                <div class="leading-tight">
-                    <p class="text-[10.5px] font-bold uppercase tracking-wide text-bark-700">Sinkronisasi Realtime RFID Aktif</p>
-                    <p class="mt-0.5 text-[11px] text-bark-500">WhatsApp: +62 812-4455-8891</p>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -95,29 +83,6 @@
             </div>
         @endforeach
     </div>
-
-    {{-- Akses pintas --}}
-    <section class="rounded-2xl border border-bark-100 bg-white px-5 py-4">
-        <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-bark-400">Akses Pintas Cepat Orang Tua</p>
-        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <a href="{{ route('ortu.kehadiran') }}" class="flex items-center justify-center gap-2 rounded-xl border border-bark-100 bg-white px-3 py-3 text-[12.5px] font-bold text-bark-600 hover:bg-bark-50 transition">
-                @include('layouts.partials.icon', ['name' => 'user-check', 'class' => 'h-4 w-4'])
-                Pantau Kehadiran
-            </a>
-            <a href="{{ route('ortu.pembayaran') }}" class="flex items-center justify-center gap-2 rounded-xl border border-bark-100 bg-white px-3 py-3 text-[12.5px] font-bold text-bark-600 hover:bg-bark-50 transition">
-                @include('layouts.partials.icon', ['name' => 'credit-card', 'class' => 'h-4 w-4'])
-                Pembayaran
-            </a>
-            <a href="#" class="flex items-center justify-center gap-2 rounded-xl border border-bark-100 bg-white px-3 py-3 text-[12.5px] font-bold text-bark-600 hover:bg-bark-50 transition">
-                @include('layouts.partials.icon', ['name' => 'award', 'class' => 'h-4 w-4'])
-                Rapor & Nilai
-            </a>
-            <a href="{{ route('ortu.profil') }}" class="flex items-center justify-center gap-2 rounded-xl border border-bark-100 bg-white px-3 py-3 text-[12.5px] font-bold text-bark-600 hover:bg-bark-50 transition">
-                @include('layouts.partials.icon', ['name' => 'user', 'class' => 'h-4 w-4'])
-                Profil Saya
-            </a>
-        </div>
-    </section>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
 

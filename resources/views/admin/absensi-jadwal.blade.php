@@ -218,18 +218,6 @@
                 Pemantauan jadwal sesi kelas, presensi kehadiran tentor dan siswa, serta pencatatan izin / sakit / alpa secara terpadu.
             </p>
         </div>
-
-        <div class="flex shrink-0 items-start gap-2.5">
-            <button type="button" id="cetak-rekap"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-shell px-4 py-3 text-[13px] font-semibold text-espresso transition hover:bg-sand">
-                @include('layouts.partials.icon', ['name' => 'printer', 'class' => 'h-4 w-4 text-bronze'])
-                Cetak Rekap
-            </button>
-            <button type="button" id="segarkan-data" aria-label="Muat ulang jadwal dan presensi terbaru"
-                    class="grid h-[46px] w-[46px] place-items-center rounded-lg bg-espresso text-gold transition hover:bg-bark-800">
-                @include('layouts.partials.icon', ['name' => 'refresh', 'class' => 'h-5 w-5'])
-            </button>
-        </div>
     </div>
 </section>
 
@@ -518,47 +506,6 @@
         </div>
     </div>
 
-    {{-- Kepadatan jadwal pekan ini --}}
-    <section class="rounded-2xl border border-line bg-white p-5">
-        <header class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <h2 class="flex min-w-0 items-center gap-2.5 text-[15px] font-bold leading-snug text-ink">
-                <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
-                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4'])
-                </span>
-                Kepadatan Jadwal Pekan Ini (Oktober 2024)
-            </h2>
-            <p class="shrink-0 text-[12px] font-semibold text-bronze">Rata-rata 13.5 Sesi / Hari</p>
-        </header>
-
-        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            @foreach ($pekan as $hari)
-                <article @class([
-                    'rounded-xl px-3.5 py-3',
-                    'border border-ember-300 bg-white' => $hari['hari_ini'],
-                    'border border-transparent bg-shell' => ! $hari['hari_ini'],
-                ])>
-                    <p @class([
-                        'text-[11.5px] font-semibold leading-snug',
-                        'font-bold text-ember-700' => $hari['hari_ini'],
-                        'text-muted' => ! $hari['hari_ini'],
-                    ])>{{ $hari['hari'] }}</p>
-                    <p class="mt-2 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">{{ $hari['sesi'] }}</p>
-                    <p class="mt-2 text-[11px] font-semibold leading-snug {{ $hari['status_kelas'] }}">{{ $hari['status'] }}</p>
-                </article>
-            @endforeach
-        </div>
-    </section>
-
-    {{-- Catatan sistem --}}
-    <section class="flex flex-col gap-2 rounded-2xl border border-line bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p class="flex items-start gap-2 text-[11.5px] leading-relaxed text-muted">
-            @include('layouts.partials.icon', ['name' => 'shield-check', 'class' => 'mt-[1px] h-4 w-4 shrink-0 text-gold'])
-            Jadwal sesi, presensi tentor, dan pengajuan izin cabang utama tersimpan dalam satu berkas rekap harian.
-        </p>
-        <p class="shrink-0 text-[11px] text-muted sm:text-right">
-            Terakhir disinkronkan: <span data-sinkron class="font-bold text-ink">Hari ini, 15:02 WIB</span>
-        </p>
-    </section>
 </div>
 
 @push('styles')
