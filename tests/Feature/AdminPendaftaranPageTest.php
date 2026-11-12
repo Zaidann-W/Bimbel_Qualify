@@ -78,10 +78,10 @@ test('pendaftaran list renders action buttons for every status without error', f
     ]);
 
     $statuses = [
-        'menunggu_review' => 'Review',
-        'perlu_perbaikan' => 'Perbaiki',
-        'diterima' => 'Selesai',
-        'ditolak' => 'Lihat Alasan',
+        'menunggu_review' => ['aksi' => 'Review', 'tab' => 'review'],
+        'perlu_perbaikan' => ['aksi' => 'Perbaiki', 'tab' => 'perbaikan'],
+        'diterima' => ['aksi' => 'Selesai', 'tab' => 'diterima'],
+        'ditolak' => ['aksi' => 'Lihat Alasan', 'tab' => 'ditolak'],
     ];
 
     foreach (array_keys($statuses) as $index => $status) {
@@ -104,11 +104,12 @@ test('pendaftaran list renders action buttons for every status without error', f
         ]);
     }
 
-    $response = $this->get(route('admin.pendaftaran'));
+    // Setiap status kini punya tab sendiri, jadi diuji lewat tab masing-masing.
+    foreach ($statuses as $status => $expectasi) {
+        $response = $this->get(route('admin.pendaftaran', ['status' => $expectasi['tab']]));
 
-    $response->assertStatus(200);
-
-    foreach ($statuses as $status => $label) {
-        $response->assertSee($label);
+        $response->assertStatus(200);
+        $response->assertSee($expectasi['aksi']);
+        $response->assertSee('Siswa '.$status);
     }
 });

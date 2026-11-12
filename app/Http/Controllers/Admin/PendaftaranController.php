@@ -31,10 +31,23 @@ class PendaftaranController extends Controller
             });
         }
 
-        // Filter status.
-        if ($request->filled('status') && $request->status !== 'semua') {
-            $query->where('status', $request->status);
+        // Filter tab status. "Semua" hanya memuat pendaftaran yang masih
+        // menunggu aksi admin, status yang sudah final (diterima/ditolak/batal)
+        // baru tampil lewat tabnya masing-masing.
+        $tabStatuses = [
+            'semua' => ['menunggu_review', 'perlu_perbaikan'],
+            'review' => ['menunggu_review'],
+            'perbaikan' => ['perlu_perbaikan'],
+            'diterima' => ['diterima'],
+            'ditolak' => ['ditolak', 'batal'],
+        ];
+
+        $activeTab = $request->input('status');
+        if (! isset($tabStatuses[$activeTab])) {
+            $activeTab = 'semua';
         }
+
+        $query->whereIn('status', $tabStatuses[$activeTab]);
 
         $pendaftar = $query->paginate(10)->withQueryString();
 
@@ -80,28 +93,15 @@ class PendaftaranController extends Controller
             ],
         ];
 
-        $statusMap = [
-            'menunggu_review' => ['label' => 'Menunggu Review', 'key' => 'review'],
-            'perlu_perbaikan' => ['label' => 'Perlu Perbaikan', 'key' => 'perbaikan'],
-            'diterima' => ['label' => 'Diterima', 'key' => 'diterima'],
-            'ditolak' => ['label' => 'Ditolak', 'key' => 'ditolak'],
-            'batal' => ['label' => 'Ditolak', 'key' => 'ditolak'],
-        ];
-
         $tabs = [
-            ['key' => 'semua', 'label' => 'Semua', 'jumlah' => Application::count(), 'hitung' => true],
+            ['key' => 'semua', 'label' => 'Semua', 'jumlah' => Application::pendingReview()->count()],
+            ['key' => 'review', 'label' => 'Menunggu Review', 'jumlah' => Application::where('status', 'menunggu_review')->count()],
+            ['key' => 'perbaikan', 'label' => 'Perlu Perbaikan', 'jumlah' => Application::where('status', 'perlu_perbaikan')->count()],
+            ['key' => 'diterima', 'label' => 'Diterima', 'jumlah' => Application::where('status', 'diterima')->count()],
+            ['key' => 'ditolak', 'label' => 'Ditolak', 'jumlah' => Application::whereIn('status', ['ditolak', 'batal'])->count()],
         ];
 
-        foreach ($statusMap as $status => $info) {
-            $tabs[] = [
-                'key' => $info['key'],
-                'label' => $info['label'],
-                'jumlah' => Application::where('status', $status)->count(),
-                'hitung' => false,
-            ];
-        }
-
-        return view('admin.pendaftaran', compact('pendaftar', 'kpis', 'tabs', 'statusMap'));
+        return view('admin.pendaftaran', compact('pendaftar', 'kpis', 'tabs', 'activeTab'));
     }
 
     /**

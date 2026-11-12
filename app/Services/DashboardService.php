@@ -539,6 +539,10 @@ class DashboardService
     }
 
     /**
+     * Pendaftaran yang masih menunggu aksi admin, dipakai card "Aksi Cepat"
+     * di dashboard. Status yang sudah final (diterima/ditolak) sengaja
+     * tidak ikut tampil karena sudah tidak butuh tindak lanjut di sini.
+     *
      * @return array<int, array<string, mixed>>
      */
     private function latestRegistrations(): array
@@ -546,8 +550,6 @@ class DashboardService
         $statusMap = [
             'menunggu_review' => ['Menunggu Review', 'bg-palegold text-bark-700', 'Periksa Berkas', 'bg-espresso text-white hover:bg-bark-800'],
             'perlu_perbaikan' => ['Perlu Perbaikan', 'bg-[#fbe3d9] text-[#9a3f22]', 'Lihat Bukti', 'bg-sand text-ink hover:bg-line'],
-            'diterima' => ['Diterima & Terbit NIS', 'bg-sand text-muted', 'Selesai', 'bg-[#f3f1ea] text-bark-300'],
-            'ditolak' => ['Ditolak', 'bg-[#fbe3d9] text-[#9a3f22]', 'Selesai', 'bg-[#f3f1ea] text-bark-300'],
         ];
 
         return Application::whereIn('status', array_keys($statusMap))
@@ -571,7 +573,6 @@ class DashboardService
                     'feeNote' => $invoice ? '('.$invoice->invoice_number.')' : '',
                     'action' => $action,
                     'actionClass' => $actionClass,
-                    'done' => in_array($application->status, ['diterima', 'ditolak'], true),
                 ];
             })
             ->all();

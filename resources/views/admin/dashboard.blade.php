@@ -71,9 +71,6 @@
                             Konfirmasi pelunasan administrasi dan penerbitan Nomor Induk Siswa (NIS) baru.
                         </p>
                     </div>
-                    <span class="w-[86px] shrink-0 rounded-full bg-gold px-3.5 py-2 text-center text-[11.5px] font-bold leading-tight text-espresso">
-                        {{ count($dashboard['registrations']) }} Prioritas Utama
-                    </span>
                 </div>
 
                 @php
@@ -99,9 +96,6 @@
                             </div>
                             <a href="{{ route('admin.pendaftaran') }}"
                                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition {{ $reg['actionClass'] }}">
-                                @if ($reg['done'])
-                                    @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5'])
-                                @endif
                                 {{ $reg['action'] }}
                             </a>
                         </div>
@@ -272,15 +266,6 @@
                             Total Masuk
                         </span>
                         <span class="text-right text-[13px] font-bold text-ink">Rp {{ number_format($dashboard['cash']['income'], 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex items-start justify-between gap-3 rounded-xl bg-shell px-4 py-3">
-                        <span class="flex items-center gap-1.5 text-[12.5px] font-medium leading-snug text-ink">
-                            <span class="text-ember-500" aria-hidden="true">↑</span>
-                            <span class="max-w-[130px]">Total Keluar (Operasional)</span>
-                        </span>
-                        <span class="max-w-[64px] text-right text-[13px] font-bold leading-snug text-ink">
-                            {{ $dashboard['cash']['expense'] === null ? '—' : 'Rp '.number_format($dashboard['cash']['expense'], 0, ',', '.') }}
-                        </span>
                     </div>
                 </div>
 

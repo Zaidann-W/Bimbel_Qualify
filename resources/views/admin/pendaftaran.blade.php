@@ -86,23 +86,24 @@
 <div class="px-4 py-5 sm:px-6">
     <section class="overflow-hidden rounded-2xl border border-line bg-white">
 
-        <?php /*  Tab status */ ?>
+        <?php /*  Tab status — memfilter lewat query string, bukan JS */ ?>
         <div class="flex flex-wrap items-center gap-2 px-4 pt-4 sm:px-5">
             @foreach ($tabs as $tab)
-                <button type="button" data-tab="{{ $tab['key'] }}" data-tab-btn
-                        aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
-                        @class([
-                            'inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[12.5px] font-bold leading-none transition',
-                            'bg-espresso text-white' => $loop->first,
-                            'text-muted hover:bg-sand hover:text-espresso' => ! $loop->first,
-                        ])>
+                @php $aktif = $tab['key'] === $activeTab; @endphp
+                <a href="{{ route('admin.pendaftaran', $tab['key'] === 'semua' ? [] : ['status' => $tab['key']]) }}"
+                   @if ($aktif) aria-current="page" @endif
+                   @class([
+                       'inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[12.5px] font-bold leading-none transition',
+                       'bg-espresso text-white' => $aktif,
+                       'text-muted hover:bg-sand hover:text-espresso' => ! $aktif,
+                   ])>
                     {{ $tab['label'] }}
                     <span @class([
                         'rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-none',
-                        'bg-gold text-espresso' => $loop->first,
-                        'bg-sand text-muted' => ! $loop->first,
+                        'bg-gold text-espresso' => $aktif,
+                        'bg-sand text-muted' => ! $aktif,
                     ])>{{ $tab['jumlah'] }}</span>
-                </button>
+                </a>
             @endforeach
         </div>
 
@@ -156,7 +157,7 @@
                                 ? $row->created_at->format('d') . ' ' . ($bulanId[$row->created_at->format('M')] ?? $row->created_at->format('M')) . ' ' . $row->created_at->format('Y')
                                 : '-';
                         @endphp
-                        <tr data-baris data-status="{{ $sk }}" data-periode="bulan"
+                        <tr data-baris data-periode="bulan"
                             data-cari="{{ strtolower($row->full_name . ' ' . $row->guardian_name . ' ' . $row->registration_number . ' ' . $row->school_name) }}"
                             class="border-t border-line align-top odd:bg-white even:bg-shell">
                             <td class="px-5 py-4">
@@ -221,15 +222,9 @@
 <script>
     (() => {
         const baris = Array.from(document.querySelectorAll('[data-baris]'));
-        const tombolTab = Array.from(document.querySelectorAll('[data-tab-btn]'));
         const inputCari = document.getElementById('pendaftaran-cari');
         const selectTanggal = document.getElementById('pendaftaran-tanggal');
         const barisKosong = document.getElementById('pendaftaran-kosong');
-        const labelDari = document.getElementById('pendaftaran-dari');
-        const labelTotal = document.getElementById('pendaftaran-total');
-        const totalAktif = baris.length;
-
-        let tabAktif = 'semua';
 
         const terapkan = () => {
             const kata = inputCari.value.trim().toLowerCase();
@@ -237,10 +232,9 @@
             let tampil = 0;
 
             baris.forEach((barisData) => {
-                const cocokTab = tabAktif === 'semua' || barisData.dataset.status === tabAktif;
                 const cocokKata = !kata || barisData.dataset.cari.includes(kata);
                 const cocokTanggal = periode === 'semua' || barisData.dataset.periode === periode;
-                const terlihat = cocokTab && cocokKata && cocokTanggal;
+                const terlihat = cocokKata && cocokTanggal;
 
                 barisData.classList.toggle('hidden', !terlihat);
                 if (terlihat) {
@@ -248,35 +242,11 @@
                 }
             });
 
-            barisKosong.classList.toggle('hidden', tampil > 0);
-            if (labelDari) {
-                labelDari.textContent = tampil === 0 ? '0' : `1 – ${tampil}`;
-            }
-            if (labelTotal) {
-                labelTotal.textContent = tabAktif === 'semua' && !kata && periode === 'semua' ? baris.length : String(tampil);
+            // Baris kosong hanya dirender saat tabel tidak punya data sama sekali.
+            if (barisKosong) {
+                barisKosong.classList.toggle('hidden', tampil > 0);
             }
         };
-
-        tombolTab.forEach((tombol) => {
-            tombol.addEventListener('click', () => {
-                tabAktif = tombol.dataset.tab;
-
-                tombolTab.forEach((lain) => {
-                    const aktif = lain === tombol;
-                    const lencana = lain.querySelector('span');
-
-                    lain.setAttribute('aria-pressed', String(aktif));
-                    lain.className = aktif
-                        ? 'inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[12.5px] font-bold leading-none transition bg-espresso text-white'
-                        : 'inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-[12.5px] font-bold leading-none transition text-muted hover:bg-sand hover:text-espresso';
-                    lencana.className = aktif
-                        ? 'rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-none bg-gold text-espresso'
-                        : 'rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-none bg-sand text-muted';
-                });
-
-                terapkan();
-            });
-        });
 
         inputCari.addEventListener('input', terapkan);
         selectTanggal.addEventListener('change', terapkan);
