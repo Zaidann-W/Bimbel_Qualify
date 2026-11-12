@@ -344,10 +344,82 @@
                     <div class="rounded-xl border border-line bg-cream px-3.5 py-3">
                         <div class="flex items-start justify-between gap-3">
                             <p class="min-w-0 text-[11.5px] font-medium leading-snug text-muted">Biaya Formulir &amp; Tes</p>
-                            <span class="shrink-0 rounded-md bg-sandgold px-2 py-1 text-[10px] font-bold leading-none text-bronze">Belum Dibayar</span>
+                            <span class="shrink-0 rounded-md @if ($pendaftar->payment_status === 'lunas') bg-emerald-50 text-emerald-600 @else bg-sandgold text-bronze @endif px-2 py-1 text-[10px] font-bold leading-none">
+                                @if ($pendaftar->payment_status === 'lunas')
+                                    Lunas
+                                @elseif ($pendaftar->payment_status === 'menunggu_verifikasi')
+                                    Menunggu Verifikasi
+                                @elseif ($pendaftar->payment_status === 'ditolak')
+                                    Ditolak
+                                @else
+                                    Belum Dibayar
+                                @endif
+                            </span>
                         </div>
-                        <p class="mt-1.5 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">-</p>
-                        <p class="mt-2 text-[11px] leading-snug text-muted">Invoice akan terbit setelah verifikasi disetujui.</p>
+                        <p class="mt-1.5 text-[17px] font-extrabold leading-none tracking-tight tabular-nums text-ink">
+                            @php echo $pendaftar->xendit_invoice_url ? 'Link Tersedia' : '-'; @endphp
+                        </p>
+                        <p class="mt-2 text-[11px] leading-snug text-muted">
+                            @if ($pendaftar->payment_status !== 'diterima' || $pendaftar->status !== 'diterima')
+                                Invoice akan terbit setelah pendaftaran disetujui admin.
+                            @elseif ($pendaftar->payment_status === 'lunas')
+                                Pembayaran telah lunas.
+                            @elseif ($pendaftar->xendit_invoice_url)
+                                Link pembayaran siap dikirim ke wali via WhatsApp.
+                            @else
+                                Klik tombol di bawah untuk membuat link pembayaran Xendit.
+                            @endif
+                        </p>
+
+                        <!-- Tombol generate link -->
+                        @if ($pendaftar->status === 'diterima' && $pendaftar->payment_status !== 'lunas' && ! $pendaftar->xendit_invoice_url)
+                            <form action="{{ route('admin.pendaftaran.link-pembayaran', $pendaftar->registration_number) }}" method="POST" class="mt-3">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 w-full sm:w-auto rounded-lg bg-gold px-3.5 py-2.5 text-[12.5px] font-bold text-espresso transition hover:bg-palegold">
+                                    @include('layouts.partials.icon', ['name' => 'zap', 'class' => 'h-4 w-4'])
+                                    Buat Link Pembayaran Xendit
+                                </button>
+                            </form>
+                        @endif
+
+                        <!-- Tampilkan link jika sudah ada -->
+                        @if ($pendaftar->xendit_invoice_url)
+                            <div class="mt-3 rounded-xl border border-line bg-white p-3">
+                                <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-muted mb-2">Link Pembayaran Xendit</p>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" value="{{ $pendaftar->xendit_invoice_url }}"
+                                           readonly
+                                           class="flex-1 rounded-lg border border-line bg-sand px-3 py-2 text-[12px] font-mono text-bronze">
+                                    <button type="button"
+                                            onclick="copyLink(this)"
+                                            class="rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand">
+                                        Salin
+                                    </button>
+                                </div>
+                                <a href="https://wa.me/{{ str_replace(['+', ' ', '-'], '', $pendaftar->guardian_phone ?: $pendaftar->phone_wa) }}?text={{ urlencode('Halo, ini link pembayaran pendaftaran '.$pendaftar->registration_number.' Bimbel QUALIFY: '.$pendaftar->xendit_invoice_url) }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="mt-2 inline-flex items-center gap-2 w-full sm:w-auto rounded-lg border border-gold bg-sandgold px-3.5 py-2.5 text-[12.5px] font-bold text-bronze transition hover:bg-palegold">
+                                    @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-4 w-4'])
+                                    Kirim via WhatsApp
+                                </a>
+                            </div>
+                            <script>
+                                function copyLink(btn) {
+                                    const input = btn.previousElementSibling;
+                                    input.select();
+                                    document.execCommand('copy');
+                                    const orig = btn.innerHTML;
+                                    btn.innerHTML = 'Disalin!';
+                                    btn.classList.replace('text-espresso', 'text-emerald-600');
+                                    setTimeout(() => {
+                                        btn.innerHTML = orig;
+                                        btn.classList.replace('text-emerald-600', 'text-espresso');
+                                    }, 1500);
+                                }
+                            </script>
+                        @endif
                     </div>
                 </div>
             </section>

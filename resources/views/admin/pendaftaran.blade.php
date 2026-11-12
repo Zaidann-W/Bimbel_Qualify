@@ -174,8 +174,21 @@
                                 </a>
                             </td>
                             <td class="px-5 py-4">
-                                <p class="text-[13.5px] font-bold leading-snug tabular-nums text-ink">-</p>
-                                <p class="mt-1.5 text-[11.5px] leading-snug text-muted">Belum ada tagihan</p>
+                                <span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10.5px] font-bold leading-none
+                                    @if ($row->payment_status === 'lunas') bg-emerald-50 text-emerald-600
+                                    @elseif ($row->payment_status === 'menunggu_verifikasi') bg-gold/30 text-espresso
+                                    @elseif ($row->payment_status === 'ditolak') bg-ember-50 text-ember-700
+                                    @else bg-sandgold text-bronze @endif">
+                                    @if ($row->payment_status === 'lunas')
+                                        Lunas
+                                    @elseif ($row->payment_status === 'menunggu_verifikasi')
+                                        Menunggu Verifikasi
+                                    @elseif ($row->payment_status === 'ditolak')
+                                        Ditolak
+                                    @else
+                                        Belum Bayar
+                                    @endif
+                                </span>
                             </td>
                             <td class="px-5 py-4">
                                 <span class="inline-flex rounded-lg px-2.5 py-1.5 text-[11px] font-bold leading-tight {{ $status['kelas'] }}">
@@ -184,13 +197,35 @@
                                 <p class="mt-1.5 text-[11px] leading-snug text-muted">{{ $tglId }} <span class="text-bark-300">•</span> {{ $row->registration_number }}</p>
                             </td>
                             <td class="px-5 py-4 text-right">
-                                <a href="{{ route('admin.pendaftaran.detail', $row->registration_number) }}"
-                                   class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12.5px] font-semibold transition {{ $ak['kelas'] }}">
-                                    @if ($ak['ikon'] ?? null)
-                                        @include('layouts.partials.icon', ['name' => $ak['ikon'], 'class' => 'h-4 w-4'])
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <!-- Tombol buat link pembayaran (hanya untuk diterima & belum lunas & belum ada link) -->
+                                    @if ($row->status === 'diterima' && $row->payment_status !== 'lunas' && ! $row->xendit_invoice_url)
+                                        <form action="{{ route('admin.pendaftaran.link-pembayaran', $row->registration_number) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit"
+                                                    onclick="return confirm('Buat link pembayaran Xendit untuk {{ $row->full_name }}?')"
+                                                    class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12px] font-bold transition bg-gold text-espresso hover:bg-palegold">
+                                                @include('layouts.partials.icon', ['name' => 'zap', 'class' => 'h-3.5 w-3.5'])
+                                                Buat Link
+                                            </button>
+                                        </form>
+                                    @elseif ($row->xendit_invoice_url)
+                                        <a href="{{ $row->xendit_invoice_url }}" target="_blank" rel="noopener noreferrer"
+                                           class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12px] font-bold transition bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">
+                                            @include('layouts.partials.icon', ['name' => 'link', 'class' => 'h-3.5 w-3.5'])
+                                            Link Pembayaran
+                                        </a>
                                     @endif
-                                    {{ $ak['label'] }}
-                                </a>
+
+                                    <!-- Aksi standar (detail / review / dll) -->
+                                    <a href="{{ route('admin.pendaftaran.detail', $row->registration_number) }}"
+                                       class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-[12.5px] font-semibold transition {{ $ak['kelas'] }}">
+                                        @if ($ak['ikon'] ?? null)
+                                            @include('layouts.partials.icon', ['name' => $ak['ikon'], 'class' => 'h-4 w-4'])
+                                        @endif
+                                        {{ $ak['label'] }}
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty

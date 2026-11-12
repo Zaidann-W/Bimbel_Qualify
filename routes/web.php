@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::patch('/pendaftaran/{kode}/status', [PendaftaranController::class, 'updateStatus'])->name('pendaftaran.status');
     Route::patch('/pendaftaran/{kode}/pembayaran', [PendaftaranController::class, 'updatePembayaran'])->name('pendaftaran.pembayaran');
+    Route::post('/pendaftaran/{kode}/link-pembayaran', [PendaftaranController::class, 'generateXenditLink'])->name('pendaftaran.link-pembayaran');
 
     Route::get('/data-siswa', [DataSiswaController::class, 'index'])->name('dataSiswa');
     Route::get('/data-siswa/create', [DataSiswaController::class, 'create'])->name('dataSiswa.create');

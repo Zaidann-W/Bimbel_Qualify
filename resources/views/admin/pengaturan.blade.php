@@ -126,6 +126,15 @@
                            value="{{ old('penanggung_jawab', $settings['penanggung_jawab'] ?? 'Ust. Farhan Kamil, M.Pd.') }}"
                            class="mt-2 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-ink transition hover:bg-bark-50 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40">
                 </div>
+
+                <div>
+                    <label for="biaya-pendaftaran" class="block text-[10.5px] font-bold uppercase leading-none tracking-[0.12em] text-muted">
+                        Biaya Pendaftaran (Rp)
+                    </label>
+                    <input id="biaya-pendaftaran" name="biaya_pendaftaran" type="number"
+                           value="{{ old('biaya_pendaftaran', $settings['biaya_pendaftaran'] ?? '') }}"
+                           class="mt-2 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-ink transition hover:bg-bark-50 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40">
+                </div>
             </div>
 
             <div class="border-t border-line bg-bark-50 px-5 py-4">

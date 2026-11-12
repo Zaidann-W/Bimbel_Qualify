@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationStatusHistory;
+use App\Models\Guardian;
+use App\Models\Student;
+use App\Models\WebsiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -192,6 +197,12 @@ class PendaftaranController extends Controller
                 'reason' => $validated['review_note'] ?? null,
                 'changed_by' => auth()->id(),
             ]);
+
+            // Saat diterima, buat data siswa induk dari pendaftaran supaya
+            // muncul di halaman Data Siswa & Kelas (data asli dari DB, bukan mock).
+            if ($validated['status'] === 'diterima' && $application->student_id === null) {
+                $this->createStudentFromApplication($application);
+            }
         });
 
         $statusLabel = match ($validated['status']) {
@@ -239,5 +250,103 @@ class PendaftaranController extends Controller
 
         return redirect()->route('admin.pendaftaran.detail', $kode)
             ->with('success', "Status pembayaran berhasil diubah menjadi {$label}.");
+    }
+
+    /**
+     * Generate invoice link Xendit untuk pendaftaran yang sudah diterima,
+     * agar staff bisa kirim link pembayaran ke wali via WhatsApp secara manual.
+     */
+    public function generateXenditLink(string $kode): RedirectResponse
+    {
+        $application = Application::where('registration_number', $kode)->firstOrFail();
+
+        if ($application->status !== 'diterima') {
+            return back()->withErrors([
+                'generate_link' => 'Pendaftaran belum disetujui admin (status belum Diterima).',
+            ]);
+        }
+
+        if ($application->payment_status === 'lunas') {
+            return back()->withErrors([
+                'generate_link' => 'Pembayaran sudah lunas.',
+            ]);
+        }
+
+        // Ambil nominal biaya pendaftaran dari pengaturan, fallback default.
+        $amount = (float) (WebsiteSetting::where('key', 'biaya_pendaftaran')->value('value') ?? 500000);
+
+        $externalId = 'REG-'.$application->registration_number.'-'.Str::random(8);
+
+        $response = Http::withBasicAuth(config('xendit.secret_key'), '')
+            ->timeout(30)
+            ->post(config('xendit.base_url').'/'.config('xendit.api_version').'/invoices', [
+                'external_id' => $externalId,
+                'amount' => $amount,
+                'payer_email' => $application->email ?? '',
+                'description' => 'Biaya Pendaftaran - '.$application->registration_number.' - '.$application->full_name,
+                'invoice_duration' => 86400,
+                'callback_url' => config('xendit.callback_url'),
+                'redirect_url' => config('xendit.redirect_url'),
+            ]);
+
+        if ($response->failed()) {
+            Log::error('Gagal generate link Xendit untuk pendaftaran '.$kode.': '.$response->body());
+
+            return back()->withErrors([
+                'generate_link' => 'Gagal membuat link pembayaran Xendit. Silakan coba lagi nanti.',
+            ]);
+        }
+
+        $data = $response->json();
+
+        $application->update([
+            'xendit_invoice_id' => $data['id'] ?? null,
+            'xendit_invoice_url' => $data['invoice_url'] ?? null,
+        ]);
+
+        return redirect()->route('admin.pendaftaran')
+            ->with('success', 'Link pembayaran Xendit berhasil dibuat. Silakan salin dan kirim ke wali via WhatsApp.');
+    }
+
+    /**
+     * Buat record Student + Guardian dari data pendaftaran yang diterima,
+     * lalu link student_id ke application agar muncul di Data Siswa & Kelas.
+     */
+    private function createStudentFromApplication(Application $application): void
+    {
+        $student = Student::create([
+            'nis' => 'QLF-'.now()->year.'-'.str_pad((string) $application->id, 4, '0', STR_PAD_LEFT),
+            'nisn' => $application->nisn,
+            'full_name' => $application->full_name,
+            'nickname' => $application->nickname,
+            'birth_place' => $application->birth_place,
+            'birth_date' => $application->birth_date,
+            'email' => $application->email,
+            'phone_wa' => $application->phone_wa,
+            'group_wa' => $application->group_wa,
+            'study_shift_id' => $application->study_shift_id,
+            'address' => $application->address,
+            'school_name' => $application->school_name,
+            'school_grade' => $application->school_grade,
+            'education_level' => $application->education_level,
+            'curriculum' => $application->curriculum,
+            'major' => $application->major,
+            'status' => 'aktif',
+        ]);
+
+        if ($application->guardian_name) {
+            $guardian = Guardian::create([
+                'name' => $application->guardian_name,
+                'phone_wa' => $application->guardian_phone,
+            ]);
+
+            $student->guardians()->attach($guardian->id, [
+                'relationship' => 'wali',
+                'is_primary_contact' => true,
+                'is_financial_responsible' => true,
+            ]);
+        }
+
+        $application->update(['student_id' => $student->id]);
     }
 }
