@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\ApplicationDocument;
 use App\Models\ApplicationStatusHistory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class PendaftaranController extends Controller
 {
@@ -114,6 +117,34 @@ class PendaftaranController extends Controller
             ->firstOrFail();
 
         return view('admin.pendaftaran-detail', compact('pendaftar'));
+    }
+
+    /**
+     * Tayangkan berkas dokumen pendaftaran secara inline untuk verifikasi admin.
+     */
+    public function showDocument(string $kode, ApplicationDocument $dokumen): Response
+    {
+        $application = Application::where('registration_number', $kode)->firstOrFail();
+
+        // Pastikan dokumen milik aplikasi ini.
+        if ($dokumen->application_id !== $application->id) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        $file = $dokumen->file;
+        if (! $file) {
+            abort(404, 'Berkas tidak ditemukan.');
+        }
+
+        $path = $file->path;
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            abort(404, 'Berkas tidak tersedia di storage.');
+        }
+
+        return response()->file(Storage::disk('local')->path($path), [
+            'Content-Type' => $file->mime_type ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="'.$file->original_name.'"',
+        ]);
     }
 
     /**

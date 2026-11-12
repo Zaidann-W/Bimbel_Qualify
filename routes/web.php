@@ -59,6 +59,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran');
     Route::get('/pendaftaran/{kode}', [PendaftaranController::class, 'show'])->name('pendaftaran.detail');
+    Route::get('/pendaftaran/{kode}/dokumen/{dokumen}', [PendaftaranController::class, 'showDocument'])->name('pendaftaran.dokumen');
 
     Route::patch('/pendaftaran/{kode}/status', [PendaftaranController::class, 'updateStatus'])->name('pendaftaran.status');
     Route::patch('/pendaftaran/{kode}/pembayaran', [PendaftaranController::class, 'updatePembayaran'])->name('pendaftaran.pembayaran');

@@ -306,11 +306,20 @@
                                 <p class="mt-1.5 truncate text-[11.5px] leading-snug text-muted">{{ $fileName }}</p>
                             </div>
 
-                            <button type="button"
-                                    class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
-                                @include('layouts.partials.icon', ['name' => 'eye', 'class' => 'h-4 w-4'])
-                                Lihat
-                            </button>
+                            @if ($berkas->file)
+                                <a href="{{ route('admin.pendaftaran.dokumen', [$pendaftar->registration_number, $berkas->id]) }}"
+                                   target="_blank" rel="noopener noreferrer"
+                                   class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
+                                    @include('layouts.partials.icon', ['name' => 'eye', 'class' => 'h-4 w-4'])
+                                    Lihat
+                                </a>
+                            @else
+                                <button type="button" disabled
+                                        class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-sand px-3.5 py-2.5 text-[12.5px] font-semibold text-muted cursor-not-allowed">
+                                    @include('layouts.partials.icon', ['name' => 'eye', 'class' => 'h-4 w-4'])
+                                    Lihat
+                                </button>
+                            @endif
                         </li>
                     @empty
                         <li class="rounded-xl border border-line bg-cream px-4 py-3.5 text-center text-[12.5px] text-muted">
