@@ -41,33 +41,6 @@
         default => 'bg-sandgold text-bronze',
     };
 
-    $statusAksi = [
-        [
-            'key' => 'review',
-            'label' => 'Menunggu Review',
-            'ket' => 'Pemeriksaan kelengkapan dokumen masih berlangsung.',
-            'aktif' => $pendaftar->status === 'menunggu_review',
-        ],
-        [
-            'key' => 'perbaikan',
-            'label' => 'Perlu Perbaikan Berkas',
-            'ket' => 'Kirim notifikasi untuk upload ulang scan KK / Rapor.',
-            'aktif' => $pendaftar->status === 'perlu_perbaikan',
-        ],
-        [
-            'key' => 'diterima',
-            'label' => 'Diterima Menjadi Siswa',
-            'ket' => 'Generate ID QLF & kirim akun via WhatsApp.',
-            'aktif' => $pendaftar->status === 'diterima',
-        ],
-        [
-            'key' => 'ditolak',
-            'label' => 'Tolak Pendaftaran',
-            'ket' => 'Kuota cabang penuh / nilai kualifikasi tidak mencukupi.',
-            'aktif' => in_array($pendaftar->status, ['ditolak', 'batal']),
-        ],
-    ];
-
     $jenjangKurikulum = $pendaftar->education_level
         ? ($pendaftar->education_level . ' - ' . ($pendaftar->curriculum ?: '-'))
         : '-';
@@ -196,10 +169,10 @@
 </section>
 
 <div class="px-4 py-5 sm:px-6">
-    <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+    <div class="grid grid-cols-1 gap-5">
 
-        <?php /*  Kolom utama */ ?>
-        <div class="space-y-5 xl:col-span-2">
+        <?php /*  Konten utama */ ?>
+        <div class="space-y-5">
 
             <?php /*  Info calon siswa */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
@@ -346,12 +319,7 @@
                     @endforelse
                 </ul>
             </section>
-        </div>
-
-        <?php /*  Kolom kanan */ ?>
-        <div class="space-y-5">
-
-            <?php /*  Keuangan */ ?>
+            <?php /*  Keuangan & Tagihan */ ?>
             <section class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex min-w-0 items-start gap-3">
                     <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
@@ -375,42 +343,6 @@
                 </div>
             </section>
 
-            <?php /*  Aksi status */ ?>
-            <section class="rounded-2xl border border-line bg-white p-5">
-                <header class="flex min-w-0 items-start gap-3">
-                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sand text-ink">
-                        @include('layouts.partials.icon', ['name' => 'sliders', 'class' => 'h-4.5 w-4.5'])
-                    </span>
-                    <div class="min-w-0">
-                        <h2 class="text-[15px] font-bold leading-snug text-ink">Aksi Cepat Status Pendaftaran</h2>
-                        <p class="mt-0.5 text-[11.5px] leading-snug text-muted">Update langsung status calon siswa</p>
-                    </div>
-                </header>
-
-                <fieldset class="mt-4 space-y-2.5">
-                    <legend class="sr-only">Pilih status pendaftaran</legend>
-                    @foreach ($statusAksi as $opsi)
-                        <label @class([
-                            'flex cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-3 transition',
-                            'border-gold bg-sandgold' => $opsi['aktif'],
-                            'border-line bg-white hover:bg-cream' => ! $opsi['aktif'],
-                        ])>
-                            <input type="radio" name="status_pendaftaran" value="{{ $opsi['key'] }}" @checked($opsi['aktif'])
-                                   class="mt-0.5 h-4 w-4 shrink-0 accent-gold">
-                            <span class="min-w-0">
-                                <span class="block text-[12.5px] font-bold leading-snug text-ink">{{ $opsi['label'] }}</span>
-                                <span class="mt-1 block text-[11.5px] leading-relaxed text-muted">{{ $opsi['ket'] }}</span>
-                            </span>
-                        </label>
-                    @endforeach
-                </fieldset>
-
-                <button type="button"
-                        class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-gold py-3 text-[12.5px] font-bold text-espresso transition hover:bg-palegold">
-                    @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4'])
-                    Terapkan Perubahan Status
-                </button>
-            </section>
         </div>
     </div>
 </div>
