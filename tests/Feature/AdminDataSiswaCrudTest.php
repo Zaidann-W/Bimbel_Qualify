@@ -103,11 +103,18 @@ test('halaman data siswa mendukung pencarian dan ekspor csv', function () {
 test('admin bisa menambah siswa beserta wali dan kelas', function () {
     $this->post(route('admin.dataSiswa.store'), [
         'full_name' => 'Citra Dewi',
+        'nickname' => 'Citra',
+        'birth_date' => '2008-05-14',
+        'kelas' => 'sma-12',
+        'school_name' => 'SMAN 1 Yogyakarta',
+        'phone_wa' => '08129876543',
+        'address' => 'Jl. Merdeka No. 10',
         'nis' => '260099',
-        'education_level' => 'SMA',
         'status' => 'aktif',
         'guardian_name' => 'Ibu Dewi',
-        'guardian_phone' => '08129876543',
+        'guardian_phone' => '08129876544',
+        'group_wa' => '08129876545',
+        'sesi' => 'sore',
         'class_group_id' => $this->classA,
     ])->assertRedirect(route('admin.dataSiswa'));
 
@@ -115,6 +122,10 @@ test('admin bisa menambah siswa beserta wali dan kelas', function () {
 
     expect($student->guardians()->first()?->name)->toBe('Ibu Dewi');
     expect($student->enrollments()->where('status', 'aktif')->value('class_group_id'))->toBe($this->classA);
+    expect($student->education_level)->toBe('SMA');
+    expect($student->school_grade)->toBe('12');
+    expect($student->group_wa)->toBe('08129876545');
+    expect($student->studyShift?->name)->toBe('Sesi Sore');
 });
 
 test('admin bisa memperbarui siswa dan memindahkan kelas', function () {
@@ -139,12 +150,24 @@ test('admin bisa memperbarui siswa dan memindahkan kelas', function () {
 
     $this->put(route('admin.dataSiswa.update', $student), [
         'full_name' => 'Dimas Saputra',
-        'education_level' => 'SMA',
+        'nickname' => 'Dimas',
+        'birth_date' => '2008-01-20',
+        'kelas' => 'sma-11',
+        'school_name' => 'SMAN 2 Yogyakarta',
+        'phone_wa' => '0812 3456 7890',
+        'address' => 'Jl. Melati No. 3',
         'status' => 'cuti',
+        'guardian_name' => 'Bapak Dimas',
+        'guardian_phone' => '08129876541',
+        'group_wa' => '08129876542',
+        'sesi' => 'malam',
         'class_group_id' => $this->classB,
     ])->assertRedirect(route('admin.dataSiswa'));
 
     expect($student->fresh()->status)->toBe('cuti');
+    expect($student->fresh()->school_grade)->toBe('11');
+    expect($student->fresh()->phone_wa)->toBe('081234567890');
+    expect($student->fresh()->studyShift?->name)->toBe('Sesi Malam');
     expect(DB::table('enrollments')->where('student_id', $studentId)->where('class_group_id', $this->classA)->value('status'))->toBe('pindah');
     expect(DB::table('enrollments')->where('student_id', $studentId)->where('class_group_id', $this->classB)->value('status'))->toBe('aktif');
 });
@@ -177,10 +200,10 @@ test('admin bisa menghapus siswa dan menutup kelas aktifnya', function () {
     expect(DB::table('enrollments')->where('student_id', $studentId)->value('status'))->toBe('keluar');
 });
 
-test('validasi menolak siswa tanpa nama dan jenjang', function () {
+test('validasi menolak siswa tanpa nama dan kelas', function () {
     $this->post(route('admin.dataSiswa.store'), [
         'status' => 'aktif',
-    ])->assertSessionHasErrors(['full_name', 'education_level']);
+    ])->assertSessionHasErrors(['full_name', 'kelas', 'nickname', 'birth_date', 'school_name', 'phone_wa', 'address', 'guardian_name', 'guardian_phone', 'group_wa', 'sesi']);
 });
 
 test('halaman detail siswa menampilkan identitas dan riwayat kelas', function () {
@@ -223,4 +246,36 @@ test('form tambah dan edit siswa bisa dibuka', function () {
 
     $this->get(route('admin.dataSiswa.create'))->assertOk()->assertSee('Tambah Siswa Baru');
     $this->get(route('admin.dataSiswa.edit', $studentId))->assertOk()->assertSee('Edit Data Siswa')->assertSee('Gita Permata');
+});
+
+test('form data siswa memakai field yang sama dengan formulir pendaftaran', function () {
+    $studentId = DB::table('students')->insertGetId([
+        'full_name' => 'Hana Kusuma',
+        'nickname' => 'Hana',
+        'education_level' => 'SMA',
+        'school_grade' => '12',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->get(route('admin.dataSiswa.edit', $studentId))
+        ->assertOk()
+        ->assertSee('Data Calon Siswa')
+        ->assertSee('Nama Lengkap Siswa')
+        ->assertSee('Nama Panggilan Siswa')
+        ->assertSee('Tanggal Lahir Siswa')
+        ->assertSee('Kelas T.A (Tahun Ajaran)')
+        ->assertSee('Asal Sekolah')
+        ->assertSee('No. WA Siswa')
+        ->assertSee('Alamat Tempat Tinggal')
+        ->assertSee('Kontak Orang Tua / Wali')
+        ->assertSee('Nama Orang Tua / Wali')
+        ->assertSee('No. WA Wali')
+        ->assertSee('No. yang Dimasukkan ke Grup')
+        ->assertSee('Pilihan Sesi Belajar')
+        ->assertSee('Sesi Sore')
+        ->assertSee('Sesi Malam')
+        ->assertSee('SMA Kelas 12')
+        ->assertSee('Data Internal Admin');
 });

@@ -22,6 +22,8 @@ class Student extends Model
         'birth_date',
         'email',
         'phone_wa',
+        'group_wa',
+        'study_shift_id',
         'address',
         'school_name',
         'school_grade',
@@ -35,6 +37,7 @@ class Student extends Model
     protected $casts = [
         'birth_date' => 'date',
         'photo_file_id' => 'integer',
+        'study_shift_id' => 'integer',
     ];
 
     public function user()
@@ -57,6 +60,11 @@ class Student extends Model
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function studyShift()
+    {
+        return $this->belongsTo(StudyShift::class, 'study_shift_id');
     }
 
     public function scopeActive($query)

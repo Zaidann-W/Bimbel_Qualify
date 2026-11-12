@@ -24,6 +24,8 @@
         'Tanggal Lahir' => $student->birth_date?->translatedFormat('d F Y'),
         'Email' => $student->email,
         'WhatsApp' => $student->phone_wa,
+        'WA Grup' => $student->group_wa,
+        'Sesi Belajar' => $student->studyShift?->name,
         'Alamat' => $student->address,
         'Jenjang' => $student->education_level,
         'Tingkat' => $student->school_grade,

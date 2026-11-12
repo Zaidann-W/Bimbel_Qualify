@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SiswaRequest;
 use App\Models\ClassGroup;
 use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Student;
+use App\Services\PilihanPendaftaranService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -96,12 +98,16 @@ class DataSiswaController extends Controller
             'classGroups' => ClassGroup::orderBy('code')->get(),
             'guardian' => null,
             'classGroupId' => null,
+            'kelasValue' => null,
+            'sesiValue' => null,
+            'kelasOptions' => PilihanPendaftaranService::opsiKelas(),
+            'sesiOptions' => PilihanPendaftaranService::opsiSesi(),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(SiswaRequest $request): RedirectResponse
     {
-        $data = $this->validated($request);
+        $data = $request->validated();
 
         DB::transaction(function () use ($data) {
             $student = Student::create($this->studentPayload($data));
@@ -114,7 +120,7 @@ class DataSiswaController extends Controller
 
     public function show(Student $student): View
     {
-        $student->load(['guardians', 'enrollments.classGroup.academicPeriod', 'invoices']);
+        $student->load(['guardians', 'enrollments.classGroup.academicPeriod', 'invoices', 'studyShift']);
 
         return view('admin.siswa-detail', ['student' => $student]);
     }
@@ -129,12 +135,16 @@ class DataSiswaController extends Controller
             'classGroups' => ClassGroup::orderBy('code')->get(),
             'guardian' => $guardian,
             'classGroupId' => $student->enrollments()->where('status', 'aktif')->value('class_group_id'),
+            'kelasValue' => PilihanPendaftaranService::kelasDari($student->education_level, $student->school_grade),
+            'sesiValue' => PilihanPendaftaranService::sesiDariStudyShift($student->study_shift_id),
+            'kelasOptions' => PilihanPendaftaranService::opsiKelas(),
+            'sesiOptions' => PilihanPendaftaranService::opsiSesi(),
         ]);
     }
 
-    public function update(Request $request, Student $student): RedirectResponse
+    public function update(SiswaRequest $request, Student $student): RedirectResponse
     {
-        $data = $this->validated($request, $student);
+        $data = $request->validated();
 
         DB::transaction(function () use ($student, $data) {
             $student->update($this->studentPayload($data));
@@ -159,46 +169,32 @@ class DataSiswaController extends Controller
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    private function validated(Request $request, ?Student $student = null): array
-    {
-        return $request->validate([
-            'full_name' => ['required', 'string', 'max:150'],
-            'nickname' => ['nullable', 'string', 'max:50'],
-            'nis' => ['nullable', 'string', 'max:30', 'unique:students,nis,'.($student?->id ?? 'NULL')],
-            'nisn' => ['nullable', 'string', 'max:20', 'unique:students,nisn,'.($student?->id ?? 'NULL')],
-            'birth_place' => ['nullable', 'string', 'max:100'],
-            'birth_date' => ['nullable', 'date'],
-            'email' => ['nullable', 'email', 'max:190'],
-            'phone_wa' => ['nullable', 'string', 'max:20'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'school_name' => ['nullable', 'string', 'max:150'],
-            'school_grade' => ['nullable', 'string', 'max:10'],
-            'education_level' => ['required', 'in:SD,SMP,SMA'],
-            'curriculum' => ['nullable', 'string', 'max:50'],
-            'major' => ['nullable', 'string', 'max:30'],
-            'status' => ['required', 'in:aktif,cuti,nonaktif,lulus'],
-            'guardian_name' => ['nullable', 'string', 'max:150'],
-            'guardian_phone' => ['nullable', 'string', 'max:20'],
-            'class_group_id' => ['nullable', 'exists:class_groups,id'],
-        ]);
-    }
-
-    /**
+     * Susun data siswa yang disimpan, mengikuti berkas data formulir pendaftaran.
+     *
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     private function studentPayload(array $data): array
     {
-        return collect($data)
-            ->only([
-                'full_name', 'nickname', 'nis', 'nisn', 'birth_place', 'birth_date', 'email',
-                'phone_wa', 'address', 'school_name', 'school_grade', 'education_level',
-                'curriculum', 'major', 'status',
-            ])
-            ->filter(fn ($value) => $value !== null)
-            ->all();
+        return [
+            'full_name' => $data['full_name'],
+            'nickname' => $data['nickname'],
+            'birth_date' => $data['birth_date'],
+            'education_level' => $data['education_level'] ?? null,
+            'school_grade' => $data['school_grade'] ?? null,
+            'school_name' => $data['school_name'],
+            'phone_wa' => $data['phone_wa'],
+            'address' => $data['address'],
+            'group_wa' => $data['group_wa'],
+            'study_shift_id' => PilihanPendaftaranService::studyShiftId($data['sesi']),
+            'nis' => $data['nis'] ?? null,
+            'nisn' => $data['nisn'] ?? null,
+            'birth_place' => $data['birth_place'] ?? null,
+            'email' => $data['email'] ?? null,
+            'major' => $data['major'] ?? null,
+            'curriculum' => $data['curriculum'] ?? null,
+            'status' => $data['status'],
+        ];
     }
 
     /**

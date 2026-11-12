@@ -8,7 +8,6 @@ use App\Models\Application;
 use App\Models\ApplicationDocument;
 use App\Models\ApplicationStatusHistory;
 use App\Models\File;
-use App\Models\StudyShift;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -166,19 +165,7 @@ class RegistrationService
      */
     protected function mapKelasToGrade(string $kelas): ?string
     {
-        $map = [
-            'sd-4' => '4',
-            'sd-5' => '5',
-            'sd-6' => '6',
-            'smp-7' => '7',
-            'smp-8' => '8',
-            'smp-9' => '9',
-            'sma-10' => '10',
-            'sma-11' => '11',
-            'sma-12' => '12',
-        ];
-
-        return $map[$kelas] ?? null;
+        return PilihanPendaftaranService::tingkat($kelas);
     }
 
     /**
@@ -186,19 +173,7 @@ class RegistrationService
      */
     protected function mapKelasToEducationLevel(string $kelas): ?string
     {
-        $map = [
-            'sd-4' => 'SD',
-            'sd-5' => 'SD',
-            'sd-6' => 'SD',
-            'smp-7' => 'SMP',
-            'smp-8' => 'SMP',
-            'smp-9' => 'SMP',
-            'sma-10' => 'SMA',
-            'sma-11' => 'SMA',
-            'sma-12' => 'SMA',
-        ];
-
-        return $map[$kelas] ?? null;
+        return PilihanPendaftaranService::jenjang($kelas);
     }
 
     /**
@@ -206,14 +181,7 @@ class RegistrationService
      */
     protected function mapSesiToStudyShiftId(string $sesi): ?int
     {
-        $map = [
-            'sore' => 'Sesi Sore',
-            'malam' => 'Sesi Malam',
-        ];
-
-        $shift = StudyShift::where('name', $map[$sesi] ?? $sesi)->first();
-
-        return $shift?->id;
+        return PilihanPendaftaranService::studyShiftId($sesi);
     }
 
     /**

@@ -200,22 +200,14 @@
                                         required
                                         class="w-full appearance-none rounded-xl border border-line bg-shell px-4 py-3.5 pr-11 text-[15px] text-ink transition-colors focus:border-gold focus:bg-paper focus:outline-none focus:ring-4 focus:ring-gold/20"
                                     >
-                                        <option value="" selected disabled>Pilih Jenjang / Kelas T.A 2025/2026</option>
-                                        <optgroup label="SD">
-                                            <option value="sd-4">SD Kelas 4</option>
-                                            <option value="sd-5">SD Kelas 5</option>
-                                            <option value="sd-6">SD Kelas 6</option>
-                                        </optgroup>
-                                        <optgroup label="SMP">
-                                            <option value="smp-7">SMP Kelas 7</option>
-                                            <option value="smp-8">SMP Kelas 8</option>
-                                            <option value="smp-9">SMP Kelas 9</option>
-                                        </optgroup>
-                                        <optgroup label="SMA">
-                                            <option value="sma-10">SMA Kelas 10</option>
-                                            <option value="sma-11">SMA Kelas 11</option>
-                                            <option value="sma-12">SMA Kelas 12</option>
-                                        </optgroup>
+                                        <option value="" selected disabled>Pilih Jenjang / Kelas T.A {{ $tahunAjaran }}</option>
+                                        @foreach ($kelasOptions as $jenjang => $opsiKelas)
+                                            <optgroup label="{{ $jenjang }}">
+                                                @foreach ($opsiKelas as $nilaiKelas => $labelKelas)
+                                                    <option value="{{ $nilaiKelas }}">{{ $labelKelas }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
                                     </select>
                                     <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-ink/45" aria-hidden="true">
                                         @include('partials.icon', ['name' => 'chevron-down', 'size' => 18])
@@ -436,29 +428,19 @@
                                     Pilihan Sesi Belajar <span class="text-bronze" aria-hidden="true">*</span>
                                 </legend>
                                 <div class="mt-2.5 grid gap-3 rounded-xl sm:grid-cols-2" data-control-surface>
-                                    <label class="flex cursor-pointer items-center gap-3.5 rounded-xl border-2 border-line bg-shell px-4 py-4 transition-colors has-[:checked]:border-gold has-[:checked]:bg-sandgold/70">
-                                        <input type="radio" name="sesi" value="sore" data-label="sesi belajar" required class="peer sr-only">
-                                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line bg-paper text-bronze" aria-hidden="true">
-                                            @include('partials.icon', ['name' => 'sun', 'size' => 19])
-                                        </span>
-                                        <span class="min-w-0 flex-1">
-                                            <span class="block text-[15px] font-bold text-ink">Sesi Sore</span>
-                                            <span class="block text-[12.5px] font-semibold text-bronze">15.30 - 17.30 WIB</span>
-                                        </span>
-                                        <span class="relative grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-line bg-paper transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-gold before:opacity-0 before:transition-opacity peer-checked:border-espresso peer-checked:bg-espresso peer-checked:before:opacity-100 peer-focus-visible:ring-4 peer-focus-visible:ring-gold/40" aria-hidden="true"></span>
-                                    </label>
-
-                                    <label class="flex cursor-pointer items-center gap-3.5 rounded-xl border-2 border-line bg-shell px-4 py-4 transition-colors has-[:checked]:border-gold has-[:checked]:bg-sandgold/70">
-                                        <input type="radio" name="sesi" value="malam" class="peer sr-only">
-                                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line bg-paper text-bronze" aria-hidden="true">
-                                            @include('partials.icon', ['name' => 'moon', 'size' => 19])
-                                        </span>
-                                        <span class="min-w-0 flex-1">
-                                            <span class="block text-[15px] font-bold text-ink">Sesi Malam</span>
-                                            <span class="block text-[12.5px] font-semibold text-bronze">18.30 - 20.30 WIB</span>
-                                        </span>
-                                        <span class="relative grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-line bg-paper transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-gold before:opacity-0 before:transition-opacity peer-checked:border-espresso peer-checked:bg-espresso peer-checked:before:opacity-100 peer-focus-visible:ring-4 peer-focus-visible:ring-gold/40" aria-hidden="true"></span>
-                                    </label>
+                                    @foreach ($sesiOptions as $nilaiSesi => $opsiSesi)
+                                        <label class="flex cursor-pointer items-center gap-3.5 rounded-xl border-2 border-line bg-shell px-4 py-4 transition-colors has-[:checked]:border-gold has-[:checked]:bg-sandgold/70">
+                                            <input type="radio" name="sesi" value="{{ $nilaiSesi }}" data-label="sesi belajar" @required($loop->first) class="peer sr-only">
+                                            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line bg-paper text-bronze" aria-hidden="true">
+                                                @include('partials.icon', ['name' => $nilaiSesi === 'sore' ? 'sun' : 'moon', 'size' => 19])
+                                            </span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block text-[15px] font-bold text-ink">{{ $opsiSesi['label'] }}</span>
+                                                <span class="block text-[12.5px] font-semibold text-bronze">{{ $opsiSesi['waktu'] }}</span>
+                                            </span>
+                                            <span class="relative grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-line bg-paper transition-colors before:absolute before:left-1/2 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-gold before:opacity-0 before:transition-opacity peer-checked:border-espresso peer-checked:bg-espresso peer-checked:before:opacity-100 peer-focus-visible:ring-4 peer-focus-visible:ring-gold/40" aria-hidden="true"></span>
+                                        </label>
+                                    @endforeach
                                 </div>
                                 <p class="mt-1.5 hidden text-[12.5px] font-medium text-ember-700" data-error-for="sesi" role="alert"></p>
                             </fieldset>

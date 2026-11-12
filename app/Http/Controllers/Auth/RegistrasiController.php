@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrasiRequest;
 use App\Models\AcademicPeriod;
 use App\Models\AdmissionBatch;
+use App\Services\PilihanPendaftaranService;
 use App\Services\RegistrationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
@@ -29,6 +30,8 @@ class RegistrasiController extends Controller
                 ?? $gelombangBerikutnya?->academicPeriod?->academic_year
                 ?? $tahunMulai.'/'.($tahunMulai + 1),
             'pesanPendaftaranTutup' => RegistrasiRequest::PESAN_PENDAFTARAN_TUTUP,
+            'kelasOptions' => PilihanPendaftaranService::opsiKelas(),
+            'sesiOptions' => PilihanPendaftaranService::opsiSesi(),
         ]);
     }
 
