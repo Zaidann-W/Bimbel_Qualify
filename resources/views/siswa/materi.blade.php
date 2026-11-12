@@ -154,9 +154,17 @@
                         <p class="shrink-0 text-[10.5px] text-bark-400">{{ $m->published_at?->locale('id')->translatedFormat('j M Y') ?? '-' }}</p>
                     </div>
 
-                    <a href="{{ route('siswa.materi') }}" class="mt-3 w-full rounded-lg bg-bark-800 px-3 py-2.5 text-[12px] font-bold text-white transition hover:bg-bark-900">
-                        Baca Modul
-                    </a>
+                    @if ($m->allow_download)
+                        <a href="{{ route('siswa.materi.unduh', $m) }}"
+                           class="mt-3 w-full rounded-lg bg-bark-800 px-3 py-2.5 text-[12px] font-bold text-white transition hover:bg-bark-900">
+                            Unduh Modul
+                        </a>
+                    @else
+                        <span class="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-bark-200 bg-bark-50 px-3 py-2.5 text-[12px] font-bold text-bark-500">
+                            @include('layouts.partials.icon', ['name' => 'eye', 'class' => 'h-4 w-4'])
+                            Hanya Baca
+                        </span>
+                    @endif
                 </article>
             @endforeach
         </div>

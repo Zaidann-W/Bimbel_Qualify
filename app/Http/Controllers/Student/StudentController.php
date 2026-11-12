@@ -6,22 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\QualifixTicket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentController extends Controller
 {
     public function materi(Request $request): View
     {
         $student = $request->user()->student;
-        $classGroupId = $student?->enrollments()->where('status', 'aktif')->value('class_group_id');
+        $classGroupIds = $student?->enrollments()
+            ->where('status', 'aktif')
+            ->pluck('class_group_id')
+            ?? collect();
+        $classGroup = $student?->enrollments()->where('status', 'aktif')->first()?->classGroup;
 
         $materials = Material::query()
-            ->with(['subject', 'file'])
-            ->where('status', 'terbit')
-            ->when($classGroupId !== null, fn ($q) => $q->whereHas(
+            ->with(['subject', 'file', 'uploader'])
+            ->published()
+            ->whereHas(
                 'classGroups',
-                fn ($q) => $q->where('class_groups.id', $classGroupId),
-            ))
+                fn ($q) => $q->whereIn('class_groups.id', $classGroupIds),
+            )
             ->orderByDesc('published_at')
             ->paginate(12);
 
@@ -33,9 +39,46 @@ class StudentController extends Controller
         ];
 
         $jenjang = ['Semua bentuk', 'Kelas 12 X/UTBK', 'Kelas 11 SMA', 'Kelas 10 SMA', 'SMP/SD'];
-        $activeJenjang = $student?->classGroup?->grade === '12' ? 'Kelas 12 X/UTBK' : 'Semua bentuk';
+        $activeJenjang = $classGroup?->grade === '12' ? 'Kelas 12 X/UTBK' : 'Semua bentuk';
 
         return view('siswa.materi', compact('materials', 'stats', 'jenjang', 'activeJenjang'));
+    }
+
+    /**
+     * Unduh berkas modul sesuai hak akses siswa pada materi tersebut.
+     */
+    public function unduhMateri(Request $request, Material $materi): StreamedResponse
+    {
+        $student = $request->user()->student;
+
+        abort_if($student === null, 403, 'Akun ini belum terhubung ke data siswa.');
+        abort_if($materi->status !== 'terbit', 404);
+
+        $classGroupIds = $student->enrollments()
+            ->where('status', 'aktif')
+            ->pluck('class_group_id');
+
+        abort_unless(
+            $materi->classGroups()->whereIn('class_groups.id', $classGroupIds)->exists(),
+            403,
+            'Materi ini tidak ditujukan untuk kelasmu.'
+        );
+
+        abort_unless(
+            $materi->allow_download,
+            403,
+            'Materi ini hanya dapat dibaca secara online.'
+        );
+
+        $file = $materi->file;
+
+        abort_if(
+            $file === null || ! Storage::disk('local')->exists($file->path),
+            404,
+            'Berkas modul tidak ditemukan.'
+        );
+
+        return Storage::disk('local')->download($file->path, $file->original_name);
     }
 
     public function qualifix(Request $request): View

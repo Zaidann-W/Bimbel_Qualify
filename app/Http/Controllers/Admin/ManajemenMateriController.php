@@ -7,8 +7,9 @@ use App\Models\ClassGroup;
 use App\Models\File;
 use App\Models\Material;
 use App\Models\Subject;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,7 @@ class ManajemenMateriController extends Controller
         $query = Material::with(['subject', 'file', 'uploader', 'classGroups'])
             ->orderByDesc('materials.created_at');
 
-        // Pencarianjudul, deskripsi, mata pelajaran, atau nama pengunggah.
+        // Pencarian judul, deskripsi, mata pelajaran, atau nama pengunggah.
         if ($request->filled('q')) {
             $kata = $request->q;
             $query->where(function ($q) use ($kata) {
@@ -91,19 +92,14 @@ class ManajemenMateriController extends Controller
 
         // Data dropdown formulir unggah, diambil dari database.
         $subjects = Subject::orderBy('name')->get();
-        $kelas = ClassGroup::active()->orderBy('grade')->get();
-        $pengajar = User::where('role', 'tentor')
-            ->where('status', 'aktif')
-            ->orderBy('name')
-            ->get();
+        $kelas = $this->kelasAktif();
 
         return view('admin.manajemen-materi', compact(
             'materi',
             'kpis',
             'tabs',
             'subjects',
-            'kelas',
-            'pengajar'
+            'kelas'
         ));
     }
 
@@ -119,20 +115,13 @@ class ManajemenMateriController extends Controller
             'mapel' => ['required', 'exists:subjects,id'],
             'target' => ['required', 'array'],
             'target.*' => ['required', 'exists:class_groups,id'],
+            'status' => ['nullable', 'in:draf,terbit'],
             'akses' => ['boolean'],
         ]);
 
-        $berkas = $request->file('berkas');
-        $diska = Storage::disk('local');
-        $namaDisimpan = $berkas->store('materi', 'local');
+        $status = $validated['status'] ?? 'terbit';
 
-        $file = File::create([
-            'original_name' => $berkas->getClientOriginalName(),
-            'path' => $namaDisimpan,
-            'mime_type' => $berkas->getMimeType(),
-            'size_bytes' => $berkas->getSize(),
-            'uploaded_by' => auth()->id(),
-        ]);
+        $file = $this->simpanBerkas($request->file('berkas'));
 
         $materi = Material::create([
             'title' => $validated['judul'],
@@ -140,14 +129,28 @@ class ManajemenMateriController extends Controller
             'subject_id' => $validated['mapel'],
             'file_id' => $file->id,
             'uploaded_by' => auth()->id(),
-            'status' => 'terbit',
+            'status' => $status,
             'allow_download' => (bool) $request->boolean('akses'),
-            'published_at' => now(),
+            'published_at' => $status === 'terbit' ? now() : null,
         ]);
 
-        $materi->classGroups()->attach($validated['target']);
+        $materi->classGroups()->sync($validated['target']);
 
-        return back()->with('sukses', 'Materi ajar "'.$materi->title.'" berhasil diunggah.');
+        return redirect()->route('admin.manajemenMateri')->with('sukses', 'Materi ajar "'.$materi->title.'" berhasil diunggah.');
+    }
+
+    /**
+     * Tampilkan formulir ubah materi ajar yang sudah tersimpan.
+     */
+    public function edit(Material $materi): View
+    {
+        $materi->load(['subject', 'file', 'classGroups']);
+
+        return view('admin.manajemen-materi-form', [
+            'materi' => $materi,
+            'subjects' => Subject::orderBy('name')->get(),
+            'kelas' => $this->kelasAktif(),
+        ]);
     }
 
     /**
@@ -158,26 +161,45 @@ class ManajemenMateriController extends Controller
         $validated = $request->validate([
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
+            'berkas' => ['nullable', 'file', 'mimes:pdf,pptx,ppt,doc,docx', 'max:61440'],
             'mapel' => ['required', 'exists:subjects,id'],
             'target' => ['required', 'array'],
             'target.*' => ['required', 'exists:class_groups,id'],
-            'status' => ['required', 'in:draf,terbit'],
             'akses' => ['boolean'],
         ]);
 
-        $materi->update([
+        // Status publikasi tidak diubah dari halaman edit, materi yang sudah
+        // terbit tetap terbit dan draf tetap draf.
+        $attributes = [
             'title' => $validated['judul'],
             'description' => $validated['deskripsi'] ?? null,
             'subject_id' => $validated['mapel'],
-            'uploaded_by' => auth()->id(),
-            'status' => $validated['status'],
             'allow_download' => (bool) $request->boolean('akses'),
-            'published_at' => $validated['status'] === 'terbit' ? now() : null,
-        ]);
+        ];
+
+        // Berkas hanya diganti bila admin mengunggah berkas baru.
+        $fileLama = $materi->file;
+
+        if ($request->hasFile('berkas')) {
+            $fileBaru = $this->simpanBerkas($request->file('berkas'));
+
+            $attributes['file_id'] = $fileBaru->id;
+        }
+
+        $materi->update($attributes);
+
+        // Berkas lama dibersihkan setelah materi memakai berkas baru.
+        if ($fileLama !== null && isset($attributes['file_id']) && $fileLama->id !== $attributes['file_id']) {
+            $fileLama->delete();
+
+            if (Storage::disk('local')->exists($fileLama->path)) {
+                Storage::disk('local')->delete($fileLama->path);
+            }
+        }
 
         $materi->classGroups()->sync($validated['target']);
 
-        return back()->with('sukses', 'Materi ajar "'.$materi->title.'" berhasil diperbarui.');
+        return redirect()->route('admin.manajemenMateri')->with('sukses', 'Materi ajar "'.$materi->title.'" berhasil diperbarui.');
     }
 
     /**
@@ -194,6 +216,40 @@ class ManajemenMateriController extends Controller
             Storage::disk('local')->delete($berkasPath);
         }
 
-        return back()->with('sukses', 'Materi ajar "'.$judul.'" berhasil dihapus.');
+        return redirect()->route('admin.manajemenMateri')->with('sukses', 'Materi ajar "'.$judul.'" berhasil dihapus.');
+    }
+
+    /**
+     * Kelas aktif yang bisa dipilih sebagai target materi ajar.
+     */
+    private function kelasAktif(): Collection
+    {
+        $urutanJenjang = ['SD' => 1, 'SMP' => 2, 'SMA' => 3];
+
+        return ClassGroup::with('academicPeriod')
+            ->active()
+            ->get()
+            ->sortBy(fn (ClassGroup $kelas) => [
+                (int) $kelas->grade,
+                $urutanJenjang[$kelas->education_level] ?? 4,
+                $kelas->code,
+            ])
+            ->values();
+    }
+
+    /**
+     * Simpan berkas unggahan ke disk privat dan catat metadata-nya.
+     */
+    private function simpanBerkas(UploadedFile $berkas): File
+    {
+        $namaDisimpan = $berkas->store('materi', 'local');
+
+        return File::create([
+            'original_name' => $berkas->getClientOriginalName(),
+            'path' => $namaDisimpan,
+            'mime_type' => $berkas->getMimeType(),
+            'size_bytes' => $berkas->getSize(),
+            'uploaded_by' => auth()->id(),
+        ]);
     }
 }

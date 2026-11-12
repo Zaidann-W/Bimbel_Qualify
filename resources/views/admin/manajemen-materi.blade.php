@@ -3,6 +3,8 @@
 @section('title', 'Manajemen Materi Ajar')
 
 @section('content')
+
+<x-flash-toast />
 @php
     $query = request()->only(['q', 'status', 'jenjang']);
 @endphp
@@ -56,118 +58,18 @@
                 </div>
             </header>
 
-            <form id="materi-form" action="{{ route('admin.manajemenMateri.store') }}" method="POST" enctype="multipart/form-data" class="mt-5">
-                @csrf
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-12">
-
-                    {{-- Berkas modul --}}
-                    <div class="md:col-span-6">
-                        <label for="materi-berkas" class="block text-[12px] font-bold leading-snug text-ink">
-                            File Modul <span class="font-medium text-muted">(PDF / PPTX / DOCX)</span>
-                        </label>
-                        <label for="materi-berkas"
-                               class="mt-2 flex cursor-pointer items-center gap-2.5 rounded-xl border border-bark-200 bg-shell px-4 py-3 transition hover:bg-sand focus-within:border-gold focus-within:bg-white focus-within:ring-2 focus-within:ring-gold/30">
-                            @include('layouts.partials.icon', ['name' => 'upload', 'class' => 'h-4 w-4 shrink-0 text-bronze'])
-                            <span id="materi-berkas-nama" class="min-w-0 flex-1 truncate text-[13px] leading-snug text-muted">
-                                Belum ada berkas dipilih — klik untuk memilih dari komputer
-                            </span>
-                        </label>
-                        <input type="file" id="materi-berkas" name="berkas" accept=".pdf,.pptx,.docx"
-                               class="sr-only" aria-describedby="materi-berkas-error">
-                        <p id="materi-berkas-error" class="mt-1.5 hidden text-[11.5px] font-semibold leading-snug text-ember-700"></p>
-                    </div>
-
-                    {{-- Judul materi --}}
-                    <div class="md:col-span-3">
-                        <label for="materi-judul" class="block text-[12px] font-bold leading-snug text-ink">Judul Materi</label>
-                        <input type="text" id="materi-judul" name="judul" aria-describedby="materi-judul-error"
-                               value="{{ old('judul') }}"
-                               placeholder="Contoh: Bank Soal Penalaran Matematika"
-                               class="mt-2 w-full rounded-xl border border-bark-200 bg-white px-4 py-3 text-[13px] text-ink placeholder:text-bark-300 transition focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 @error('judul') border-ember-700 @enderror">
-                        @error('judul')
-                            <p class="mt-1.5 text-[11.5px] font-semibold leading-snug text-ember-700">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Deskripsi --}}
-                    <div class="md:col-span-3">
-                        <label for="materi-deskripsi" class="block text-[12px] font-bold leading-snug text-ink">Deskripsi</label>
-                        <textarea id="materi-deskripsi" name="deskripsi" rows="2"
-                               placeholder="Singkat ceritakan isi modul ini..."
-                               class="mt-2 w-full rounded-xl border border-bark-200 bg-white px-4 py-3 text-[13px] text-ink placeholder:text-bark-300 transition focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30">{{ old('deskripsi') }}</textarea>
-                    </div>
-
-                    {{-- Mata pelajaran --}}
-                    <div class="md:col-span-3">
-                        <label for="materi-mapel" class="block text-[12px] font-bold leading-snug text-ink">Mata Pelajaran</label>
-                        <div class="relative mt-2">
-                            <select id="materi-mapel" name="mapel"
-                                    class="w-full appearance-none rounded-xl border border-bark-200 bg-white px-4 py-3 pr-10 text-[13px] text-ink transition focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 @error('mapel') border-ember-700 @enderror">
-                                <option value="">Pilih mata pelajaran</option>
-                                @foreach ($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('mapel') == $subject->id ? 'selected' : '' }}>
-                                        {{ $subject->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <span class="pointer-events-none absolute inset-y-0 right-0 grid w-10 place-items-center text-bark-400">
-                                @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-4 w-4'])
-                            </span>
-                        </div>
-                        @error('mapel')
-                            <p class="mt-1.5 text-[11.5px] font-semibold leading-snug text-ember-700">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Target kelas --}}
-                    <div class="md:col-span-9">
-                        <label for="materi-target" class="block text-[12px] font-bold leading-snug text-ink">Target Kelas</label>
-                        <div class="relative mt-2">
-                            <select id="materi-target" name="target[]" multiple
-                                    class="w-full appearance-none rounded-xl border border-bark-200 bg-white px-4 py-3 pr-10 text-[13px] text-ink transition focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30 @error('target') border-ember-700 @enderror" size="4">
-                                @foreach ($kelas as $kelasItem)
-                                    <option value="{{ $kelasItem->id }}" {{ in_array($kelasItem->id, old('target', [])) ? 'selected' : '' }}>
-                                        {{ $kelasItem->code }} — {{ $kelasItem->education_level }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <span class="pointer-events-none absolute inset-y-0 right-0 grid w-10 place-items-center text-bark-400">
-                                @include('layouts.partials.icon', ['name' => 'chevron-down', 'class' => 'h-4 w-4'])
-                            </span>
-                        </div>
-                        <p class="mt-1 text-[11px] leading-none text-muted">Tekan Ctrl/Cmd untuk memilih lebih dari satu kelas.</p>
-                        @error('target')
-                            <p class="mt-1.5 text-[11.5px] font-semibold leading-snug text-ember-700">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Hak akses --}}
-                    <div class="md:col-span-3">
-                        <label for="materi-akses" class="block text-[12px] font-bold leading-snug text-ink">Hak Akses Siswa</label>
-                        <div class="mt-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="akses" value="1" {{ old('akses', '1') ? 'checked' : '' }}
-                                       class="rounded border-bark-300 text-espresso focus:ring-gold">
-                                <span class="text-[13px] text-ink">Boleh diunduh siswa</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {{-- Aksi unggah --}}
-                    <div class="flex flex-col gap-3 md:col-span-12 sm:flex-row sm:items-center sm:justify-end">
-                        <button type="button" id="materi-draf"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-3 text-[13px] font-semibold text-espresso transition hover:bg-sand">
-                            @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4 text-bronze'])
-                            Simpan Draf
-                        </button>
-                        <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-espresso px-5 py-3 text-[13px] font-semibold text-white transition hover:bg-bark-800">
-                            @include('layouts.partials.icon', ['name' => 'upload', 'class' => 'h-4 w-4 text-gold'])
-                            Unggah Materi
-                        </button>
-                    </div>
-                </div>
-            </form>
+            <x-admin.materi-form :subjects="$subjects" :kelas="$kelas">
+                <button type="submit" name="status" value="draf"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-3 text-[13px] font-semibold text-espresso transition hover:bg-sand">
+                    @include('layouts.partials.icon', ['name' => 'save', 'class' => 'h-4 w-4 text-bronze'])
+                    Simpan Draf
+                </button>
+                <button type="submit" name="status" value="terbit"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-espresso px-5 py-3 text-[13px] font-semibold text-white transition hover:bg-bark-800">
+                    @include('layouts.partials.icon', ['name' => 'upload', 'class' => 'h-4 w-4 text-gold'])
+                    Unggah Materi
+                </button>
+            </x-admin.materi-form>
         </section>
 
         {{-- Daftar materi terunggah (dari DB) --}}
@@ -270,14 +172,14 @@
                                     </td>
                                     <td class="px-5 py-4">
                                         <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('admin.manajemenMateri.edit', $materiItem->id) }}"
+                                               aria-label="Edit materi {{ $materiItem->title }}"
+                                               class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-white text-bark-400 transition hover:bg-sand hover:text-espresso">
+                                                @include('layouts.partials.icon', ['name' => 'sliders', 'class' => 'h-4 w-4'])
+                                            </a>
                                             <form action="{{ route('admin.manajemenMateri.destroy', $materiItem->id) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" aria-label="Edit materi {{ $materiItem->title }}"
-                                                        class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-white text-bark-400 transition hover:bg-sand hover:text-espresso"
-                                                        onclick="location.href='{{ route('admin.manajemenMateri.update', $materiItem->id) }}'">
-                                                    @include('layouts.partials.icon', ['name' => 'sliders', 'class' => 'h-4 w-4'])
-                                                </button>
                                                 <button type="submit" aria-label="Hapus materi {{ $materiItem->title }}"
                                                         class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ember-100 text-ember-700 transition hover:bg-ember-200"
                                                         onclick="return confirm('Yakin ingin menghapus materi \"{{ $materiItem->title }}\"?')">
@@ -323,30 +225,7 @@
                     @endif
                 </div>
 
-                @if (session('sukses'))
-                    <div class="rounded-lg border border-gold/50 bg-gold/10 px-4 py-3 text-[12.5px] text-bronze flex items-center gap-2">
-                        @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-4 w-4 text-bronze'])
-                        <span>{{ session('sukses') }}</span>
-                    </div>
-                @endif
             </footer>
         </section>
     </div>
-
-    <script>
-        (() => {
-            const form = document.getElementById('materi-form');
-            const berkas = document.getElementById('materi-berkas');
-            const namaBerkas = document.getElementById('materi-berkas-nama');
-
-            berkas.addEventListener('change', () => {
-                const file = berkas.files[0];
-                namaBerkas.textContent = file
-                    ? `${file.name} — ${(file.size / (1024 * 1024)).toFixed(1)} MB`
-                    : 'Belum ada berkas dipilih — klik untuk memilih dari komputer';
-                namaBerkas.classList.toggle('text-ink', Boolean(file));
-                namaBerkas.classList.toggle('text-muted', ! file);
-            });
-        })();
-    </script>
 @endsection

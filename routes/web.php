@@ -83,6 +83,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::get('/manajemen-materi', [ManajemenMateriController::class, 'index'])->name('manajemenMateri');
     Route::post('/manajemen-materi', [ManajemenMateriController::class, 'store'])->name('manajemenMateri.store');
+    Route::get('/manajemen-materi/{materi}/edit', [ManajemenMateriController::class, 'edit'])
+        ->whereNumber('materi')
+        ->name('manajemenMateri.edit');
     Route::put('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'update'])->name('manajemenMateri.update');
     Route::delete('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'destroy'])->name('manajemenMateri.destroy');
 
@@ -176,6 +179,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/jadwal', [SessionController::class, 'current'])->name('jadwal');
 
         Route::get('/materi', [StudentController::class, 'materi'])->name('materi');
+
+        Route::get('/materi/{materi}/unduh', [StudentController::class, 'unduhMateri'])
+            ->whereNumber('materi')
+            ->name('materi.unduh');
 
         Route::get('/qualifix', [StudentController::class, 'qualifix'])->name('qualifix');
 
