@@ -25,7 +25,6 @@ class ProfilController extends Controller
     public function update(Request $request)
     {
         $user = $request->user();
-        $staffProfile = StaffProfile::where('user_id', $user->id)->firstOrFail();
 
         $validated = $request->validate([
             'full_name_with_title' => 'required|string|max:100',
@@ -34,6 +33,11 @@ class ProfilController extends Controller
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
         ]);
+
+        $staffProfile = StaffProfile::firstOrCreate(
+            ['user_id' => $user->id],
+            ['full_name_with_title' => $validated['full_name_with_title']],
+        );
 
         $staffProfile->update([
             'full_name_with_title' => $validated['full_name_with_title'],

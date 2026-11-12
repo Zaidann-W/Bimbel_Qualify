@@ -150,7 +150,7 @@
                     </div>
                     <div>
                         <label class="text-[12px] font-bold text-bark-700">Pendidikan Terakhir</label>
-                        <input type="text" name="education" value="{{ $staff->education }}"
+                        <input type="text" name="education" value="{{ $staff?->education }}"
                                class="mt-1.5 w-full rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
                     </div>
                     <div>
@@ -166,12 +166,12 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="text-[12px] font-bold text-bark-700">Alamat Domisili Mengajar</label>
-                        <input type="text" name="address" value="{{ $staff->address }}"
+                        <input type="text" name="address" value="{{ $staff?->address }}"
                                class="mt-1.5 w-full rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="text-[12px] font-bold text-bark-700">Keahlian / Mata Pelajaran</label>
-                        <input type="text" name="job_title" value="{{ $staff->job_title }}"
+                        <input type="text" name="job_title" value="{{ $staff?->job_title }}"
                                class="mt-1.5 w-full rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[13px] text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100"
                                placeholder="Pisahkan dengan koma, cth: Matematika Saintek, TPS Kuantitatif, OSN">
                         <p class="mt-1 text-[10.5px] text-bark-400">Pisahkan dengan koma untuk setiap keahlian.</p>
