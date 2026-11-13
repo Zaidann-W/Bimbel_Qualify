@@ -13,7 +13,16 @@ class ScheduleRule extends Model
 
     protected $table = 'schedule_rules';
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'class_group_id',
+        'subject_id',
+        'staff_id',
+        'room_id',
+        'study_shift_id',
+        'weekday',
+        'start_time',
+        'end_time',
+    ];
 
     public function classGroup(): BelongsTo
     {

@@ -3,10 +3,15 @@
 use App\Models\StudySession;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Waktu dibekukan supaya status "berjalan" dan "terjadwal" tidak
+    // bergantung pada jam serta tanggal saat test dijalankan.
+    Carbon::setTestNow(Carbon::parse('2026-11-12 16:00:00'));
+
     $this->actingAs(User::factory()->create(['role' => 'siswa']));
 
     StudySession::factory()->create([
@@ -29,6 +34,10 @@ beforeEach(function () {
         'room_name' => 'Ruang Volta (Lantai 2)',
         'tutor_name' => 'Dr Hartanto, M.Pd',
     ]);
+});
+
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
 test('detail pertemuan siswa page returns a successful response', function () {

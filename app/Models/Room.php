@@ -22,4 +22,9 @@ class Room extends Model
     {
         return $query->where('status', 'aktif');
     }
+
+    public function classSessions()
+    {
+        return $this->hasMany(ClassSession::class);
+    }
 }

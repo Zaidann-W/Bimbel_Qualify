@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class ClassSession extends Model
 {
@@ -60,8 +61,45 @@ class ClassSession extends Model
         return $this->hasMany(StudentAttendance::class);
     }
 
+    public function tutorAttendance()
+    {
+        return $this->hasMany(TutorAttendance::class);
+    }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
     public function scopeToday($query)
     {
         return $query->whereDate('session_date', today());
+    }
+
+    /**
+     * Tanggal sesi sebagai objek Carbon.
+     *
+     * Kolom session_date disimpan sebagai teks Y-m-d, jadi parsing dilakukan
+     * di satu tempat agar formatnya konsisten di view dan service.
+     */
+    public function getTanggalAttribute(): Carbon
+    {
+        return Carbon::parse($this->session_date)->startOfDay();
+    }
+
+    /**
+     * Status sesi yang memperhitungkan tanggal yang sudah lewat.
+     *
+     * Sesi yang tanggalnya sudah lewat ditampilkan sebagai "selesai" tanpa
+     * perlu mengubah kolom status, sehingga riwayat tetap konsisten walaupun
+     * tidak ada proses Closure yang berjalan setiap hari.
+     */
+    public function getStatusEfektifAttribute(): string
+    {
+        if ($this->status === 'terjadwal' && $this->tanggal->isPast()) {
+            return 'selesai';
+        }
+
+        return $this->status;
     }
 }

@@ -3,11 +3,13 @@
 use App\Http\Controllers\Admin\AbsensiJadwalController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataSiswaController;
+use App\Http\Controllers\Admin\IzinController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KeuanganController;
 use App\Http\Controllers\Admin\LaporanKeuanganController;
 use App\Http\Controllers\Admin\LaporanPengaturanController;
 use App\Http\Controllers\Admin\LaporanPresensiController;
+use App\Http\Controllers\Admin\ManajemenJadwalController;
 use App\Http\Controllers\Admin\ManajemenMateriController;
 use App\Http\Controllers\Admin\PendaftaranController;
 use App\Http\Controllers\Admin\PengaturanController;
@@ -91,6 +93,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::delete('/manajemen-materi/{materi}', [ManajemenMateriController::class, 'destroy'])->name('manajemenMateri.destroy');
 
     Route::get('/absensi-jadwal', [AbsensiJadwalController::class, 'index'])->name('absensiJadwal');
+    Route::patch('/izin/{leaveRequest}', [IzinController::class, 'update'])->name('izin.update');
+
+    Route::get('/manajemen-jadwal', [ManajemenJadwalController::class, 'index'])->name('manajemenJadwal');
+
+    Route::get('/manajemen-jadwal/aturan/create', [ManajemenJadwalController::class, 'createAturan'])->name('manajemenJadwal.aturan.create');
+    Route::post('/manajemen-jadwal/aturan', [ManajemenJadwalController::class, 'storeAturan'])->name('manajemenJadwal.aturan.store');
+    Route::get('/manajemen-jadwal/aturan/{scheduleRule}/edit', [ManajemenJadwalController::class, 'editAturan'])->name('manajemenJadwal.aturan.edit');
+    Route::put('/manajemen-jadwal/aturan/{scheduleRule}', [ManajemenJadwalController::class, 'updateAturan'])->name('manajemenJadwal.aturan.update');
+    Route::delete('/manajemen-jadwal/aturan/{scheduleRule}', [ManajemenJadwalController::class, 'destroyAturan'])->name('manajemenJadwal.aturan.destroy');
+
+    Route::post('/manajemen-jadwal/sesi/generate', [ManajemenJadwalController::class, 'generate'])->name('manajemenJadwal.sesi.generate');
+    Route::get('/manajemen-jadwal/sesi/{classSession}/edit', [ManajemenJadwalController::class, 'editSesi'])->name('manajemenJadwal.sesi.edit');
+    Route::put('/manajemen-jadwal/sesi/{classSession}', [ManajemenJadwalController::class, 'updateSesi'])->name('manajemenJadwal.sesi.update');
+    Route::post('/manajemen-jadwal/sesi/{classSession}/batalkan', [ManajemenJadwalController::class, 'batalkanSesi'])->name('manajemenJadwal.sesi.batalkan');
+
+    Route::post('/manajemen-jadwal/ruang', [ManajemenJadwalController::class, 'storeRuang'])->name('manajemenJadwal.ruang.store');
+    Route::put('/manajemen-jadwal/ruang/{room}', [ManajemenJadwalController::class, 'updateRuang'])->name('manajemenJadwal.ruang.update');
+    Route::delete('/manajemen-jadwal/ruang/{room}', [ManajemenJadwalController::class, 'destroyRuang'])->name('manajemenJadwal.ruang.destroy');
 
     Route::get('/qualifix', [QualifixController::class, 'index'])->name('qualifix');
 
@@ -155,6 +175,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi');
         Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
+        Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn'])->name('absensi.check-in');
+        Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])->name('absensi.check-out');
 
         Route::get('/qualifix', [TentorQualifixController::class, 'index'])->name('qualifix');
 

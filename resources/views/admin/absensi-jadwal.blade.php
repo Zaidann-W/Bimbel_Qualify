@@ -2,165 +2,12 @@
 
 @section('title', 'Absensi & Jadwal')
 
-{{-- Halaman masih memakai data mock UI sesuai rancangan docs/absensi-admin.png;
-     sambungkan ke tabel jadwal sesi, presensi tentor/siswa, dan pengajuan izin begitu modulnya tersedia --}}
 @section('content')
 @php
-    $sesi_pil = [
-        'sore' => [
-            'label' => 'Sesi Sore',
-            'rentang' => '(15:30 - 18:00)',
-            'judul' => 'Daftar Kelas — Sesi Sore (15:30 - 17:30)',
-            'jumlah' => 8,
-        ],
-        'malam' => [
-            'label' => 'Sesi Malam',
-            'rentang' => '(18:30 - 20:00)',
-            'judul' => 'Daftar Kelas — Sesi Malam (18:30 - 20:00)',
-            'jumlah' => 6,
-        ],
-    ];
-
-    $kpis = [
-        [
-            'label' => 'Total Sesi Hari Ini',
-            'kunci' => null,
-            'nilai' => '14',
-            'satuan' => 'Kelas',
-            'satuan_kelas' => 'text-muted',
-            'ikon' => 'calendar',
-            'tile' => 'bg-sandgold text-bronze',
-            'aksen' => 'border-t-gold',
-            'gelap' => false,
-            'catatan' => 'Sesi Sore: 8',
-            'catatan_2' => 'Sesi Malam: 6',
-            'lencana' => null,
-            'tautan' => null,
-        ],
-        [
-            'label' => 'Presensi Siswa',
-            'kunci' => null,
-            'nilai' => '94.8%',
-            'satuan' => '',
-            'satuan_kelas' => '',
-            'ikon' => 'users',
-            'tile' => 'bg-palegold text-espresso',
-            'aksen' => 'border-t-gold',
-            'gelap' => false,
-            'catatan' => '324 Hadir',
-            'catatan_2' => '18 Tidak Hadir',
-            'lencana' => null,
-            'tautan' => null,
-        ],
-        [
-            'label' => 'Kehadiran Tentor',
-            'kunci' => null,
-            'nilai' => '14 / 14',
-            'satuan' => 'Lengkap',
-            'satuan_kelas' => 'text-gold',
-            'ikon' => 'user-check',
-            'tile' => 'bg-gold text-espresso',
-            'aksen' => 'border-t-espresso',
-            'gelap' => true,
-            'catatan' => '100% Mengajar',
-            'catatan_2' => null,
-            'lencana' => 'Tepat Waktu',
-            'tautan' => null,
-        ],
-        [
-            'label' => 'Pengajuan Izin / Sakit',
-            'kunci' => 'izin',
-            'nilai' => '3',
-            'satuan' => 'Menunggu',
-            'satuan_kelas' => 'text-bronze',
-            'ikon' => 'mail',
-            'tile' => 'bg-sandgold text-bronze',
-            'aksen' => 'border-t-gold',
-            'gelap' => false,
-            'catatan' => 'Perlu verifikasi admin',
-            'catatan_2' => null,
-            'lencana' => null,
-            'tautan' => 'Lihat Panel',
-        ],
-    ];
-
     $avatar_pil = [
         'espresso' => 'bg-espresso text-white',
         'palegold' => 'bg-palegold text-espresso',
         'sand' => 'bg-sand text-bark-500',
-    ];
-
-    $jadwal = [
-        [
-            'sesi' => 'sore', 'waktu' => '15:30 - 17:00', 'mapel' => 'Matematika',
-            'tentor' => 'Dimas Wahyu, S.Pd', 'inisial' => 'DW', 'avatar' => 'espresso',
-            'checkin' => '15:15', 'rombel' => '12-IPA-1', 'ruang' => 'R. Bima (Lt. 2)', 'ruang_key' => 'bima',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '15:45 - 17:15', 'mapel' => 'Fisika',
-            'tentor' => 'Rina Novianti, M.Si', 'inisial' => 'RN', 'avatar' => 'palegold',
-            'checkin' => '15:35', 'rombel' => '11-IPA-2', 'ruang' => 'R. Gajah Mada (Lt. 1)', 'ruang_key' => 'gajah-mada',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '15:30 - 17:00', 'mapel' => 'Bahasa Inggris',
-            'tentor' => 'Fajar Anshori, B.Ed', 'inisial' => 'FA', 'avatar' => 'sand',
-            'checkin' => '15:20', 'rombel' => '12-IPS-1', 'ruang' => 'R. Diponegoro (Lt. 1)', 'ruang_key' => 'diponegoro',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '16:00 - 17:30', 'mapel' => 'Kimia',
-            'tentor' => 'Dr. Azhar Pratama', 'inisial' => 'AZ', 'avatar' => 'espresso',
-            'checkin' => '15:50', 'rombel' => '10-IPA-1', 'ruang' => 'R. Cut Nyak Dien (Lt. 2)', 'ruang_key' => 'cut-nyak-dien',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '15:30 - 17:00', 'mapel' => 'Bahasa Indonesia',
-            'tentor' => 'Sdri. Nur Aini, S.Pd', 'inisial' => 'NA', 'avatar' => 'palegold',
-            'checkin' => '15:25', 'rombel' => '9-SMP-A', 'ruang' => 'R. Pattimura (Lt. 1)', 'ruang_key' => 'pattimura',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '15:45 - 17:15', 'mapel' => 'Biologi',
-            'tentor' => 'Ust. Dwi Hermanto, M.Pd', 'inisial' => 'DH', 'avatar' => 'sand',
-            'checkin' => '15:40', 'rombel' => '11-IPA-1', 'ruang' => 'R. Sultan Agung (Lt. 3)', 'ruang_key' => 'sultan-agung',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '16:00 - 17:30', 'mapel' => 'Matematika OSN',
-            'tentor' => 'Ust. Ahmad Fauzi, S.Pd', 'inisial' => 'AF', 'avatar' => 'espresso',
-            'checkin' => '15:55', 'rombel' => 'SD-OSN-Bintang', 'ruang' => 'R. Jayawijaya (Lt. 2)', 'ruang_key' => 'jayawijaya',
-        ],
-        [
-            'sesi' => 'sore', 'waktu' => '16:00 - 17:30', 'mapel' => 'Bahasa Inggris SD',
-            'tentor' => 'Sdri. Laila Hasanah, S.Pd', 'inisial' => 'LH', 'avatar' => 'palegold',
-            'checkin' => '15:58', 'rombel' => '5-SD-B', 'ruang' => 'R. Hasanuddin (Lt. 1)', 'ruang_key' => 'hasanuddin',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '18:30 - 20:00', 'mapel' => 'Matematika',
-            'tentor' => 'Ust. Rizky Maulana, M.Pd', 'inisial' => 'RM', 'avatar' => 'espresso',
-            'checkin' => null, 'rombel' => '12-IPA-2', 'ruang' => 'R. Bima (Lt. 2)', 'ruang_key' => 'bima',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '18:30 - 20:00', 'mapel' => 'Fisika',
-            'tentor' => 'Sdri. Maya Anggraini, M.Si', 'inisial' => 'MA', 'avatar' => 'palegold',
-            'checkin' => null, 'rombel' => '11-IPA-1', 'ruang' => 'R. Gajah Mada (Lt. 1)', 'ruang_key' => 'gajah-mada',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '18:45 - 20:00', 'mapel' => 'Bahasa Indonesia',
-            'tentor' => 'Ust. Yusuf Hakim, S.Pd', 'inisial' => 'YH', 'avatar' => 'sand',
-            'checkin' => null, 'rombel' => '9-SMP-B', 'ruang' => 'R. Diponegoro (Lt. 1)', 'ruang_key' => 'diponegoro',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '18:45 - 20:00', 'mapel' => 'Ekonomi',
-            'tentor' => 'Sdri. Fitri Handayani, S.E.', 'inisial' => 'FH', 'avatar' => 'palegold',
-            'checkin' => null, 'rombel' => '12-IPS-2', 'ruang' => 'R. Cut Nyak Dien (Lt. 2)', 'ruang_key' => 'cut-nyak-dien',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '19:00 - 20:00', 'mapel' => 'Kimia',
-            'tentor' => 'Ust. Ilham Saputra, S.Si', 'inisial' => 'IS', 'avatar' => 'espresso',
-            'checkin' => null, 'rombel' => '10-IPA-2', 'ruang' => 'R. Pattimura (Lt. 1)', 'ruang_key' => 'pattimura',
-        ],
-        [
-            'sesi' => 'malam', 'waktu' => '19:00 - 20:00', 'mapel' => 'Sosiologi',
-            'tentor' => 'Sdri. Rahma Dewi Lestari, S.Sos', 'inisial' => 'RL', 'avatar' => 'sand',
-            'checkin' => null, 'rombel' => '11-IPS-1', 'ruang' => 'R. Sultan Agung (Lt. 3)', 'ruang_key' => 'sultan-agung',
-        ],
     ];
 
     $izin_pil = [
@@ -169,36 +16,17 @@
         'pribadi' => ['label' => 'Izin Pribadi', 'kelas' => 'bg-sandgold text-bronze'],
     ];
 
-    $pengajuan = [
-        [
-            'nama' => 'Aura Clarissa Putri', 'jenis' => 'sakit',
-            'kelas' => 'Kelas 11-IPA-2', 'wali' => 'Wali: Ibu Dewi R.',
-        ],
-        [
-            'nama' => 'Muhammad Farrel', 'jenis' => 'lomba',
-            'kelas' => 'Kelas 11-IPA-2', 'wali' => 'Wali: Bpk. Hendra',
-        ],
-        [
-            'nama' => 'Nabila Ayu Prameswari', 'jenis' => 'pribadi',
-            'kelas' => 'Kelas 10-IPA-1', 'wali' => 'Wali: Ibu Sri H.',
-        ],
-    ];
+    $kunciIzin = function (?string $type) use ($izin_pil) {
+        $type = strtolower((string) $type);
 
-    $ruangan = [
-        ['nama' => 'R. Bima', 'status' => 'Sesi Sore Aktif', 'aktif' => true],
-        ['nama' => 'R. Gajah Mada', 'status' => 'Sesi Sore Aktif', 'aktif' => true],
-        ['nama' => 'R. Diponegoro', 'status' => 'Sesi Sore Aktif', 'aktif' => true],
-        ['nama' => 'R. Cut Nyak Dien', 'status' => 'Siap Sesi Malam', 'aktif' => false],
-    ];
+        foreach (array_keys($izin_pil) as $kunci) {
+            if (str_contains($type, $kunci)) {
+                return $kunci;
+            }
+        }
 
-    $pekan = [
-        ['hari' => 'Senin', 'sesi' => '12 Sesi', 'status' => '92% Hadir', 'status_kelas' => 'text-muted', 'hari_ini' => false],
-        ['hari' => 'Selasa', 'sesi' => '14 Sesi', 'status' => '95% Hadir', 'status_kelas' => 'text-muted', 'hari_ini' => false],
-        ['hari' => 'Rabu', 'sesi' => '15 Sesi', 'status' => '93% Hadir', 'status_kelas' => 'text-muted', 'hari_ini' => false],
-        ['hari' => 'Kamis (Hari ini)', 'sesi' => '14 Sesi', 'status' => '94.8% Hadir', 'status_kelas' => 'text-ember-700', 'hari_ini' => true],
-        ['hari' => 'Jumat', 'sesi' => '10 Sesi', 'status' => 'Terjadwal', 'status_kelas' => 'text-muted', 'hari_ini' => false],
-        ['hari' => 'Sabtu', 'sesi' => '18 Sesi', 'status' => 'Terjadwal Akhir', 'status_kelas' => 'text-muted', 'hari_ini' => false],
-    ];
+        return 'pribadi';
+    };
 @endphp
 
 {{-- Kepala halaman --}}
@@ -209,7 +37,7 @@
                 <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-gold"></span>
                 Modul 5.3 Operasional &amp; Akademik
                 <span class="text-bark-300" aria-hidden="true">•</span>
-                Bimbel Qualify T.A. 2024/2025
+                Bimbel Qualify
             </p>
             <h1 class="mt-2.5 text-[30px] font-extrabold leading-[1.1] tracking-tight text-ink sm:text-[34px]">
                 Manajemen Jadwal &amp; Presensi Bimbel
@@ -217,6 +45,30 @@
             <p class="mt-3 max-w-xl text-[13.5px] leading-relaxed text-muted">
                 Pemantauan jadwal sesi kelas, presensi kehadiran tentor dan siswa, serta pencatatan izin / sakit / alpa secara terpadu.
             </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+            <form method="GET" action="{{ route('admin.absensiJadwal') }}" class="flex items-center gap-2.5">
+                <label class="flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2.5 text-[12.5px] font-semibold text-ink">
+                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 text-bronze'])
+                    <input type="date" name="tanggal" value="{{ $tanggal->toDateString() }}"
+                           onchange="this.form.submit()"
+                           aria-label="Pilih tanggal jadwal"
+                           class="bg-transparent text-[12.5px] font-semibold text-ink focus:outline-none">
+                </label>
+                @if (! $tanggal->isToday())
+                    <a href="{{ route('admin.absensiJadwal') }}"
+                       class="rounded-lg border border-line bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-espresso transition hover:bg-sand">
+                        Hari ini
+                    </a>
+                @endif
+            </form>
+
+            <a href="{{ route('admin.manajemenJadwal') }}"
+               class="inline-flex items-center justify-center gap-2 rounded-lg bg-espresso px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-bark-800">
+                @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 text-gold'])
+                Kelola Jadwal
+            </a>
         </div>
     </div>
 </section>
@@ -248,7 +100,7 @@
                         'text-[27px] font-extrabold leading-none tracking-tight tabular-nums',
                         'text-white' => $kpi['gelap'],
                         'text-ink' => ! $kpi['gelap'],
-                    ]) @if ($kpi['kunci']) data-kunci="{{ $kpi['kunci'] }}" @endif>{{ $kpi['nilai'] }}</span>
+                    ])>{{ $kpi['nilai'] }}</span>
                     @if ($kpi['satuan'] !== '')
                         <span class="text-[13px] font-bold leading-none {{ $kpi['satuan_kelas'] }}">{{ $kpi['satuan'] }}</span>
                     @endif
@@ -260,9 +112,9 @@
                     'text-bark-700' => ! $kpi['gelap'],
                 ])>
                     <span>{{ $kpi['catatan'] }}</span>
-                    @if ($kpi['catatan_2'])
+                    @if ($kpi['catatan2'])
                         <span class="text-bark-300" aria-hidden="true">•</span>
-                        <span>{{ $kpi['catatan_2'] }}</span>
+                        <span>{{ $kpi['catatan2'] }}</span>
                     @endif
                     @if ($kpi['lencana'])
                         <span class="rounded-md bg-white/10 px-2 py-1 text-[10.5px] font-bold leading-none text-gold">{{ $kpi['lencana'] }}</span>
@@ -282,7 +134,7 @@
         {{-- Kolom utama: jadwal sesi --}}
         <div class="space-y-5 xl:col-span-2">
 
-            {{-- Pemilih sesi & tanggal --}}
+            {{-- Pemilih sesi --}}
             <section class="rounded-2xl border border-line bg-white p-3">
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex min-w-0 flex-1 basis-72 gap-1 rounded-xl bg-sand p-1" role="group" aria-label="Pilih sesi belajar">
@@ -306,8 +158,7 @@
                                         'font-semibold text-bark-400' => ! $loop->first,
                                     ])>{{ $sesi['label'] }}</span>
                                     <span data-rentang @class([
-                                        'block text-[10.5px]',
-                                        'font-medium text-muted' => $loop->first,
+                                        'block text-[10.5px] font-medium text-muted' => $loop->first,
                                         'text-bark-300' => ! $loop->first,
                                     ])>{{ $sesi['rentang'] }}</span>
                                 </span>
@@ -322,7 +173,8 @@
 
                     <p class="flex shrink-0 items-center gap-2 rounded-lg border border-line bg-white px-3 py-2.5 text-[12.5px] font-semibold text-ink">
                         @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4 text-bronze'])
-                        <time datetime="2026-10-24">Kamis, 24/10/2026</time>                    </p>
+                        <time datetime="{{ $tanggal->toDateString() }}">{{ $tanggal->translatedFormat('l, d/m/Y') }}</time>
+                    </p>
                 </div>
             </section>
 
@@ -353,7 +205,7 @@
                 </div>
             </section>
 
-            {{-- Daftar kelas hari ini --}}
+            {{-- Daftar kelas pada tanggal aktif --}}
             <section class="overflow-hidden rounded-2xl border border-line bg-white">
                 <header class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 pt-4 sm:px-5">
                     <h2 class="flex min-w-0 items-center gap-2.5 text-[16px] font-bold leading-snug text-ink">
@@ -374,6 +226,7 @@
                                 <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Tentor</th>
                                 <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Rombel / Kelas</th>
                                 <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Ruangan</th>
+                                <th scope="col" class="px-5 py-3 text-right text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -382,16 +235,26 @@
                                     data-sesi="{{ $baris['sesi'] }}"
                                     data-ruang="{{ $baris['ruang_key'] }}"
                                     data-ruang-label="{{ $baris['ruang'] }}"
-                                    data-cari="{{ strtolower($baris['waktu'] . ' ' . $baris['mapel'] . ' ' . $baris['tentor'] . ' ' . $baris['rombel'] . ' ' . $baris['ruang']) }}"
+                                    data-cari="{{ strtolower($baris['waktu'].' '.$baris['mapel'].' '.$baris['tentor'].' '.$baris['rombel'].' '.$baris['ruang']) }}"
                                     @class([
                                         'border-t border-line align-top odd:bg-white even:bg-shell',
                                         'hidden' => $baris['sesi'] === 'malam',
+                                        'opacity-60' => $baris['batal'],
                                     ])>
-                                    <td class="px-5 py-4 text-[12.5px] font-bold tabular-nums text-ink">{{ $baris['waktu'] }}</td>
+                                    <td class="px-5 py-4">
+                                        <span class="text-[12.5px] font-bold tabular-nums text-ink">{{ $baris['waktu'] }}</span>
+                                        <span @class([
+                                            'mt-1.5 inline-flex rounded-md px-2 py-0.5 text-[10.5px] font-bold leading-tight',
+                                            'bg-sandgold text-bronze' => $baris['status'] === 'terjadwal',
+                                            'bg-palegold text-espresso' => $baris['status'] === 'berlangsung',
+                                            'bg-forest-50 text-forest-600' => $baris['status'] === 'selesai',
+                                            'bg-ember-100 text-ember-600' => $baris['status'] === 'dibatalkan',
+                                        ])>{{ ucfirst($baris['status']) }}</span>
+                                    </td>
                                     <td class="px-5 py-4 text-[13px] font-bold leading-snug text-ink">{{ $baris['mapel'] }}</td>
                                     <td class="px-5 py-4">
                                         <div class="flex items-center gap-3">
-                                            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11.5px] font-bold {{ $avatar_pil[$baris['avatar']] }}" aria-hidden="true">
+                                            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11.5px] font-bold {{ $avatar_pil[array_keys($avatar_pil)[$loop->index % count($avatar_pil)]] }}" aria-hidden="true">
                                                 {{ $baris['inisial'] }}
                                             </span>
                                             <div class="min-w-0">
@@ -410,13 +273,51 @@
                                     <td class="px-5 py-4">
                                         <span class="inline-flex rounded-md border border-line bg-white px-2 py-1 text-[11.5px] font-semibold text-ink">{{ $baris['ruang'] }}</span>
                                     </td>
+                                    <td class="px-5 py-4">
+                                        <div class="flex items-center justify-end gap-2">
+                                            @if ($baris['batal'])
+                                                <span class="rounded-lg bg-ember-100 px-2.5 py-1.5 text-[11px] font-bold leading-tight text-ember-600">Dibatalkan</span>
+                                            @else
+                                                <a href="{{ route('admin.manajemenJadwal.sesi.edit', $baris['id']) }}"
+                                                   aria-label="Ubah sesi {{ $baris['mapel'] }} di {{ $baris['rombel'] }}"
+                                                   class="grid h-9 w-9 place-items-center rounded-lg border border-line bg-white text-bark-400 transition hover:bg-sand hover:text-espresso">
+                                                    @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-4 w-4'])
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
 
                             <tr id="jadwal-kosong" class="hidden border-t border-line">
-                                <td colspan="5" class="px-5 py-12 text-center">
-                                    <p class="text-[13.5px] font-bold text-ink">Tidak ada kelas yang cocok</p>
-                                    <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci, pilih ruang lain, atau kembalikan filter ke Semua.</p>
+                                <td colspan="6" class="px-5 py-12 text-center">
+                                    <div data-kosong-tanpa-sesi class="hidden">
+                                        @if ($sesiBerikutnya)
+                                            <p class="text-[13.5px] font-bold text-ink">
+                                                Belum ada sesi terjadwal pada {{ $tanggal->locale('id')->translatedFormat('l, d/m/Y') }}
+                                            </p>
+                                            <p class="mt-1.5 text-[12.5px] text-muted">
+                                                Sesi berikutnya: {{ $sesiBerikutnya->tanggal->locale('id')->translatedFormat('l, d/m/Y') }}
+                                                pukul {{ substr($sesiBerikutnya->start_time, 0, 5) }} ·
+                                                {{ $sesiBerikutnya->subject?->name ?? 'Mata pelajaran' }} ·
+                                                {{ $sesiBerikutnya->classGroup?->code ?? '-' }}
+                                            </p>
+                                            <a href="{{ route('admin.absensiJadwal', ['tanggal' => $sesiBerikutnya->tanggal->toDateString()]) }}"
+                                               class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-espresso px-3.5 py-2 text-[12px] font-semibold text-white transition hover:bg-bark-800">
+                                                Lihat Sesi {{ $sesiBerikutnya->tanggal->locale('id')->translatedFormat('d/m/Y') }}
+                                            </a>
+                                        @else
+                                            <p class="text-[13.5px] font-bold text-ink">Belum ada sesi terjadwal</p>
+                                            <p class="mt-1.5 text-[12.5px] text-muted">
+                                                Buat aturan jadwal mingguan lalu generate sesi lewat
+                                                <a href="{{ route('admin.manajemenJadwal') }}" class="font-semibold text-bronze underline underline-offset-2">Kelola Jadwal</a>.
+                                            </p>
+                                        @endif
+                                    </div>
+                                    <div data-kosong-filter>
+                                        <p class="text-[13.5px] font-bold text-ink">Tidak ada kelas yang cocok</p>
+                                        <p class="mt-1.5 text-[12.5px] text-muted">Ubah kata kunci, pilih ruang lain, atau kembalikan filter ke Semua.</p>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -425,7 +326,7 @@
 
                 <footer class="flex flex-col gap-3 border-t border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <p data-hitung aria-live="polite" class="text-[12px] leading-snug text-muted">
-                        Menampilkan <span class="font-bold text-ink">4</span> dari <span class="font-bold text-ink">8</span> kelas Sesi Sore
+                        Menampilkan <span class="font-bold text-ink">0</span> dari <span class="font-bold text-ink">0</span> kelas Sesi Sore
                     </p>
                     <button type="button" data-luas
                             class="text-[12.5px] font-semibold text-bronze transition hover:text-espresso focus-visible:underline">
@@ -433,10 +334,88 @@
                     </button>
                 </footer>
             </section>
+
+            {{-- Kepadatan jadwal sepekan --}}
+            <section class="overflow-hidden rounded-2xl border border-line bg-white">
+                <header class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 pt-4 sm:px-5">
+                    <h2 class="flex min-w-0 items-center gap-2.5 text-[15px] font-bold leading-snug text-ink">
+                        <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
+                            @include('layouts.partials.icon', ['name' => 'table', 'class' => 'h-4 w-4'])
+                        </span>
+                        Kepadatan Jadwal Pekan Ini
+                    </h2>
+                    <p class="shrink-0 text-[12px] font-semibold text-muted">{{ $tanggal->translatedFormat('d M Y') }}</p>
+                </header>
+
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full min-w-[640px] border-collapse text-left">
+                        <thead>
+                            <tr class="bg-shell">
+                                <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Hari</th>
+                                <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Sesi</th>
+                                <th scope="col" class="px-5 py-3 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Kehadiran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($pekan as $hari)
+                                <tr @class(['border-t border-line odd:bg-white even:bg-shell', 'bg-sandgold/40' => $hari['hari_ini']])>
+                                    <td class="px-5 py-3.5 text-[12.5px] font-bold text-ink">
+                                        {{ $hari['hari'] }}
+                                        @if ($hari['hari_ini'])
+                                            <span class="ml-1.5 rounded-md bg-gold px-1.5 py-0.5 text-[10px] font-bold leading-none text-espresso">Hari ini</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3.5 text-[12.5px] font-semibold text-bark-500">{{ $hari['sesi'] }} Sesi</td>
+                                    <td class="px-5 py-3.5 text-[12.5px] font-semibold">
+                                        @if ($hari['rate'] === null)
+                                            <span class="text-muted">Belum ada presensi</span>
+                                        @else
+                                            <span class="font-bold {{ $hari['rate'] >= 90 ? 'text-forest-600' : 'text-bronze' }}">{{ $hari['rate'] }}% Hadir</span>
+                                            <span class="text-bark-400"> ({{ $hari['hadir'] }}/{{ $hari['total'] }})</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
 
-        {{-- Rail kanan: verifikasi izin & ruangan --}}
+        {{-- Rail kanan: sesi berikutnya, verifikasi izin & ruangan --}}
         <div class="space-y-5">
+
+            @if ($sesiBerikutnya)
+                <section class="rounded-2xl border border-line bg-white p-5">
+                    <header class="flex flex-wrap items-center gap-2.5">
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-sandgold text-bronze">
+                            @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4.5 w-4.5'])
+                        </span>
+                        <h2 class="min-w-0 text-[15px] font-bold leading-snug text-ink">Sesi Berikutnya</h2>
+                    </header>
+
+                    <article class="mt-4 rounded-xl border border-line bg-cream px-4 py-3.5">
+                        <p class="text-[12.5px] font-bold text-bronze">
+                            {{ $sesiBerikutnya->tanggal->locale('id')->translatedFormat('l, d/m/Y') }}
+                        </p>
+                        <p class="mt-1.5 text-[13.5px] font-bold leading-snug text-ink">
+                            {{ $sesiBerikutnya->subject?->name ?? 'Mata pelajaran' }}
+                        </p>
+                        <p class="mt-1 text-[11.5px] leading-snug text-muted">
+                            {{ substr($sesiBerikutnya->start_time, 0, 5) }} - {{ substr($sesiBerikutnya->end_time, 0, 5) }}
+                            · {{ $sesiBerikutnya->classGroup?->code ?? '-' }}
+                            · {{ $sesiBerikutnya->room?->name ?? 'Tanpa ruang' }}
+                        </p>
+                        <p class="mt-1 text-[11.5px] leading-snug text-bark-400">
+                            Tentor: {{ $sesiBerikutnya->staff?->full_name_with_title ?? '-' }}
+                        </p>
+                        <a href="{{ route('admin.absensiJadwal', ['tanggal' => $sesiBerikutnya->tanggal->toDateString()]) }}"
+                           class="mt-3 inline-flex items-center gap-1.5 text-[12px] font-bold text-bronze underline decoration-bronze/40 underline-offset-2 transition hover:text-gold">
+                            Buka tanggal tersebut
+                        </a>
+                    </article>
+                </section>
+            @endif
 
             <section id="verifikasi-izin" class="rounded-2xl border border-line bg-white p-5">
                 <header class="flex flex-wrap items-center gap-2.5">
@@ -444,43 +423,64 @@
                         @include('layouts.partials.icon', ['name' => 'mail', 'class' => 'h-4.5 w-4.5'])
                     </span>
                     <h2 class="min-w-0 text-[15px] font-bold leading-snug text-ink">Verifikasi Izin &amp; Sakit</h2>
-                    <span data-jumlah-izin class="ml-auto shrink-0 rounded-md bg-gold px-2 py-1 text-[10.5px] font-bold leading-none text-espresso">
-                        {{ count($pengajuan) }} Menunggu
+                    <span class="ml-auto shrink-0 rounded-md bg-gold px-2 py-1 text-[10.5px] font-bold leading-none text-espresso">
+                        {{ $pengajuan->count() }} Menunggu
                     </span>
                 </header>
 
-                <div data-daftar-izin class="mt-4 space-y-3">
+                <div class="mt-4 space-y-3">
                     @foreach ($pengajuan as $ajuan)
-                        @php $izin = $izin_pil[$ajuan['jenis']]; @endphp
-                        <article data-izin class="rounded-xl border border-line bg-cream px-4 py-3.5">
+                        @php
+                            $kunci = $kunciIzin($ajuan->type);
+                            $izin = $izin_pil[$kunci];
+                            $enrollment = $ajuan->student?->enrollments->firstWhere('status', 'aktif');
+                            $wali = $ajuan->student?->guardians->first();
+                        @endphp
+                        <article class="rounded-xl border border-line bg-cream px-4 py-3.5">
                             <div class="flex items-start justify-between gap-3">
-                                <p class="min-w-0 text-[13.5px] font-bold leading-snug text-ink">{{ $ajuan['nama'] }}</p>
+                                <p class="min-w-0 text-[13.5px] font-bold leading-snug text-ink">{{ $ajuan->student?->full_name ?? 'Siswa' }}</p>
                                 <span class="shrink-0 rounded-md px-2 py-1 text-[10.5px] font-bold leading-none {{ $izin['kelas'] }}">{{ $izin['label'] }}</span>
                             </div>
                             <p class="mt-1.5 text-[11.5px] leading-snug text-muted">
-                                {{ $ajuan['kelas'] }} <span class="text-bark-300">•</span> {{ $ajuan['wali'] }}
+                                {{ $enrollment?->classGroup?->code ?? 'Tanpa kelas' }}
+                                <span class="text-bark-300">•</span>
+                                Wali: {{ $wali?->name ?? '-' }}
                             </p>
+                            @if ($ajuan->reason)
+                                <p class="mt-1.5 text-[11.5px] leading-snug text-bark-400">{{ $ajuan->reason }}</p>
+                            @endif
                             <div class="mt-3 flex justify-end gap-2">
-                                <button type="button" data-aksi="tolak"
-                                        class="rounded-lg border border-line bg-white px-3.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand">
-                                    Tolak
-                                </button>
-                                <button type="button" data-aksi="setujui"
-                                        class="rounded-lg bg-espresso px-3.5 py-2 text-[12px] font-semibold text-white transition hover:bg-bark-800">
-                                    Setujui
-                                </button>
+                                <form method="POST" action="{{ route('admin.izin.update', $ajuan) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="ditolak">
+                                    <button type="submit"
+                                            class="rounded-lg border border-line bg-white px-3.5 py-2 text-[12px] font-semibold text-espresso transition hover:bg-sand">
+                                        Tolak
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.izin.update', $ajuan) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="disetujui">
+                                    <button type="submit"
+                                            class="rounded-lg bg-espresso px-3.5 py-2 text-[12px] font-semibold text-white transition hover:bg-bark-800">
+                                        Setujui
+                                    </button>
+                                </form>
                             </div>
                         </article>
                     @endforeach
                 </div>
 
-                <div data-izin-kosong class="mt-4 hidden rounded-xl border border-dashed border-line bg-cream px-4 py-7 text-center">
+                <div @class([
+                    'mt-4 rounded-xl border border-dashed border-line bg-cream px-4 py-7 text-center',
+                    'hidden' => $pengajuan->isNotEmpty(),
+                ])>
                     @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'mx-auto h-6 w-6 text-bronze'])
                     <p class="mt-2.5 text-[13px] font-bold text-ink">Semua pengajuan sudah diputuskan</p>
-                    <p class="mt-1.5 text-[12px] leading-relaxed text-muted">Tidak ada izin atau sakit yang menunggu verifikasi hari ini.</p>
+                    <p class="mt-1.5 text-[12px] leading-relaxed text-muted">Tidak ada izin atau sakit yang menunggu verifikasi.</p>
                 </div>
-
-                <p data-status-izin role="status" aria-live="polite" class="mt-3 text-[11.5px] font-semibold leading-snug text-bronze"></p>
             </section>
 
             <section class="rounded-2xl border border-line bg-white p-5">
@@ -490,17 +490,21 @@
                     </span>
                     <h2 class="min-w-0 text-[15px] font-bold leading-snug text-ink">Ketersediaan Ruangan</h2>
                     <span class="ml-auto shrink-0 rounded-md bg-sandgold px-2 py-1 text-[10.5px] font-bold leading-none text-bronze">
-                        {{ count($ruangan) }} Ruang Aktif
+                        {{ $ruangan->count() }} Ruang Aktif
                     </span>
                 </header>
 
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    @foreach ($ruangan as $ruang)
+                    @forelse ($ruangan as $ruang)
                         <div class="rounded-xl bg-cream px-3.5 py-3">
                             <p class="text-[13px] font-bold leading-snug text-ink">{{ $ruang['nama'] }}</p>
                             <p class="mt-1 text-[11.5px] font-bold leading-snug {{ $ruang['aktif'] ? 'text-bronze' : 'text-muted' }}">{{ $ruang['status'] }}</p>
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="col-span-2 rounded-xl border border-dashed border-line bg-cream px-4 py-6 text-center text-[12.5px] text-muted">
+                            Belum ada data ruang.
+                        </p>
+                    @endforelse
                 </div>
             </section>
         </div>
@@ -627,6 +631,8 @@
             });
 
             barisKosong.classList.toggle('hidden', tampak > 0);
+            document.querySelector('[data-kosong-tanpa-sesi]')?.classList.toggle('hidden', baris.length !== 0);
+            document.querySelector('[data-kosong-filter]')?.classList.toggle('hidden', baris.length === 0);
             judulSesi.textContent = infoSesi[sesi].judul;
             jumlahSesi.textContent = `${total} Kelas Terjadwal`;
             hitung.innerHTML = `Menampilkan <span class="font-bold text-ink">${tampak}</span>`
@@ -673,50 +679,6 @@
 
         bangunRuang();
         terapkan();
-
-        // ---- Verifikasi izin & sakit ----
-        const daftarIzin = document.querySelector('[data-daftar-izin]');
-        const kotakKosong = document.querySelector('[data-izin-kosong]');
-        const lencanaIzin = document.querySelector('[data-jumlah-izin]');
-        const nilaiIzin = document.querySelector('[data-kunci="izin"]');
-        const statusIzin = document.querySelector('[data-status-izin]');
-
-        const perbaruiIzin = () => {
-            const sisa = daftarIzin.querySelectorAll('[data-izin]').length;
-
-            lencanaIzin.textContent = `${sisa} Menunggu`;
-            lencanaIzin.classList.toggle('hidden', sisa === 0);
-            kotakKosong.classList.toggle('hidden', sisa > 0);
-            daftarIzin.classList.toggle('hidden', sisa === 0);
-            nilaiIzin.textContent = String(sisa);
-        };
-
-        daftarIzin.addEventListener('click', (event) => {
-            const tombol = event.target.closest('[data-aksi]');
-            if (!tombol) {
-                return;
-            }
-
-            const kartu = tombol.closest('[data-izin]');
-            const nama = kartu.querySelector('p').textContent.trim();
-            const disetujui = tombol.dataset.aksi === 'setujui';
-
-            kartu.remove();
-            perbaruiIzin();
-
-            const sisa = daftarIzin.querySelectorAll('[data-izin]').length;
-            statusIzin.textContent = `Pengajuan ${nama} ${disetujui ? 'disetujui' : 'ditolak'}.`
-                + ` ${sisa} pengajuan masih menunggu verifikasi.`;
-        });
-
-        // ---- Cetak & sinkronisasi ----
-        document.getElementById('cetak-rekap').addEventListener('click', () => window.print());
-
-        document.getElementById('segarkan-data').addEventListener('click', () => {
-            const kini = new Date();
-            const jam = `${String(kini.getHours()).padStart(2, '0')}:${String(kini.getMinutes()).padStart(2, '0')}`;
-            document.querySelector('[data-sinkron]').textContent = `Hari ini, ${jam} WIB`;
-        });
     })();
 </script>
 @endsection

@@ -12,6 +12,9 @@
     ];
 
     $sessionStatusOptions = ['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpa' => 'Alpa'];
+
+    // Jam sesi disimpan sebagai teks HH:MM:SS, tampilkan dengan pemisah titik.
+    $jam = fn (?string $waktu) => $waktu === null ? '-' : str_replace(':', '.', substr($waktu, 0, 5));
 @endphp
 
 <div class="space-y-5">
@@ -28,33 +31,118 @@
             @if ($session)
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    Sesi Berlangsung
+                    {{ $session->tanggal->isToday() ? 'Sesi Hari Ini' : 'Sesi '.$session->tanggal->locale('id')->translatedFormat('d/m/Y') }}
                 </span>
             @else
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-bark-100 px-2.5 py-1 text-[11px] font-bold text-bark-600">
                     <span class="h-1.5 w-1.5 rounded-full bg-bark-400"></span>
-                    Tidak Ada Sesi Hari Ini
+                    Tidak Ada Sesi
                 </span>
             @endif
         </div>
         <p class="mt-1 text-[13px] text-bark-400">Catat kehadiran murid dan pantau rekap per pertemuan.</p>
     </div>
 
-    {{-- Pilih sesi (jika ada lebih dari 1) --}}
-    @if ($sessions->count() > 1)
-        <div class="rounded-2xl border border-bark-100 bg-white p-4">
-            <label class="block text-[12px] font-medium text-bark-600 mb-2">Pilih Sesi</label>
-            <div class="flex flex-wrap gap-2">
-                @foreach ($sessions as $s)
-                    <a href="{{ route('tentor.absensi', ['session_id' => $s->id]) }}"
-                       class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition
-                           {{ $session && $session->id === $s->id ? 'bg-ember-500 text-white' : 'bg-bark-50 text-bark-600 hover:bg-bark-100' }}">
-                        {{ $s->start_time->format('H.i') }} – {{ $s->end_time->format('H.i') }} · {{ $s->subject->name ?? $s->topic ?? 'Mata Pelajaran' }} · {{ $s->classGroup->code ?? 'Kelas' }}
+    {{-- Filter rentang & daftar sesi --}}
+    <div class="rounded-2xl border border-bark-100 bg-white p-4">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+            <div class="flex flex-wrap items-end gap-2.5">
+                <label class="block">
+                    <span class="mb-1 block text-[11px] font-semibold text-bark-600">Dari</span>
+                    <input type="date" name="dari" value="{{ $dari->toDateString() }}" form="filter-rentang"
+                           class="rounded-lg border border-bark-100 bg-bark-50 px-3 py-2 text-[12.5px] text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
+                </label>
+                <label class="block">
+                    <span class="mb-1 block text-[11px] font-semibold text-bark-600">Sampai</span>
+                    <input type="date" name="sampai" value="{{ $sampai->toDateString() }}" form="filter-rentang"
+                           class="rounded-lg border border-bark-100 bg-bark-50 px-3 py-2 text-[12.5px] text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
+                </label>
+                <button type="submit" form="filter-rentang"
+                        class="rounded-lg bg-bark-800 px-4 py-2 text-[12.5px] font-bold text-white transition hover:bg-bark-900">
+                    Tampilkan
+                </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5">
+                @foreach ([
+                    'Harian ini' => [today()->toDateString(), today()->toDateString()],
+                    'Minggu ini' => [today()->startOfWeek()->toDateString(), today()->endOfWeek()->toDateString()],
+                    '7 Hari' => [today()->subDays(7)->toDateString(), today()->addDays(7)->toDateString()],
+                    '30 Hari Ke Depan' => [today()->toDateString(), today()->addDays(30)->toDateString()],
+                ] as $label => $rentang)
+                    <a href="{{ route('tentor.absensi', ['dari' => $rentang[0], 'sampai' => $rentang[1]]) }}"
+                       class="rounded-lg border border-bark-200 bg-white px-3 py-1.5 text-[11.5px] font-semibold text-bark-600 transition hover:bg-bark-50">
+                        {{ $label }}
                     </a>
                 @endforeach
             </div>
         </div>
-    @endif
+
+        <form id="filter-rentang" method="GET" action="{{ route('tentor.absensi') }}" class="hidden"></form>
+
+        @if (count($barisSesi) > 0)
+            <div class="mt-4 flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wide text-bark-400">Daftar Sesi</span>
+                <span class="rounded-full bg-bark-100 px-2 py-0.5 text-[10.5px] font-bold text-bark-600">
+                    {{ count($barisSesi) }} Sesi
+                </span>
+            </div>
+            <div class="mt-2 overflow-x-auto">
+                <table class="w-full min-w-[760px] text-left">
+                    <thead>
+                        <tr class="bg-bark-50/60 text-[10px] font-bold uppercase tracking-wide text-bark-400">
+                            <th class="px-4 py-3">Tanggal</th>
+                            <th class="px-4 py-3">Jam</th>
+                            <th class="px-4 py-3">Mata Pelajaran</th>
+                            <th class="px-4 py-3">Kelas</th>
+                            <th class="px-4 py-3">Ruang</th>
+                            <th class="px-4 py-3 text-right">Kehadiran</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-bark-100">
+                        @foreach ($barisSesi as $baris)
+                            <tr @class([
+                                'transition',
+                                'bg-ember-50/60' => $session && $session->id === $baris['id'],
+                                'hover:bg-bark-50' => ! $session || $session->id !== $baris['id'],
+                            ])>
+                                <td class="px-4 py-3">
+                                    <a href="{{ route('tentor.absensi', [
+                                        'session_id' => $baris['id'],
+                                        'dari' => $dari->toDateString(),
+                                        'sampai' => $sampai->toDateString(),
+                                    ]) }}"
+                                       class="text-[12.5px] font-bold text-bark-800 hover:text-ember-600">
+                                        {{ $baris['label_tanggal'] }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-3 text-[12.5px] font-semibold tabular-nums text-bark-600">{{ $baris['waktu'] }}</td>
+                                <td class="px-4 py-3 text-[12.5px] font-medium text-bark-700">{{ $baris['mapel'] }}</td>
+                                <td class="px-4 py-3 text-[12.5px] font-medium text-bark-700">{{ $baris['rombel'] }}</td>
+                                <td class="px-4 py-3 text-[12.5px] font-medium text-bark-500">{{ $baris['ruang'] }}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <span class="inline-block rounded-md px-2 py-1 text-[11px] font-bold {{ $baris['tone'] }}">
+                                        {{ $baris['badge'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="mt-4 rounded-xl border border-dashed border-bark-100 bg-bark-50 px-4 py-8 text-center">
+                <p class="text-[14px] font-bold text-bark-800">Tidak ada sesi mengajar pada rentang ini</p>
+                <p class="mt-1 text-[12px] text-bark-400">
+                    {{ $dari->locale('id')->translatedFormat('d M Y') }} — {{ $sampai->locale('id')->translatedFormat('d M Y') }}
+                </p>
+                <a href="{{ route('tentor.absensi', ['dari' => today()->toDateString(), 'sampai' => today()->addDays(30)->toDateString()]) }}"
+                   class="mt-3 inline-block text-[12px] font-bold text-ember-600 hover:underline">
+                    Lihat 30 hari ke depan
+                </a>
+            </div>
+        @endif
+    </div>
 
     {{-- Panel sesi --}}
     @if ($session)
@@ -62,7 +150,7 @@
             @php
                 $sesi = [
                     ['Rombongan Belajar', $session->classGroup->code ?? '-', $session->classGroup->education_level.' '.$session->classGroup->grade.' '.$session->classGroup->major ?? '-', 'graduation-cap'],
-                    ['Waktu Sesi', $session->session_date->locale('id')->translatedFormat('l, j F Y'), $session->start_time->format('H.i').' – '.$session->end_time->format('H.i').' WIB', 'clock'],
+                    ['Waktu Sesi', $session->tanggal->locale('id')->translatedFormat('l, j F Y'), $jam($session->start_time).' – '.$jam($session->end_time).' WIB', 'clock'],
                     ['Mata Pelajaran', $session->subject->name ?? $session->topic ?? '-', 'Topik: '.($session->topic ?? '-'), 'book-open'],
                     ['Ruangan', $session->room->name ?? '-', $session->room->building ?? '', 'map-pin'],
                 ];
@@ -79,6 +167,64 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+
+        {{-- Kehadiran tentor --}}
+        <div class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-bark-100 bg-white px-5 py-4">
+            <div class="flex items-start gap-3">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ember-50 text-ember-600">
+                    @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-[18px] w-[18px]'])
+                </span>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold uppercase tracking-wide text-bark-400">Kehadiran Anda</p>
+                    @if (! $kehadiran)
+                        <p class="mt-1 text-[14px] font-bold text-bark-800">Belum check-in</p>
+                        <p class="truncate text-[11px] text-bark-400">Catat kehadiran supaya admin tahu Anda sudah mengajar.</p>
+                    @elseif ($kehadiran->check_out_at)
+                        <p class="mt-1 text-[14px] font-bold text-bark-800">
+                            Check-in {{ $kehadiran->check_in_at?->format('H.i') }} &middot; Checkout {{ $kehadiran->check_out_at->format('H.i') }}
+                        </p>
+                        <p class="truncate text-[11px] text-emerald-600">Selesai mengajar</p>
+                    @else
+                        <p class="mt-1 text-[14px] font-bold text-bark-800">Sudah check-in pukul {{ $kehadiran->check_in_at?->format('H.i') }}</p>
+                        <p class="truncate text-[11px] text-bark-400">
+                            {{ $kehadiran->status === 'terlambat' ? 'Check-in terlambat' : 'Check-in tepat waktu' }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                @if (! $kehadiran || ! $kehadiran->check_out_at)
+                    @if ($session->tanggal->isToday())
+                        <form method="POST" action="{{ route('tentor.absensi.check-in') }}">
+                            @csrf
+                            <input type="hidden" name="session_id" value="{{ $session->id }}">
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-espresso px-4 py-2.5 text-[12.5px] font-bold text-white transition hover:bg-bark-800">
+                                @include('layouts.partials.icon', ['name' => 'check', 'class' => 'h-4 w-4 text-gold'])
+                                {{ $kehadiran ? 'Check-in Ulang' : 'Check-in' }}
+                            </button>
+                        </form>
+                    @else
+                        <span class="rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12px] font-semibold text-bark-400">
+                            Bisa check-in pada hari sesi
+                        </span>
+                    @endif
+                @endif
+
+                @if ($kehadiran && ! $kehadiran->check_out_at)
+                    <form method="POST" action="{{ route('tentor.absensi.check-out') }}">
+                        @csrf
+                        <input type="hidden" name="session_id" value="{{ $session->id }}">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
+                            @include('layouts.partials.icon', ['name' => 'log-out', 'class' => 'h-4 w-4 text-bark-400'])
+                            Checkout
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
 
         {{-- Stat cards --}}
@@ -158,7 +304,7 @@
                                     $attendance = $attendances->get($siswa->id);
                                     $currentStatus = $attendance->status ?? 'alpa';
                                     [$label, $badge] = $statusMap[$currentStatus];
-                                    $waktu = $attendance->arrived_at ? $attendance->arrived_at->format('H:i') : null;
+                                    $waktu = $attendance?->arrived_at ? $attendance->arrived_at->format('H:i') : null;
                                 @endphp
                                 <tr class="transition hover:bg-bark-50/60" data-nama="{{ strtolower($siswa->full_name) }}">
                                     <td class="px-5 py-3.5 text-center text-[12px] font-medium text-bark-400">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</td>
@@ -226,7 +372,7 @@
         {{-- Riwayat pertemuan --}}
         @php
             // Ambil sesi sebelumnya untuk riwayat
-            $riwayatSessions = ClassSession::with(['classGroup', 'subject'])
+            $riwayatSessions = \App\Models\ClassSession::with(['classGroup', 'subject'])
                 ->where('staff_id', $staffProfile->id)
                 ->whereDate('session_date', '<', today())
                 ->orderByDesc('session_date')
@@ -243,7 +389,7 @@
                 <ul class="grid grid-cols-1 divide-y divide-bark-100 sm:grid-cols-3 sm:divide-y-0">
                     @foreach ($riwayatSessions as $sesi)
                         @php
-                            $histAttendances = StudentAttendance::where('class_session_id', $sesi->id)->get();
+                            $histAttendances = \App\Models\StudentAttendance::where('class_session_id', $sesi->id)->get();
                             $histHadir = $histAttendances->where('status', 'hadir')->count();
                             $histSakit = $histAttendances->where('status', 'sakit')->count();
                             $histIzin = $histAttendances->where('status', 'izin')->count();
@@ -252,10 +398,10 @@
                         @endphp
                         <li class="px-5 py-4 sm:border-r sm:border-bark-100 sm:last:border-r-0">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[13px] font-bold text-bark-800">{{ $sesi->subject->name ?? 'Sesi' }} · {{ $sesi->session_date->format('d/m/Y') }}</p>
+                                <p class="text-[13px] font-bold text-bark-800">{{ $sesi->subject->name ?? 'Sesi' }} · {{ $sesi->tanggal->format('d/m/Y') }}</p>
                                 <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">{{ $histPersen }}%</span>
                             </div>
-                            <p class="mt-0.5 text-[11px] text-bark-400">{{ $sesi->session_date->locale('id')->translatedFormat('l, j F Y') }}</p>
+                            <p class="mt-0.5 text-[11px] text-bark-400">{{ $sesi->tanggal->locale('id')->translatedFormat('l, j F Y') }}</p>
                             <p class="mt-2 text-[12px] text-bark-600">
                                 <span class="font-bold text-bark-800">{{ $histHadir }} / {{ $histTotal }} Hadir</span>
                             </p>
@@ -267,11 +413,19 @@
         @endif
 
     @else
-        {{-- Tidak ada sesi hari ini --}}
+        {{-- Tidak ada sesi pada rentang aktif --}}
         <div class="rounded-2xl border border-bark-100 bg-white p-12 text-center">
-            @include('layouts.partials.icon', ['name' => 'calendar-x', 'class' => 'mx-auto h-12 w-12 text-bark-300'])
-            <h3 class="mt-4 text-[18px] font-bold text-bark-800">Tidak ada jadwal mengajar hari ini</h3>
-            <p class="mt-2 text-bark-400">Anda tidak memiliki sesi mengajar pada tanggal {{ today()->locale('id')->translatedFormat('l, j F Y') }}.</p>
+            @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'mx-auto h-12 w-12 text-bark-300'])
+            <h3 class="mt-4 text-[18px] font-bold text-bark-800">Tidak ada jadwal mengajar pada rentang ini</h3>
+            <p class="mt-2 text-bark-400">
+                Anda tidak memiliki sesi mengajar antara
+                {{ $dari->locale('id')->translatedFormat('l, j F Y') }} dan
+                {{ $sampai->locale('id')->translatedFormat('l, j F Y') }}.
+            </p>
+            <a href="{{ route('tentor.absensi', ['dari' => today()->toDateString(), 'sampai' => today()->addDays(30)->toDateString()]) }}"
+               class="mt-4 inline-block text-[12.5px] font-bold text-ember-600 hover:underline">
+                Lihat 30 hari ke depan
+            </a>
         </div>
     @endif
 
