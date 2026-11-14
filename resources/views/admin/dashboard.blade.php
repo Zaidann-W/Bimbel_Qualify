@@ -244,50 +244,6 @@
         {{-- Kolom kanan --}}
         <div class="space-y-4">
 
-            {{-- Ringkasan arus kas --}}
-            <section class="rounded-3xl border border-line/80 bg-white p-5">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 gap-3">
-                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-shell text-espresso">
-                            @include('layouts.partials.icon', ['name' => 'wallet', 'class' => 'h-4 w-4'])
-                        </span>
-                        <div class="min-w-0">
-                            <h2 class="text-[14.5px] font-bold leading-snug text-ink">Ringkasan Arus Kas</h2>
-                            <p class="mt-0.5 text-[11.5px] text-muted">Perkiraan Real-time Hari Ini</p>
-                        </div>
-                    </div>
-                    <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-bronze"></span>
-                </div>
-
-                <div class="mt-4 space-y-2.5">
-                    <div class="flex items-start justify-between gap-3 rounded-xl bg-shell px-4 py-3">
-                        <span class="flex items-center gap-1.5 text-[12.5px] font-medium text-ink">
-                            <span class="text-bronze" aria-hidden="true">↓</span>
-                            Total Masuk
-                        </span>
-                        <span class="text-right text-[13px] font-bold text-ink">Rp {{ number_format($dashboard['cash']['income'], 0, ',', '.') }}</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-espresso px-4 py-3.5">
-                    <div class="min-w-0">
-                        <p class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-palegold">Saldo Bersih Hari Ini</p>
-                        <p class="mt-1.5 text-[19px] font-extrabold leading-none text-white">Rp {{ number_format($dashboard['cash']['balance'], 0, ',', '.') }}</p>
-                    </div>
-                    @include('layouts.partials.icon', ['name' => 'piggy-bank', 'class' => 'h-5 w-5 shrink-0 text-gold'])
-                </div>
-
-                @if ($dashboard['cash']['expense'] === null)
-                    <p class="mt-2 text-[11px] leading-relaxed text-muted">Pencatatan pengeluaran operasional belum tersedia di sistem.</p>
-                @endif
-
-                <a href="{{ route('admin.keuangan') }}"
-                   class="mt-3 flex w-full items-center justify-center gap-1 rounded-xl bg-sand px-4 py-3 text-[13px] font-semibold text-ink transition hover:bg-line">
-                    Lihat Jurnal Transaksi
-                    @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-3.5 w-3.5'])
-                </a>
-            </section>
-
             {{-- QualiFix --}}
             <section class="rounded-3xl border border-line/80 bg-white p-5">
                 <div class="flex items-start justify-between gap-3">
