@@ -45,6 +45,7 @@ class Application extends Model
         'payment_verified_by',
         'xendit_invoice_id',
         'xendit_invoice_url',
+        'xendit_external_id',
         'accounts_created',
     ];
 

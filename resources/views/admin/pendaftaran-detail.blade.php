@@ -214,10 +214,6 @@
                         </dd>
                     </div>
                     <div class="min-w-0">
-                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Alamat Email</dt>
-                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->email ?: '-' }}</dd>
-                    </div>
-                    <div class="min-w-0">
                         <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Tempat, Tanggal Lahir</dt>
                         <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $tglLahir }}</dd>
                     </div>
@@ -260,6 +256,24 @@
                                 {{ $pendaftar->guardian_phone ?: '-' }}
                             </span>
                         </dd>
+                    </div>
+                    <div class="min-w-0">
+                        <dt class="text-[9.5px] font-bold uppercase tracking-[0.12em] text-muted">Alamat Email Wali</dt>
+                        <dd class="mt-1.5 break-words text-[13.5px] font-semibold leading-snug text-ink">{{ $pendaftar->email ?: '-' }}</dd>
+                        @unless ($pendaftar->email)
+                            {{-- Pendaftaran lama belum menyimpan email; tanpa email Xendit menolak pembuatan invoice. --}}
+                            <form action="{{ route('admin.pendaftaran.email', $pendaftar->registration_number) }}" method="POST" class="mt-2 flex items-center gap-2">
+                                @csrf
+                                @method('PATCH')
+                                <input type="email" name="email" required placeholder="email wali"
+                                       class="w-full rounded-lg border border-line bg-sand px-2.5 py-1.5 text-[12px] text-ink placeholder:text-muted/60 focus:border-gold focus:outline-none">
+                                <button type="submit"
+                                        class="shrink-0 rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] font-semibold text-espresso transition hover:bg-sand">
+                                    Simpan
+                                </button>
+                            </form>
+                            <p class="mt-1.5 text-[11px] leading-snug text-ember-700">Email wajib diisi agar link pembayaran Xendit bisa dibuat.</p>
+                        @endunless
                     </div>
                 </dl>
             </section>
@@ -370,6 +384,22 @@
                                 Klik tombol di bawah untuk membuat link pembayaran Xendit.
                             @endif
                         </p>
+
+                        <!-- Verifikasi pembayaran manual (cadangan bila webhook Xendit belum diterima) -->
+                        @if ($pendaftar->status === 'diterima' && $pendaftar->payment_status !== 'lunas')
+                            <form action="{{ route('admin.pendaftaran.pembayaran', $pendaftar->registration_number) }}" method="POST" class="mt-3">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="payment_status" value="lunas">
+                                <textarea name="review_note" placeholder="Catatan verifikasi (opsional)..." class="hidden"></textarea>
+                                <button type="submit"
+                                        onclick="return confirm('Tandai pembayaran pendaftaran ini sebagai LUNAS?')"
+                                        class="inline-flex items-center gap-2 w-full sm:w-auto rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[12.5px] font-bold text-emerald-700 transition hover:bg-emerald-100">
+                                    @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-4 w-4'])
+                                    Tandai Lunas
+                                </button>
+                            </form>
+                        @endif
 
                         <!-- Tombol generate link -->
                         @if ($pendaftar->status === 'diterima' && $pendaftar->payment_status !== 'lunas' && ! $pendaftar->xendit_invoice_url)

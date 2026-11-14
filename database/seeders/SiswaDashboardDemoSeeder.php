@@ -6,7 +6,6 @@ use App\Models\Announcement;
 use App\Models\ClassSession;
 use App\Models\File;
 use App\Models\Material;
-use App\Models\QualifixTicket;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -53,7 +52,6 @@ class SiswaDashboardDemoSeeder extends Seeder
         }
 
         $this->seedModul($classGroupId, $subjectId, $adminId);
-        $this->seedKlinik($student, $subjectId, $classGroupId);
         $this->seedPengumuman($classGroupId, $adminId);
 
         $this->command->info('Data demo dashboard siswa siap untuk '.$student->full_name.'.');
@@ -92,30 +90,6 @@ class SiswaDashboardDemoSeeder extends Seeder
             );
 
             $material->classGroups()->syncWithoutDetaching([$classGroupId]);
-        }
-    }
-
-    private function seedKlinik(Student $student, int $subjectId, int $classGroupId): void
-    {
-        $daftar = [
-            ['ticket_number' => 'KPR-DEMO-0001', 'title' => 'Cara cepat limit bentuk 0/0', 'question' => 'Untuk soal limit aljabar bentuk 0/0, kapan pakai L\'Hopital dan kapan pakai pemfaktoran?', 'status' => 'selesai', 'resolved' => true],
-            ['ticket_number' => 'KPR-DEMO-0002', 'title' => 'Beda substitusi dan parsial', 'question' => 'Bagaimana menentukan integral substitusi atau parsial saat soal tidak diberi petunjuk?', 'status' => 'menunggu_tentor', 'resolved' => false],
-        ];
-
-        foreach ($daftar as $item) {
-            QualifixTicket::query()->updateOrCreate(
-                ['ticket_number' => $item['ticket_number']],
-                [
-                    'student_id' => $student->id,
-                    'subject_id' => $subjectId,
-                    'class_group_id' => $classGroupId,
-                    'title' => $item['title'],
-                    'question' => $item['question'],
-                    'status' => $item['status'],
-                    'submitted_at' => now()->subDays(3),
-                    'resolved_at' => $item['resolved'] ? now()->subDays(2) : null,
-                ],
-            );
         }
     }
 

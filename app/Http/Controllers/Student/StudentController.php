@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreQualifixTicketRequest;
+use App\Models\File;
 use App\Models\Material;
 use App\Models\QualifixTicket;
+use App\Models\Subject;
+use App\Services\QualifixService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -12,6 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentController extends Controller
 {
+    public function __construct(private readonly QualifixService $qualifixService) {}
+
     public function materi(Request $request): View
     {
         $student = $request->user()->student;
@@ -93,7 +100,7 @@ class StudentController extends Controller
         $stats = [
             ['label' => 'Total Diajukan', 'value' => (clone $tickets)->count(), 'unit' => 'Soal', 'icon' => 'file', 'tone' => 'bg-bark-100 text-bark-600', 'active' => false],
             ['label' => 'Menunggu Jawaban', 'value' => (clone $tickets)->whereIn('status', ['menunggu_tentor', 'sedang_dibahas'])->count(), 'unit' => 'Pertanyaan', 'icon' => 'clock', 'tone' => 'bg-ember-100 text-ember-600', 'active' => false],
-            ['label' => 'Sudah Dijawab', 'value' => (clone $tickets)->where('status', 'dijawab')->count(), 'unit' => 'Tersedia', 'icon' => 'message-circle', 'tone' => 'bg-bark-100 text-bark-600', 'active' => false],
+            ['label' => 'Sudah Dijawab', 'value' => (clone $tickets)->where('status', 'sedang_dibahas')->count(), 'unit' => 'Tersedia', 'icon' => 'message-circle', 'tone' => 'bg-bark-100 text-bark-600', 'active' => false],
             ['label' => 'Selesai / Dipahami', 'value' => (clone $tickets)->where('status', 'selesai')->count(), 'unit' => 'Arsip', 'icon' => 'check-circle', 'tone' => 'bg-emerald-50 text-emerald-600', 'active' => false],
         ];
 
@@ -106,7 +113,58 @@ class StudentController extends Controller
 
         $soal = $tickets->with(['subject', 'student'])->orderByDesc('created_at')->paginate(10);
 
-        return view('siswa.qualifix', compact('stats', 'tabs', 'soal'));
+        $subjects = Subject::orderBy('name')->get();
+
+        return view('siswa.qualifix', compact('stats', 'tabs', 'soal', 'subjects'));
+    }
+
+    /**
+     * Ajukan pertanyaan / tugas PR baru (Klinik PR) oleh siswa.
+     */
+    public function storeQualifix(StoreQualifixTicketRequest $request): RedirectResponse
+    {
+        $student = $request->user()->student;
+
+        abort_if($student === null, 403, 'Akun ini belum terhubung ke data siswa.');
+
+        $validated = $request->validated();
+
+        // Gunakan kelas aktif siswa sebagai class_group jika tidak dikirim dari formulir.
+        $classGroupId = $validated['class_group_id'] ?? $student->enrollments()
+            ->where('status', 'aktif')
+            ->pluck('class_group_id')
+            ->first();
+
+        $fileIds = [];
+        foreach ($request->file('files') ?? [] as $berkas) {
+            $file = $this->simpanBerkas($berkas);
+            $fileIds[] = $file->id;
+        }
+
+        $this->qualifixService->createTicket(array_merge($validated, [
+            'student_id' => $student->id,
+            'class_group_id' => $classGroupId,
+            'file_ids' => $fileIds,
+        ]));
+
+        return redirect()->route('siswa.qualifix')
+            ->with('sukses', 'Pertanyaan PR berhasil dikirim dan telah masuk ke antrean Master Tutor.');
+    }
+
+    /**
+     * Simpan berkas unggahan dan catat ke tabel files.
+     */
+    private function simpanBerkas($berkas): File
+    {
+        $path = $berkas->store('qualifix', 'local');
+
+        return File::create([
+            'original_name' => $berkas->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $berkas->getMimeType(),
+            'size_bytes' => $berkas->getSize(),
+            'uploaded_by' => auth()->id(),
+        ]);
     }
 
     public function profil(Request $request): View

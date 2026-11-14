@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\StaffProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,7 @@ class RoleSeeder extends Seeder
      * Default password untuk development (hash dari 'Qualify2025!').
      * Di production, GANTI dengan password unik per akun yang dikirim via email.
      */
-    protected const DEFAULT_PASSWORD = 'Qualify2025!';
+    public const DEFAULT_PASSWORD = 'Qualify2025!';
 
     public function run(): void
     {
@@ -81,6 +82,22 @@ class RoleSeeder extends Seeder
                     'password' => $password,
                     'email_verified_at' => now(),
                 ])
+            );
+        }
+
+        // Pastikan akun tentor utama punya StaffProfile agar Klinik PR berfungsi.
+        $tentorUser = User::where('email', 'tentor@qualify.test')->first();
+        if ($tentorUser !== null) {
+            StaffProfile::firstOrCreate(
+                ['user_id' => $tentorUser->id],
+                [
+                    'employee_number' => 'TTR-TEST-001',
+                    'full_name_with_title' => 'Kak Hendra Wijaya, M.Sc',
+                    'job_title' => 'Master Tentor Matematika',
+                    'education' => 'S1 Matematika',
+                    'status' => 'aktif',
+                    'joined_on' => '2023-01-15',
+                ],
             );
         }
 

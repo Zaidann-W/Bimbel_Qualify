@@ -148,5 +148,6 @@
 </div>
 
 <x-qualifix-panduan-modal />
-<x-qualifix-ajukan-modal />
+<x-qualifix-ajukan-modal :subjects="$subjects" />
+<x-flash-toast />
 @endsection

@@ -113,6 +113,8 @@ class TentorQualifixService
             $ticket->question,                                       // 5: preview
             [$subject?->name ?? 'Mata Pelajaran'],                   // 6: tags
             $ticket->status === 'menunggu_tentor',                   // 7: active
+            $ticket->id,                                             // 8: ticket id
+            $ticket->ticket_number,                                  // 9: ticket number
         ];
     }
 

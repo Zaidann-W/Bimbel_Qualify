@@ -7,7 +7,7 @@
         <title>@yield('title', config('app.name', 'Bimbel QUALIFY') . ' — Lembaga Bimbingan Belajar')</title>
         <meta
             name="description"
-            content="@yield('meta_description', 'Bimbel QUALIFY — bimbingan belajar personal untuk siswa SD, SMP, & SMA dengan tentor ahli, Klinik PR QualiFix, dan pemantauan belajar transparan.')"
+            content="@yield('meta_description', 'Bimbel QUALIFY — bimbingan belajar personal untuk siswa SD, SMP, & SMA dengan tentor ahli, QualiFix, dan pemantauan belajar transparan.')"
         >
 
         @fonts
@@ -19,6 +19,7 @@
         @include('partials.header')
 
         <main>
+            @include('partials.flash')
             @yield('content')
         </main>
 

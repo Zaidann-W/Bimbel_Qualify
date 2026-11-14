@@ -9,25 +9,16 @@
     $berkas = [
         ['ikon' => 'wallet', 'judul' => 'Laporan Keuangan & SPP', 'keterangan' => 'Arus kas, uang gedung, dan pelunasan SPP', 'route' => route('admin.laporanKeuangan.export')],
         ['ikon' => 'clipboard-check', 'judul' => 'Presensi & Jadwal Mengajar', 'keterangan' => 'Kehadiran siswa dan jam mengajar tentor', 'route' => route('admin.laporanPresensi.export')],
-        ['ikon' => 'user-plus', 'judul' => 'Pendaftaran Siswa Baru', 'keterangan' => 'Data pendaftar baru dan status registrasi berkas', 'route' => null],
-        ['ikon' => 'book-open', 'judul' => 'Rekap Sesi Klinik PR', 'keterangan' => 'Sesi konsultasi belajar dan rekap materi', 'route' => null],
+        ['ikon' => 'user-plus', 'judul' => 'Pendaftaran Siswa Baru', 'keterangan' => 'Data pendaftar baru dan status registrasi berkas', 'route' => route('laporanPendaftaran.export')],
+        ['ikon' => 'book-open', 'judul' => 'Rekap Sesi QualiFix', 'keterangan' => 'Sesi konsultasi belajar dan rekap materi', 'route' => route('laporanQualifix.export')],
     ];
-
-    $notifikasi = [
-        ['id' => 'notif-struk', 'label' => 'Kirim bukti struk pembayaran otomatis', 'aktif' => ! empty($settings['notif_struk'])],
-        ['id' => 'notif-absensi', 'label' => 'Pemberitahuan ketidakhadiran kelas', 'aktif' => ! empty($settings['notif_absensi'])],
-        ['id' => 'notif-tagihan', 'label' => 'Pengingat tagihan SPP jatuh tempo', 'aktif' => ! empty($settings['notif_tagihan'])],
-    ];
-
-    $semester_pil = ['Semester Ganjil', 'Semester Genap'];
 @endphp
 
-{{-- Kepala halaman --}}
 <section class="bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div class="max-w-2xl">
             <h1 class="text-[28px] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-[32px]">
-                Laporan &amp; Pengaturan
+                Laporan & Pengaturan
             </h1>
             <p class="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-muted">
                 Unduh berkas rekapitulasi operasional dan pengaturan preferensi sistem.
@@ -39,7 +30,7 @@
         </div>
 
         <button type="submit" form="pengaturan-sistem" data-simpan
-                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-espresso px-4 py-2.5 text-[13px] font-bold text-white transition hover:bg-bark-800 disabled:cursor-wait disabled:opacity-70">
+                class="inline-flex shrink-0 items-center justify-center rounded-lg bg-espresso px-4 py-2.5 text-[13px] font-bold text-white transition hover:bg-bark-800 disabled:cursor-wait disabled:opacity-70">
             @include('layouts.partials.icon', ['name' => 'check', 'class' => 'h-4 w-4 text-gold'])
             <span data-simpan-label>Simpan Pengaturan</span>
         </button>
@@ -56,7 +47,9 @@
             </span>
             <div class="min-w-0">
                 <h2 class="text-[16px] font-extrabold leading-snug tracking-tight text-ink">Ekspor Laporan Operasional</h2>
-                <p class="mt-1 max-w-md text-[12px] leading-relaxed text-muted">Pilih berkas rekapitulasi berkala dalam format Excel atau PDF</p>
+                <p class="mt-1 max-w-md text-[12px] leading-relaxed text-muted">
+                    Pilih berkas rekapitulasi berkala dalam format Excel atau PDF
+                </p>
             </div>
         </div>
 
@@ -74,15 +67,15 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         @if ($item['route'])
-                            <a href="{{ $item['route'] }}?format=csv"
+                            <a href="{{ $item['route'] }}?format=pdf"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-bold text-espresso transition hover:bg-sand">
                                 @include('layouts.partials.icon', ['name' => 'layout-grid', 'class' => 'h-3.5 w-3.5 text-forest-600'])
-                                Excel
+                                PDF
                             </a>
                             <a href="{{ $item['route'] }}?format=csv"
                                class="inline-flex items-center gap-1.5 rounded-lg bg-espresso px-3 py-2 text-[12px] font-bold text-white transition hover:bg-bark-800">
                                 @include('layouts.partials.icon', ['name' => 'file', 'class' => 'h-3.5 w-3.5 text-gold'])
-                                PDF (CSV)
+                                Excel
                             </a>
                         @else
                             <button type="button" disabled
@@ -102,89 +95,8 @@
         </ul>
     </section>
 
-    {{-- Preferensi sistem --}}
-    <form id="pengaturan-sistem" data-pengaturan action="{{ route('admin.pengaturan.update') }}" method="POST" class="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
-        @csrf
+    {{-- Sisa fitur akan diimplementasikan saat modul aktif --}}
 
-        {{-- Notifikasi WhatsApp --}}
-        <section class="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(20,20,20,0.05)]">
-            <div class="flex items-start gap-3 px-5 py-4">
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold text-espresso">
-                    @include('layouts.partials.icon', ['name' => 'bell', 'class' => 'h-5 w-5'])
-                </span>
-                <div class="min-w-0">
-                    <h2 class="text-[16px] font-extrabold leading-snug tracking-tight text-ink">Notifikasi WhatsApp</h2>
-                    <p class="mt-1 max-w-md text-[12px] leading-relaxed text-muted">Kirim otomatis ke nomor orang tua / siswa</p>
-                </div>
-            </div>
-
-            <div class="border-t border-line">
-                @foreach ($notifikasi as $item)
-                    <label for="{{ $item['id'] }}"
-                           class="flex cursor-pointer items-center justify-between gap-4 border-b border-line px-5 py-3.5 transition last:border-b-0 hover:bg-bark-50">
-                        <span class="text-[13px] font-semibold leading-snug text-ink">{{ $item['label'] }}</span>
-                        <input type="hidden" name="{{ $item['id'] }}" value="0">
-                        <input type="checkbox" id="{{ $item['id'] }}" name="{{ $item['id'] }}" value="1"
-                               {{ old($item['id'], ! empty($settings[$item['id']])) ? 'checked' : '' }}
-                               data-notifikasi class="peer sr-only">
-                        <span class="relative h-5 w-9 shrink-0 rounded-full bg-bark-200 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:content-[''] peer-checked:bg-espresso peer-checked:after:translate-x-4 peer-focus-visible:ring-4 peer-focus-visible:ring-gold/40" aria-hidden="true"></span>
-                    </label>
-                @endforeach
-            </div>
-
-            <footer class="flex items-start gap-2 border-t border-line bg-bark-50 px-5 py-3.5">
-                @include('layouts.partials.icon', ['name' => 'whatsapp', 'class' => 'mt-0.5 h-4 w-4 shrink-0 text-forest-600'])
-                <p class="text-[11.5px] leading-relaxed text-muted">
-                    Pesan dikirim dari nomor resmi bimbel, maksimal 200 pesan per hari.
-                </p>
-            </footer>
-        </section>
-
-        {{-- Periode & cabang --}}
-        <section class="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_1px_3px_rgba(20,20,20,0.05)]">
-            <div class="flex items-start gap-3 px-5 py-4">
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold text-espresso">
-                    @include('layouts.partials.icon', ['name' => 'sliders', 'class' => 'h-5 w-5'])
-                </span>
-                <div class="min-w-0">
-                    <h2 class="text-[16px] font-extrabold leading-snug tracking-tight text-ink">Periode &amp; Cabang Bimbel</h2>
-                    <p class="mt-1 max-w-md text-[12px] leading-relaxed text-muted">Parameter operasional dan kalender akademik</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4 border-t border-line px-5 py-5 sm:grid-cols-2">
-                <div>
-                    <label for="tahun-ajaran" class="block text-[10.5px] font-bold uppercase leading-none tracking-[0.12em] text-muted">
-                        Tahun Ajaran
-                    </label>
-                    <input id="tahun-ajaran" name="tahun-ajaran" type="text" value="2024/2025"
-                           class="mt-2 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-ink transition hover:bg-bark-50 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40">
-                </div>
-
-                <div>
-                    <label for="semester" class="block text-[10.5px] font-bold uppercase leading-none tracking-[0.12em] text-muted">
-                        Semester
-                    </label>
-                    <select id="semester" name="semester"
-                            class="mt-2 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-ink transition hover:bg-bark-50 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40">
-                        @foreach ($semester_pil as $pilihan)
-                            <option @selected($pilihan === 'Semester Ganjil')>{{ $pilihan }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <footer class="flex flex-wrap items-end justify-between gap-3 border-t border-line bg-bark-50 px-5 py-4">
-                <div class="min-w-0">
-                    <p class="text-[10.5px] font-bold uppercase leading-none tracking-[0.12em] text-muted">Penanggung Jawab Cabang</p>
-                    <p class="mt-2 text-[13.5px] font-bold leading-snug text-ink">Ust. Farhan Kamil, M.Pd.</p>
-                </div>
-                <span class="shrink-0 whitespace-nowrap rounded-lg border border-line bg-white px-3 py-2 text-[11.5px] font-bold text-bark-600">
-                    Branch Director
-                </span>
-            </footer>
-        </section>
-    </form>
 </div>
 
 {{-- Penegas aksi --}}

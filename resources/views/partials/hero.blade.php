@@ -23,7 +23,7 @@
 
                 <p class="mt-6 text-[16px] lg:text-[17px] leading-[1.75] text-muted max-w-[560px]">
                     Bimbingan belajar personal dengan pendampingan tentor ahli, klinik konsultasi tugas sekolah
-                    (Klinik PR), dan pemantauan belajar transparan untuk siswa SD, SMP, &amp; SMA.
+                    (QualiFix), dan pemantauan belajar transparan untuk siswa SD, SMP, &amp; SMA.
                 </p>
 
                 <div class="mt-9 flex flex-wrap gap-4">

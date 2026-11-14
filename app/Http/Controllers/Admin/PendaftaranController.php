@@ -277,23 +277,28 @@ class PendaftaranController extends Controller
 
         $externalId = 'REG-'.$application->registration_number.'-'.Str::random(8);
 
-        $response = Http::withBasicAuth(config('xendit.secret_key'), '')
+        // Xendit menolak invoice tanpa payer_email. Pendaftar lama yang belum
+        // mengisi email memakai alamat cadangan dari konfigurasi.
+        $payerEmail = $application->email ?: (string) config('xendit.fallback_payer_email');
+
+        $response = Http::withBasicAuth((string) config('xendit.secret_key'), '')
+            ->connectTimeout(10)
             ->timeout(30)
             ->post(config('xendit.base_url').'/'.config('xendit.api_version').'/invoices', [
                 'external_id' => $externalId,
                 'amount' => $amount,
-                'payer_email' => $application->email ?? '',
+                'payer_email' => $payerEmail,
                 'description' => 'Biaya Pendaftaran - '.$application->registration_number.' - '.$application->full_name,
                 'invoice_duration' => 86400,
                 'callback_url' => config('xendit.callback_url'),
-                'redirect_url' => config('xendit.redirect_url'),
+                'redirect_url' => $this->redirectUrlPendaftaran($application),
             ]);
 
         if ($response->failed()) {
             Log::error('Gagal generate link Xendit untuk pendaftaran '.$kode.': '.$response->body());
 
             return back()->withErrors([
-                'generate_link' => 'Gagal membuat link pembayaran Xendit. Silakan coba lagi nanti.',
+                'generate_link' => 'Gagal membuat link pembayaran Xendit. '.$this->pesanErrorXendit($response->json()).' (HTTP '.$response->status().')',
             ]);
         }
 
@@ -302,10 +307,61 @@ class PendaftaranController extends Controller
         $application->update([
             'xendit_invoice_id' => $data['id'] ?? null,
             'xendit_invoice_url' => $data['invoice_url'] ?? null,
+            'xendit_external_id' => $externalId,
         ]);
 
-        return redirect()->route('admin.pendaftaran')
+        return redirect()->route('admin.pendaftaran.detail', $kode)
             ->with('success', 'Link pembayaran Xendit berhasil dibuat. Silakan salin dan kirim ke wali via WhatsApp.');
+    }
+
+    /**
+     * Simpan email pendaftar yang diisi manual dari halaman detail.
+     */
+    public function updateEmail(Request $request, string $kode): RedirectResponse
+    {
+        $application = Application::where('registration_number', $kode)->firstOrFail();
+
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:190'],
+        ]);
+
+        $application->update(['email' => $validated['email']]);
+
+        return redirect()->route('admin.pendaftaran.detail', $kode)
+            ->with('success', 'Email pendaftar berhasil disimpan.');
+    }
+
+    /**
+     * Halaman tujuan setelah wali menyelesaikan pembayaran di Xendit.
+     *
+     * Pendaftaran dialihkan ke halaman buat akun (bukan ke halaman pembayaran
+     * wali) karena invoice ini dibuat khusus untuk pendaftaran siswa.
+     */
+    private function redirectUrlPendaftaran(Application $application): string
+    {
+        return route('pendaftaran.buatAkun', $application->registration_number);
+    }
+
+    /**
+     * Ambil pesan kesalahan yang paling relevan dari respons Xendit.
+     *
+     * @param  array<string, mixed>|null  $payload
+     */
+    private function pesanErrorXendit(?array $payload): string
+    {
+        $message = $payload['message'] ?? null;
+
+        if (is_string($message) && $message !== '') {
+            $detail = collect($payload['errors'] ?? [])
+                ->pluck('messages')
+                ->flatten()
+                ->filter()
+                ->first();
+
+            return $detail ? $message.' ('.$detail.')' : $message;
+        }
+
+        return 'Silakan coba lagi nanti.';
     }
 
     /**
@@ -338,6 +394,7 @@ class PendaftaranController extends Controller
             $guardian = Guardian::create([
                 'name' => $application->guardian_name,
                 'phone_wa' => $application->guardian_phone,
+                'email' => $application->email,
             ]);
 
             $student->guardians()->attach($guardian->id, [

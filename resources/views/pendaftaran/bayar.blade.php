@@ -27,6 +27,17 @@
                         </div>
                     @endif
 
+                    @if ($application->xendit_invoice_url)
+                        <a href="{{ $application->xendit_invoice_url }}" target="_blank" rel="noopener noreferrer"
+                           class="mb-3 flex items-center justify-center gap-2 rounded-xl bg-gold hover:bg-palegold py-3.5 font-bold text-espresso transition-colors">
+                            Bayar Sekarang via Xendit
+                        </a>
+                        <p class="mb-6 text-center text-[12.5px] leading-[1.6] text-muted">
+                            Setelah pembayaran berhasil, halaman ini otomatis berubah ke formulir pembuatan akun
+                            orang tua &amp; siswa. Tidak perlu me-refresh halaman.
+                        </p>
+                    @endif
+
                     <form action="{{ route('pendaftaran.bayar.simpan', $application->registration_number) }}"
                           method="POST" enctype="multipart/form-data">
                         @csrf
@@ -103,5 +114,44 @@
                 }
             });
         });
+
+        // Pantau status pembayaran; begitu lunas, wali langsung diarahkan ke
+        // formulir pembuatan akun tanpa harus me-refresh halaman.
+        (function () {
+            const urlStatus = @json(route('pendaftaran.status', $application->registration_number));
+            const urlBuatAkun = @json(route('pendaftaran.buatAkun', $application->registration_number));
+
+            if (!document.querySelector('a[href*="checkout-staging"], a[href*="checkout.xendit"], a[href*="xen.to"]')) {
+                return;
+            }
+
+            let sedangMemuat = false;
+
+            const periksaStatus = function () {
+                if (sedangMemuat) {
+                    return;
+                }
+
+                sedangMemuat = true;
+
+                fetch(urlStatus, { headers: { Accept: 'application/json' } })
+                    .then(function (respons) {
+                        return respons.json();
+                    })
+                    .then(function (data) {
+                        if (data.lunas || data.accounts_created) {
+                            window.location.href = urlBuatAkun;
+                        }
+                    })
+                    .catch(function () {
+                        // Gagal menjangkau server: coba lagi pada polling berikutnya.
+                    })
+                    .finally(function () {
+                        sedangMemuat = false;
+                    });
+            };
+
+            window.setInterval(periksaStatus, 4000);
+        })();
     </script>
 @endpush

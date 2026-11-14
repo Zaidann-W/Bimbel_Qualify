@@ -15,7 +15,6 @@ use App\Models\Student;
 use App\Models\StudentAttendance;
 use App\Models\Subject;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +29,7 @@ class OrtuDashboardDemoSeeder extends Seeder
             $user = User::create([
                 'name' => 'Ortu/Wali Siswa',
                 'email' => 'ortu@qualify.test',
-                'password' => Hash::make('password'),
+                'password' => Hash::make(RoleSeeder::DEFAULT_PASSWORD),
                 'role' => 'ortu',
                 'status' => 'aktif',
                 'email_verified_at' => now(),
@@ -38,7 +37,9 @@ class OrtuDashboardDemoSeeder extends Seeder
         }
 
         // 1. Data guardian (orang tua) terkait user ortu.
-        $guardian = Guardian::updateOrCreate(
+        // withTrashed() dipakai karena baris guardian yang pernah di-soft-delete
+        // tetap tourner unique index pada kolom user_id.
+        $guardian = Guardian::withTrashed()->updateOrCreate(
             ['user_id' => $user->id],
             [
                 'name' => 'Ortu/Wali Siswa',
@@ -48,6 +49,10 @@ class OrtuDashboardDemoSeeder extends Seeder
                 'address' => 'Jl. Contoh No. 12, Kota',
             ]
         );
+
+        if ($guardian->trashed()) {
+            $guardian->restore();
+        }
 
         // 2. Referensi dasar yang diperlukan (jika belum ada).
         $period = AcademicPeriod::where('is_active', true)->first()
@@ -81,21 +86,23 @@ class OrtuDashboardDemoSeeder extends Seeder
             ['floor' => '1', 'capacity' => 15, 'status' => 'aktif']
         );
 
-        $staffUser = User::updateOrCreate(
-            ['email' => 'tentor.demo@qualify.test'],
-            [
-                'name' => 'Tentor Demo',
-                'password' => Hash::make('password'),
+        // Reuse akun tentor utama dari RoleSeeder agar Klinik PR punya satu profil staf tunggal.
+        $staffUser = User::where('email', 'tentor@qualify.test')->first();
+        if ($staffUser === null) {
+            $staffUser = User::create([
+                'name' => 'Tentor Utama',
+                'email' => 'tentor@qualify.test',
+                'password' => Hash::make(RoleSeeder::DEFAULT_PASSWORD),
                 'role' => 'tentor',
                 'status' => 'aktif',
                 'email_verified_at' => now(),
-            ]
-        );
+            ]);
+        }
 
         $staff = StaffProfile::firstOrCreate(
             ['user_id' => $staffUser->id],
             [
-                'employee_number' => 'TTR-DEMO-001',
+                'employee_number' => 'TTR-TEST-001',
                 'full_name_with_title' => 'Kak Hendra Wijaya, M.Sc',
                 'job_title' => 'Master Tentor Matematika',
                 'education' => 'S1 Matematika',
@@ -105,7 +112,9 @@ class OrtuDashboardDemoSeeder extends Seeder
         );
 
         // 3. Buat dua siswa yang menjadi anak dari guardian ini.
-        $siswa1 = Student::updateOrCreate(
+        // withTrashed() dipakai karena NIS yang sama pernah di-soft-delete
+        // dan unique index pada kolom nis tetap aktif.
+        $siswa1 = Student::withTrashed()->updateOrCreate(
             ['nis' => 'QLF-2025-0101'],
             [
                 'user_id' => null,
@@ -120,7 +129,11 @@ class OrtuDashboardDemoSeeder extends Seeder
             ]
         );
 
-        $siswa2 = Student::updateOrCreate(
+        if ($siswa1->trashed()) {
+            $siswa1->restore();
+        }
+
+        $siswa2 = Student::withTrashed()->updateOrCreate(
             ['nis' => 'QLF-2025-0102'],
             [
                 'user_id' => null,
@@ -134,6 +147,10 @@ class OrtuDashboardDemoSeeder extends Seeder
                 'status' => 'aktif',
             ]
         );
+
+        if ($siswa2->trashed()) {
+            $siswa2->restore();
+        }
 
         // Hubungkan siswa ke guardian.
         DB::table('student_guardians')->updateOrInsert(
@@ -214,7 +231,7 @@ class OrtuDashboardDemoSeeder extends Seeder
                     [
                         'status' => $status,
                         'arrived_at' => $status === 'hadir'
-                            ? Carbon::parse($tanggal.' '.$mulai)->subMinutes(5)
+                            ? $tanggal->copy()->setTimeFromTimeString($mulai)->subMinutes(5)
                             : null,
                         'note' => null,
                         'recorded_by' => null,

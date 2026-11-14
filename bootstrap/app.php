@@ -20,6 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
             SessionTimeoutMiddleware::class,
         ]);
 
+        // Callback Xendit datang dari server Xendit, bukan dari peramban
+        // pengguna, jadi tidak ada token CSRF. Keamanannya berasal dari
+        // header X-Callback-Token yang divalidasi di controller.
+        $middleware->validateCsrfTokens(except: [
+            'webhook/xendit',
+        ]);
+
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
             'role' => RoleMiddleware::class,

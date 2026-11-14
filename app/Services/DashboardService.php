@@ -138,28 +138,6 @@ class DashboardService
     }
 
     /**
-     * Get the count of active qualifix tickets.
-     */
-    public function activeQualifixTicketCount(): int
-    {
-        return DB::table('qualifix_tickets')
-            ->where('status', 'menunggu_tentor')
-            ->count();
-    }
-
-    /**
-     * Get the count of today's qualifix submissions.
-     */
-    public function todayQualifixCount(): int
-    {
-        $today = Carbon::today()->toDateString();
-
-        return DB::table('qualifix_tickets')
-            ->whereDate('submitted_at', $today)
-            ->count();
-    }
-
-    /**
      * Get the count of branches.
      */
     public function branchCount(): int
@@ -506,7 +484,9 @@ class DashboardService
     {
         $today = Carbon::today();
         $masuk = QualifixTicket::whereDate('submitted_at', $today)->count();
-        $butuhTentor = QualifixTicket::where('status', 'menunggu_tentor')->count();
+        $butuhTentor = QualifixTicket::whereDate('submitted_at', $today)
+            ->where('status', 'menunggu_tentor')
+            ->count();
         $selesai = QualifixTicket::whereDate('submitted_at', $today)->where('status', 'selesai')->count();
 
         return [

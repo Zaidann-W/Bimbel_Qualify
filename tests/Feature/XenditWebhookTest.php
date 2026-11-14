@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Application;
 use App\Models\Guardian;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -142,4 +143,108 @@ test('webhook dengan status EXPIRED menandai invoice sebagai batal', function ()
 
     $this->invoice->refresh();
     expect($this->invoice->status)->toBe('batal');
+});
+
+test('webhook invoice pendaftaran menandai pembayaran pendaftaran menjadi lunas', function () {
+    $application = Application::create([
+        'registration_number' => 'REG-2026-0001',
+        'full_name' => 'Budi Santoso',
+        'phone_wa' => '081234567890',
+        'status' => 'diterima',
+        'payment_status' => 'belum_bayar',
+    ]);
+
+    $response = $this->post('/webhook/xendit', [
+        'id' => 'inv_pendaftaran_001',
+        'external_id' => 'REG-'.$application->registration_number.'-a1b2c3d4',
+        'status' => 'PAID',
+        'paid_amount' => 500000,
+    ], [
+        'X-Callback-Token' => config('xendit.callback_token'),
+        'Accept' => 'application/json',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJson(['success' => true]);
+
+    $application->refresh();
+    expect($application->payment_status)->toBe('lunas')
+        ->and($application->payment_verified_at)->not->toBeNull();
+});
+
+test('webhook invoice pendaftaran dicocokkan lewat external id yang tersimpan', function () {
+    $application = Application::create([
+        'registration_number' => 'REG-2026-0003',
+        'full_name' => 'Budi Santoso',
+        'phone_wa' => '081234567890',
+        'status' => 'diterima',
+        'payment_status' => 'belum_bayar',
+        'xendit_invoice_id' => 'inv_pendaftaran_003',
+        'xendit_external_id' => 'REG-REG-2026-0003-a1b2c3d4',
+    ]);
+
+    $this->post('/webhook/xendit', [
+        'id' => 'inv_pendaftaran_003',
+        'external_id' => 'REG-REG-2026-0003-a1b2c3d4',
+        'status' => 'PAID',
+        'paid_amount' => 500000,
+    ], [
+        'X-Callback-Token' => config('xendit.callback_token'),
+        'Accept' => 'application/json',
+    ])->assertStatus(200)->assertJson(['success' => true]);
+
+    $application->refresh();
+    expect($application->payment_status)->toBe('lunas')
+        ->and($application->payment_verified_at)->not->toBeNull();
+});
+
+test('endpoint webhook tidak memerlukan token CSRF', function () {
+    $application = Application::create([
+        'registration_number' => 'REG-2026-0004',
+        'full_name' => 'Siti Aminah',
+        'status' => 'diterima',
+        'payment_status' => 'belum_bayar',
+    ]);
+
+    // Tanpa token CSRF: kalau route masih dilindungi CSRF, jawabannya 419.
+    $this->post('/webhook/xendit', [
+        'external_id' => 'REG-REG-2026-0004-a1b2c3d4',
+        'status' => 'PAID',
+    ], [
+        'X-Callback-Token' => config('xendit.callback_token'),
+        'Accept' => 'application/json',
+    ])->assertStatus(200)->assertJson(['success' => true]);
+
+    expect($application->refresh()->payment_status)->toBe('lunas');
+});
+
+test('webhook dengan token yang salah tetap ditolak', function () {
+    $this->post('/webhook/xendit', [
+        'external_id' => 'REG-REG-2026-0005-a1b2c3d4',
+        'status' => 'PAID',
+    ], [
+        'X-Callback-Token' => 'token-salah',
+        'Accept' => 'application/json',
+    ])->assertStatus(401);
+});
+
+test('webhook invoice pendaftaran dengan status selain PAID tidak menandai lunas', function () {
+    $application = Application::create([
+        'registration_number' => 'REG-2026-0002',
+        'full_name' => 'Siti Aminah',
+        'phone_wa' => '081234567890',
+        'status' => 'diterima',
+        'payment_status' => 'belum_bayar',
+    ]);
+
+    $this->post('/webhook/xendit', [
+        'id' => 'inv_pendaftaran_002',
+        'external_id' => 'REG-'.$application->registration_number.'-b2c3d4e5',
+        'status' => 'EXPIRED',
+    ], [
+        'X-Callback-Token' => config('xendit.callback_token'),
+        'Accept' => 'application/json',
+    ])->assertStatus(200);
+
+    expect($application->refresh()->payment_status)->toBe('belum_bayar');
 });

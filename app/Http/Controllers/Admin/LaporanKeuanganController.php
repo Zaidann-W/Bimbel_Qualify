@@ -32,7 +32,7 @@ class LaporanKeuanganController extends Controller
     }
 
     /**
-     * Ekspor laporan keuangan ke CSV (bisa dibuka Excel).
+     * Ekspor laporan keuangan ke CSV atau PDF.
      */
     public function export(Request $request): StreamedResponse
     {
@@ -44,7 +44,11 @@ class LaporanKeuanganController extends Controller
             $request->query('type'),
         );
 
-        $filename = 'laporan-keuangan-'.now()->format('Ymd-His').'.'.$format;
+        $filename = 'laporan-keuangan-'.now()->format('Ymd-His').($format === 'pdf' ? '.pdf' : '.'.$format);
+
+        if ($format === 'pdf') {
+            return $this->exportAsPdf($data, $filename);
+        }
 
         return response()->streamDownload(function () use ($data, $format): void {
             $out = fopen('php://output', 'w');
@@ -76,6 +80,57 @@ class LaporanKeuanganController extends Controller
             fclose($out);
         }, $filename, [
             'Content-Type' => $format === 'csv' ? 'text/csv' : 'application/vnd.ms-excel',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
+
+    /**
+     * Ekspor laporan keuangan sebagai PDF menggunakan DomPDF.
+     */
+    protected function exportAsPdf(array $rawData, string $filename): StreamedResponse
+    {
+        // Compute summaries from the raw data (same logic as rekap)
+        $totalTagihan = 0;
+        $totalTerbayar = 0;
+        $totalBelumBayar = 0;
+        $totalLunas = 0;
+
+        $rows = [];
+
+        foreach ($rawData as $row) {
+            $totalTagihan += $row['amount'] ?? 0;
+            $rows[] = $row;
+
+            $status = $row['status'] ?? '';
+            if ($status === 'lunas') {
+                $totalLunas++;
+                $totalTerbayar += $row['amount'] ?? 0;
+            } elseif ($status === 'belum_bayar') {
+                $totalBelumBayar += $row['amount'] ?? 0;
+            }
+            // 'sebagian' is partially paid - count as terbayar partially
+            if ($status === 'sebagian') {
+                $totalTerbayar += $row['amount'] ?? 0 * 0.5; // approximate
+            }
+        }
+
+        $pdfData = [
+            'summary' => [
+                'total_tagihan' => (float) $totalTagihan,
+                'total_terbayar' => (float) $totalTerbayar,
+                'total_belum_bayar' => (float) $totalBelumBayar,
+                'total_lunas' => (int) $totalLunas,
+                'total_invoice' => count($rawData),
+            ],
+            'rows' => $rows,
+        ];
+
+        $pdf = PDF::loadView('admin.laporan-keuangan-pdf', ['data' => $pdfData]);
+
+        return response()->streamDownload(function () use ($pdf): void {
+            echo $pdf->output();
+        }, $filename, [
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }

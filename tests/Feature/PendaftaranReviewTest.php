@@ -4,6 +4,8 @@ use App\Models\AcademicPeriod;
 use App\Models\AdmissionBatch;
 use App\Models\Application;
 use App\Models\ApplicationStatusHistory;
+use App\Models\Guardian;
+use App\Models\Student;
 use App\Models\StudyShift;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -256,14 +258,14 @@ test('payment page rejects application that is not yet approved', function () {
         ->assertStatus(403);
 });
 
-test('payment page rejects application that is already lunas', function () {
+test('payment page redirects to account creation when payment is already lunas', function () {
     $app = pendingApplication([
         'status' => 'diterima',
         'payment_status' => 'lunas',
     ]);
 
     $this->get(route('pendaftaran.bayar', $app->registration_number))
-        ->assertStatus(403);
+        ->assertRedirect(route('pendaftaran.buatAkun', $app->registration_number));
 });
 
 /* ============================================================
@@ -311,14 +313,30 @@ test('account creation page is accessible only after payment lunas', function ()
         ->assertSee($app->registration_number);
 });
 
-test('account creation page rejects if payment not yet lunas', function () {
+test('account creation page shows the waiting screen while payment is not yet lunas', function () {
     $app = pendingApplication([
         'status' => 'diterima',
         'payment_status' => 'menunggu_verifikasi',
     ]);
 
     $this->get(route('pendaftaran.buatAkun', $app->registration_number))
-        ->assertStatus(403);
+        ->assertStatus(200)
+        ->assertSee('Menunggu Konfirmasi Pembayaran');
+});
+
+test('payment status endpoint reports the payment state', function () {
+    $app = pendingApplication([
+        'status' => 'diterima',
+        'payment_status' => 'belum_bayar',
+    ]);
+
+    $this->getJson(route('pendaftaran.status', $app->registration_number))
+        ->assertOk()
+        ->assertJson([
+            'payment_status' => 'belum_bayar',
+            'lunas' => false,
+            'accounts_created' => false,
+        ]);
 });
 
 test('account creation creates ortu and siswa users with correct roles', function () {
@@ -353,6 +371,45 @@ test('account creation creates ortu and siswa users with correct roles', functio
 
     $app->refresh();
     expect($app->accounts_created)->toBeTrue();
+});
+
+test('pembuatan akun menautkan user orang tua ke data wali siswa', function () {
+    $app = pendingApplication(['email' => 'wali@example.com']);
+
+    // Persetujuan admin membuat data siswa + wali dari pendaftaran.
+    $this->actingAs($this->admin)
+        ->patch(route('admin.pendaftaran.status', $app->registration_number), [
+            'status' => 'diterima',
+        ])
+        ->assertSessionHas('success');
+
+    $app->refresh();
+    $app->update(['payment_status' => 'lunas']);
+
+    // Email pendaftar adalah email wali.
+    expect(Guardian::where('name', 'Siti Aminah')->firstOrFail()->email)->toBe('wali@example.com');
+
+    $this->post(route('pendaftaran.buatAkun.simpan', $app->registration_number), [
+        'ortu_name' => 'Siti Aminah',
+        'ortu_email' => 'ortu@example.com',
+        'ortu_phone' => '081234567891',
+        'ortu_password' => 'rahasia123',
+        'ortu_password_confirmation' => 'rahasia123',
+        'siswa_name' => 'Budi Santoso',
+        'siswa_email' => 'siswa@example.com',
+        'siswa_password' => 'rahasia123',
+        'siswa_password_confirmation' => 'rahasia123',
+    ])->assertRedirect(route('pendaftaran.berhasil', $app->registration_number));
+
+    $ortu = User::where('email', 'ortu@example.com')->firstOrFail();
+    $siswa = User::where('email', 'siswa@example.com')->firstOrFail();
+
+    $guardian = Guardian::where('name', 'Siti Aminah')->firstOrFail();
+    expect($guardian->user_id)->toBe($ortu->id)
+        ->and($guardian->email)->toBe('ortu@example.com');
+
+    $student = Student::findOrFail($app->student_id);
+    expect($student->user_id)->toBe($siswa->id);
 });
 
 test('email must be unique for ortu and siswa', function () {

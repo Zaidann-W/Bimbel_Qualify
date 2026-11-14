@@ -12,7 +12,7 @@ class LaporanPresensiController extends Controller
 {
     public function __construct(private readonly AdminLaporanPresensiService $service) {}
 
-    /**
+    /** 
      * Tampilkan halaman laporan presensi dengan data real dari DB.
      */
     public function index(Request $request): View
@@ -30,8 +30,8 @@ class LaporanPresensiController extends Controller
         return view('admin.laporan-presensi', $data);
     }
 
-    /**
-     * Ekspor laporan presensi ke CSV (bisa dibuka Excel).
+    /** 
+     * Ekspor laporan presensi ke CSV atau PDF.
      */
     public function export(Request $request): StreamedResponse
     {
@@ -43,7 +43,11 @@ class LaporanPresensiController extends Controller
             $request->query('status'),
         );
 
-        $filename = 'laporan-presensi-'.now()->format('Ymd-His').'.'.$format;
+        $filename = 'laporan-presensi-'.now()->format('Ymd-His').($format === 'pdf' ? '.pdf' : '.'.$format);
+
+        if ($format === 'pdf') {
+            return $this->exportAsPdf($data, $filename);
+        }
 
         return response()->streamDownload(function () use ($data, $format): void {
             $out = fopen('php://output', 'w');
@@ -71,6 +75,56 @@ class LaporanPresensiController extends Controller
             fclose($out);
         }, $filename, [
             'Content-Type' => $format === 'csv' ? 'text/csv' : 'application/vnd.ms-excel',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
+
+    /** 
+     * Ekspor laporan presensi sebagai PDF menggunakan DomPDF.
+     */
+    protected function exportAsPdf(array $rawData, string $filename): StreamedResponse
+    {
+        // Compute summaries from the raw data (same logic as rekap)
+        $totalHadir = 0;
+        $totalIzin = 0;
+        $totalSakit = 0;
+        $totalAlpha = 0;
+        $rows = [];
+
+        foreach ($rawData as $row) {
+            $status = strtolower($row['status'] ?? '');
+            $rows[] = $row;
+
+            if ($status === 'hadir') {
+                $totalHadir++;
+            } elseif ($status === 'izin') {
+                $totalIzin++;
+            } elseif ($status === 'sakit') {
+                $totalSakit++;
+            } elseif ($status === 'alpa') {
+                $totalAlpha++;
+            }
+        }
+
+        $total = count($rawData);
+        $pdfData = [
+            'summary' => [
+                'total' => $total,
+                'hadir' => $totalHadir,
+                'izin' => $totalIzin,
+                'sakit' => $totalSakit,
+                'alpa' => $totalAlpha,
+                'rate_hadir' => $total > 0 ? round($totalHadir / $total * 100, 1) : 0,
+            ],
+            'rows' => $rows,
+        ];
+
+        $pdf = PDF::loadView('admin.laporan-presensi-pdf', ['data' => $pdfData]);
+
+        return response()->streamDownload(function () use ($pdf): void {
+            echo $pdf->output();
+        }, $filename, [
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }

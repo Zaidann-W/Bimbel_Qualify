@@ -215,10 +215,10 @@
 
                 <div class="flex items-start justify-between gap-3 rounded-xl border border-bark-100 bg-bark-50 px-4 py-3">
                     <div>
-                        <p class="text-[13px] font-bold text-bark-800">Status Notifikasi Klinik PR Mandiri</p>
+                        <p class="text-[13px] font-bold text-bark-800">Status Notifikasi QualiFix Mandiri</p>
                         <p class="mt-0.5 text-[11.5px] leading-relaxed text-bark-400">Dapatkan alert real-time ketika ada siswa masuk di subjek Matematika/Fisika</p>
                     </div>
-                    <button type="button" role="switch" aria-checked="true" aria-label="Status notifikasi Klinik PR Mandiri"
+                    <button type="button" role="switch" aria-checked="true" aria-label="Status notifikasi QualiFix Mandiri"
                             class="mt-0.5 h-6 w-11 shrink-0 rounded-full bg-ember-500 p-0.5 transition">
                         <span class="block h-5 w-5 translate-x-5 rounded-full bg-white shadow-sm transition"></span>
                     </button>

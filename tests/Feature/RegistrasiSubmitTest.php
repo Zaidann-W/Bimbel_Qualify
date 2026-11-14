@@ -45,6 +45,7 @@ function registrasiPayload(): array
         'kelas' => 'smp-7',
         'asal_sekolah' => 'SDN Contoh 1',
         'wa_siswa' => '081234567890',
+        'email' => 'wali@example.com',
         'alamat' => 'Jl. Pendidikan No. 1',
         'nama_wali' => 'Siti Aminah',
         'wa_wali' => '081234567891',
@@ -75,6 +76,7 @@ test('submitting the registration form creates an application', function () {
         ->and($application->study_shift_id)->toBe($this->shift->id)
         ->and($application->school_grade)->toBe('7')
         ->and($application->education_level)->toBe('SMP')
+        ->and($application->email)->toBe('wali@example.com')
         ->and($application->status)->toBe('menunggu_review');
 
     expect(ApplicationStatusHistory::where('application_id', $application->id)->count())->toBe(1);
@@ -110,6 +112,18 @@ test('registration form validation rejects an incomplete submission', function (
         ->post(route('registrasi.simpan'), $payload)
         ->assertRedirect(route('registrasi'))
         ->assertSessionHasErrors(['nama_lengkap', 'rapor_ganjil']);
+
+    expect(Application::count())->toBe(0);
+});
+
+test('registration requires the guardian email', function () {
+    $payload = registrasiPayload();
+    unset($payload['email']);
+
+    $this->from(route('registrasi'))
+        ->post(route('registrasi.simpan'), $payload)
+        ->assertRedirect(route('registrasi'))
+        ->assertSessionHasErrors('email');
 
     expect(Application::count())->toBe(0);
 });

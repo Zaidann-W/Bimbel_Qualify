@@ -56,6 +56,7 @@ class RegistrationService
                 'school_grade' => $this->mapKelasToGrade($validated['kelas']),
                 'education_level' => $this->mapKelasToEducationLevel($validated['kelas']),
                 'phone_wa' => $validated['wa_siswa'],
+                'email' => $validated['email'],
                 'address' => $validated['alamat'],
                 'guardian_name' => $validated['nama_wali'],
                 'guardian_phone' => $validated['wa_wali'],

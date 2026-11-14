@@ -180,10 +180,44 @@
                                     <span data-badge @class(['rounded-md px-2.5 py-1.5 text-[11px] font-bold leading-none', $pil['badge']])>
                                         {{ $pil['label'] }}
                                     </span>
-                                    <button type="button" data-tiket-aksi
-                                            @class(['inline-flex items-center justify-center rounded-lg px-3.5 py-2.5 text-[12px] font-bold leading-none transition', $pil['aksi_kelas']])>
-                                        {{ $pil['aksi'] }}
-                                    </button>
+                                     {{-- Aksi tiket (tugaskan tentor / ubah status) --}}
+                                     @php
+                                         $isMenunggu = $t->view_status === 'menunggu';
+                                     @endphp
+                                     @if ($isMenunggu)
+                                         <form method="POST" action="{{ route('admin.qualifix.assign', $t->id) }}" class="flex items-center gap-2">
+                                             @csrf
+                                             <select name="staff_id" class="rounded-lg border border-line bg-white px-3 py-2 text-[12px] text-bark-800 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold">
+                                                 <option value="">Pilih tentor pendamping</option>
+                                                 @foreach ($tentor as $tent)
+                                                     <option value="{{ $tent['id'] }}">{{ $tent['nama'] }} ({{ $tent['bidang'] }})</option>
+                                                 @endforeach
+                                             </select>
+                                             <button type="submit" class="inline-flex items-center justify-center rounded-lg px-3.5 py-2.5 text-[12px] font-bold leading-none bg-espresso text-white transition hover:bg-bark-800">
+                                                 Tugaskan Tentor
+                                             </button>
+                                         </form>
+                                     @else
+                                         <form method="POST" action="{{ route('admin.qualifix.status', $t->id) }}" class="flex items-center gap-2">
+                                             @csrf
+                                             @method('PATCH')
+                                             <select name="status" class="rounded-lg border border-line bg-white px-3 py-2 text-[12px] text-bark-800 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold">
+                                                 <option value="menunggu_tentor" {{ $t->status === 'menunggu_tentor' ? 'selected' : '' }}>Kembalikan ke Menunggu</option>
+                                                 <option value="sedang_dibahas" {{ $t->status === 'sedang_dibahas' ? 'selected' : '' }}>Tandai Sedang Dibahas</option>
+                                                 <option value="selesai" {{ $t->status === 'selesai' ? 'selected' : '' }}>Tandai Selesai</option>
+                                             </select>
+                                             <button type="submit" class="inline-flex items-center justify-center rounded-lg px-3.5 py-2.5 text-[12px] font-bold leading-none bg-espresso text-white transition hover:bg-bark-800">
+                                                 @php
+                                                     $aksiLabel = match ($t->status) {
+                                                         'sedang_dibahas' => 'Lihat Detail',
+                                                         'selesai' => 'Lihat Solusi',
+                                                         default => 'Ubah Status',
+                                                     };
+                                                 @endphp
+                                                 {{ $aksiLabel }}
+                                             </button>
+                                         </form>
+                                     @endif
                                 </div>
                             </div>
                         </article>
@@ -225,7 +259,7 @@
                         {{ collect($tentor)->where('kondisi', 'tersedia')->count() }} Standby
                     </span>
                 </header>
-                <p class="mt-1 text-[12px] leading-snug text-muted">Tentor Pendamping Klinik PR</p>
+                <p class="mt-1 text-[12px] leading-snug text-muted">Tentor Pendamping QualiFix</p>
 
                 <div class="mt-4 space-y-3">
                     @foreach ($tentor as $tent)
@@ -264,9 +298,11 @@
             <section class="rounded-2xl border border-line bg-white px-5 py-4">
                 <p class="flex items-start gap-2 text-[11.5px] leading-relaxed text-muted">
                     @include('layouts.partials.icon', ['name' => 'shield-check', 'class' => 'mt-[1px] h-4 w-4 shrink-0 text-gold'])
-                    Tiket Klinik PR hanya terbaca oleh siswa pengirim, tentor pendamping, dan pengelola cabang.
+                    Tiket QualiFix hanya terbaca oleh siswa pengirim, tentor pendamping, dan pengelola cabang.
                 </p>
             </section>
+
+            <x-flash-toast />
         </div>
     </div>
 </div>

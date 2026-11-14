@@ -39,7 +39,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-[12.5px] font-semibold text-muted">Email (untuk login)</label>
                                         <input type="email" name="ortu_email"
-                                               value="{{ old('ortu_email') }}"
+                                               value="{{ old('ortu_email') ?? $application->email }}"
                                                class="block w-full rounded-lg border border-line bg-white px-4 py-2.5 text-ink focus:border-gold focus:ring-1 focus:ring-gold">
                                         <p class="text-[11px] text-muted">Email akan digunakan untuk login orang tua.</p>
                                     </div>

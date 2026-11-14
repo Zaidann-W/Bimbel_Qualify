@@ -10,7 +10,7 @@
             <h1 class="text-[22px] font-bold tracking-tight text-bark-800">
                 Selamat datang, {{ $user?->name }}! 👋
             </h1>
-            <p class="text-[13px] text-bark-400">Pantau jadwal kelas hari ini, input kehadiran siswa, dan jawab pertanyaan Klinik PR.</p>
+            <p class="text-[13px] text-bark-400">Pantau jadwal kelas hari ini, input kehadiran siswa, dan jawab pertanyaan QualiFix.</p>
         </div>
         <div class="flex items-center gap-3 rounded-xl border border-bark-100 bg-bark-50 px-4 py-3">
             <div class="flex flex-col items-center gap-1">
@@ -113,10 +113,10 @@
             @endif
         </div>
 
-        {{-- Klinik PR Siswa sidebar --}}
+        {{-- QualiFix sidebar --}}
         <div class="space-y-4">
             <div class="flex items-center justify-between gap-2">
-                <h2 class="text-[14px] font-bold text-bark-800">Klinik PR Siswa</h2>
+                <h2 class="text-[14px] font-bold text-bark-800">QualiFix Siswa</h2>
                 <span @class([
                     'text-[11px] font-bold',
                     'text-ember-600' => $qualifixTickets->isNotEmpty(),

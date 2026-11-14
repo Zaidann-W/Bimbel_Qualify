@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\QualifixTicket;
 use App\Models\StaffProfile;
+use App\Services\QualifixService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class QualifixController extends Controller
 {
+    public function __construct(private readonly QualifixService $qualifixService) {}
+
     /**
      * Tampilkan daftar tiket Klinik PR (QualiFix) yang diambil dari database.
      */
@@ -64,6 +68,7 @@ class QualifixController extends Controller
             ->orderBy('full_name_with_title')
             ->get()
             ->map(fn ($staff) => [
+                'id' => $staff->id,
                 'nama' => $staff->full_name_with_title,
                 'bidang' => $staff->job_title ?? '-',
                 'kondisi' => $staff->qualificTickets->isNotEmpty() ? 'membimbing' : 'tersedia',
@@ -78,5 +83,35 @@ class QualifixController extends Controller
             'kpis' => $kpis,
             'per_halaman' => 10,
         ]);
+    }
+
+    /**
+     * Tetapkan / ganti tentor pendamping untuk sebuah tiket.
+     */
+    public function assign(QualifixTicket $ticket, Request $request): RedirectResponse
+    {
+        $request->validate([
+            'staff_id' => ['required', 'exists:staff_profiles,id'],
+        ]);
+
+        $this->qualifixService->reassign($ticket, (int) $request->input('staff_id'));
+
+        return redirect()->route('admin.qualifix')
+            ->with('sukses', 'Tentor pendamping untuk tiket #'.$ticket->ticket_number.' telah diperbarui.');
+    }
+
+    /**
+     * Perbarui status tiket (admin).
+     */
+    public function updateStatus(QualifixTicket $ticket, Request $request): RedirectResponse
+    {
+        $request->validate([
+            'status' => ['required', 'in:menunggu_tentor,sedang_dibahas,selesai'],
+        ]);
+
+        $this->qualifixService->updateStatus($ticket, $request->input('status'));
+
+        return redirect()->route('admin.qualifix')
+            ->with('sukses', 'Status tiket #'.$ticket->ticket_number.' diperbarui.');
     }
 }

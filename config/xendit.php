@@ -24,4 +24,17 @@ return [
 
     'redirect_url' => env('XENDIT_REDIRECT_URL'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email Penagihan Cadangan
+    |--------------------------------------------------------------------------
+    |
+    | Xendit menolak invoice tanpa payer_email. Pendaftar yang belum
+    | mencantumkan email memakai alamat ini sebagai pengganti, sehingga
+    | link pembayaran tetap bisa diterbitkan.
+    |
+    */
+
+    'fallback_payer_email' => env('XENDIT_FALLBACK_PAYER_EMAIL', 'pendaftaran@bimbelqualify.id'),
+
 ];

@@ -288,7 +288,7 @@
                 </a>
             </section>
 
-            {{-- Klinik PR --}}
+            {{-- QualiFix --}}
             <section class="rounded-3xl border border-line/80 bg-white p-5">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex min-w-0 gap-3">
@@ -296,7 +296,7 @@
                             @include('layouts.partials.icon', ['name' => 'help-circle', 'class' => 'h-4 w-4'])
                         </span>
                         <div class="min-w-0">
-                            <h2 class="max-w-[160px] text-[14.5px] font-bold leading-snug text-ink">Klinik PR Siswa Hari Ini</h2>
+                            <h2 class="max-w-[160px] text-[14.5px] font-bold leading-snug text-ink">QualiFix Siswa Hari Ini</h2>
                             <p class="mt-0.5 max-w-[145px] text-[11.5px] text-muted">Bimbingan Tatap Muka 1-on-1</p>
                         </div>
                     </div>
@@ -322,9 +322,9 @@
 
                 <div class="mt-3 flex justify-between">
                     <a href="{{ route('admin.qualifix') }}" class="text-[13px] font-semibold text-[#c08a15] hover:underline">
-                        Kelola Tiket Klinik PR
+                        Kelola Tiket QualiFix
                     </a>
-                    <a href="{{ route('admin.qualifix') }}" aria-label="Kelola Tiket Klinik PR"
+                    <a href="{{ route('admin.qualifix') }}" aria-label="Kelola Tiket QualiFix"
                        class="text-[13px] font-semibold text-[#c08a15] hover:underline">
                         <span aria-hidden="true">→</span>
                     </a>

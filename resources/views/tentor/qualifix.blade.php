@@ -123,7 +123,7 @@
 
             @if ($selected)
                 @php
-                    [$sInitial, $sNama, $sStatus, $sMeta, $sTopik, $sPreview, $sTags, $sActive] = $selected;
+                    [$sInitial, $sNama, $sStatus, $sMeta, $sTopik, $sPreview, $sTags, $sActive, $sTicketId, $sTicketNumber] = $selected;
                 @endphp
                 {{-- Detail pertanyaan --}}
                 <section class="rounded-2xl border border-bark-100 bg-white">
@@ -184,67 +184,82 @@
                 </section>
 
                 {{-- Ruang solusi tentor --}}
-                <section class="rounded-2xl border border-bark-100 bg-white">
-                    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-bark-100 px-5 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-bark-800 text-white">
-                                @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-4 w-4'])
+                <form action="{{ route('tentor.qualifix.answer', $sTicketId) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <section class="rounded-2xl border border-bark-100 bg-white">
+                        <header class="flex flex-wrap items-center justify-between gap-3 border-b border-bark-100 px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-bark-800 text-white">
+                                    @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-4 w-4'])
+                                </div>
+                                <div>
+                                    <h2 class="text-[15px] font-bold text-bark-800">Ruang Solusi Tentor</h2>
+                                    <p class="text-[11px] text-bark-400">Jawaban langsung ke portal belajar {{ $sNama }}</p>
+                                </div>
                             </div>
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-600">
+                                @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5'])
+                                Draft tersimpan
+                            </span>
+                        </header>
+
+                        <div class="space-y-5 px-5 py-4">
+
+                            {{-- Teks jawaban --}}
                             <div>
-                                <h2 class="text-[15px] font-bold text-bark-800">Ruang Solusi Tentor</h2>
-                                <p class="text-[11px] text-bark-400">Jawaban langsung ke portal belajar {{ $sNama }}</p>
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <label for="solusi-teks" class="text-[12.5px] font-bold text-bark-700">Teks Penjelasan / Langkah Jawaban</label>
+                                    <span class="text-[11px] text-bark-400">Bisa salin &amp; tempel kontenmu</span>
+                                </div>
+                                <textarea id="solusi-teks" name="body" rows="8"
+                                          class="mt-2 w-full rounded-xl border border-bark-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">Halo {{ $sNama }}, pertanyaan yang sangat bagus sekali!</textarea>
+                            </div>
+
+                            {{-- Unggah foto jawaban --}}
+                            <div>
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <span class="text-[12.5px] font-bold text-bark-700">Unggah Foto Jawaban / Contoh Pembahasan (Opsional)</span>
+                                    <span class="text-[11px] text-bark-400">JPG, PNG maks 5MB</span>
+                                </div>
+                                <div class="mt-2 rounded-xl border-2 border-dashed border-bark-200 px-4 py-6 text-center">
+                                    @include('layouts.partials.icon', ['name' => 'image', 'class' => 'mx-auto h-6 w-6 text-bark-300'])
+                                    <p class="mt-2 text-[12px] text-bark-400">Tarik &amp; letakkan foto di sini atau klik dari berkas dan perangkat</p>
+                                    <input type="file" name="files[]" id="solusi-files" multiple class="hidden" accept=".jpg,.jpeg,.png,.pdf">
+                                    <button type="button" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
+                                        @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-3.5 w-3.5 rotate-180'])
+                                        Pilih Foto
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-600">
-                            @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-3.5 w-3.5'])
-                            Draft tersimpan
-                        </span>
-                    </header>
 
-                    <div class="space-y-5 px-5 py-4">
-
-                        {{-- Teks jawaban --}}
-                        <div>
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <label for="solusi-teks" class="text-[12.5px] font-bold text-bark-700">Teks Penjelasan / Langkah Jawaban</label>
-                                <span class="text-[11px] text-bark-400">Bisa salin &amp; tempel kontenmu</span>
-                            </div>
-                            <textarea id="solusi-teks" rows="8"
-                                      class="mt-2 w-full rounded-xl border border-bark-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-bark-700 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">Halo {{ $sNama }}, pertanyaan yang sangat bagus sekali!</textarea>
-                        </div>
-
-                        {{-- Unggah foto jawaban --}}
-                        <div>
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <span class="text-[12.5px] font-bold text-bark-700">Unggah Foto Jawaban / Contoh Pembahasan (Opsional)</span>
-                                <span class="text-[11px] text-bark-400">JPG, PNG maks 5MB</span>
-                            </div>
-                            <div class="mt-2 rounded-xl border-2 border-dashed border-bark-200 px-4 py-6 text-center">
-                                @include('layouts.partials.icon', ['name' => 'image', 'class' => 'mx-auto h-6 w-6 text-bark-300'])
-                                <p class="mt-2 text-[12px] text-bark-400">Tarik &amp; letakkan foto di sini atau klik dari berkas dan perangkat</p>
-                                <button type="button" class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-bark-200 bg-white px-3 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
-                                    @include('layouts.partials.icon', ['name' => 'download', 'class' => 'h-3.5 w-3.5 rotate-180'])
-                                    Pilih Foto
+                        {{-- Aksi --}}
+                        <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-bark-100 px-5 py-4">
+                            <div class="flex items-center gap-2">
+                                <button type="button" class="rounded-lg border border-bark-200 bg-white px-3.5 py-2.5 text-[12px] font-bold text-bark-600 transition hover:bg-bark-50">
+                                    Simpan sebagai Draf
+                                </button>
+                                <button type="button" class="rounded-lg px-3 py-2.5 text-[12px] font-bold text-bark-400 transition hover:bg-bark-50">
+                                    Batal
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                            <button type="submit" class="rounded-lg bg-ember-500 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-sm transition hover:bg-ember-600">
+                                Kirim Jawaban ke Siswa
+                            </button>
+                        </footer>
+                    </section>
+                </form>
 
-                    {{-- Aksi --}}
-                    <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-bark-100 px-5 py-4">
-                        <div class="flex items-center gap-2">
-                            <button type="button" class="rounded-lg border border-bark-200 bg-white px-3.5 py-2.5 text-[12px] font-bold text-bark-600 transition hover:bg-bark-50">
-                                Simpan sebagai Draf
-                            </button>
-                            <button type="button" class="rounded-lg px-3 py-2.5 text-[12px] font-bold text-bark-400 transition hover:bg-bark-50">
-                                Batal
-                            </button>
-                        </div>
-                        <button type="button" class="rounded-lg bg-ember-500 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-sm transition hover:bg-ember-600">
-                            Kirim Jawaban ke Siswa
+                {{-- Tandai selesai --}}
+                @if ($sStatus === 'Menunggu')
+                    <form action="{{ route('tentor.qualifix.resolve', $sTicketId) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-sm transition hover:bg-emerald-700 w-full">
+                            Tandai Selesai
                         </button>
-                    </footer>
-                </section>
+                    </form>
+                @endif
             @else
                 {{-- Kosong: belum ada antrean --}}
                 <section class="rounded-2xl border border-bark-100 bg-white p-12 text-center">
@@ -252,10 +267,12 @@
                         @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-8 w-8'])
                     </div>
                     <h3 class="text-[15px] font-bold text-bark-800">Belum Ada Antrean</h3>
-                    <p class="mt-1 text-[13px] text-bark-400">Tidak ada pertanyaan Klinik PR yang ditugaskan kepada Anda saat ini.</p>
+                    <p class="mt-1 text-[13px] text-bark-400">Tidak ada pertanyaan QualiFix yang ditugaskan kepada Anda saat ini.</p>
                 </section>
             @endif
         </div>
     </div>
 </div>
+
+<x-flash-toast />
 @endsection

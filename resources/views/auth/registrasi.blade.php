@@ -344,7 +344,7 @@
                             <div>
                                 <h2 class="text-[20px] font-bold leading-tight text-ink">Kontak Orang Tua / Wali &amp; Pengaturan Grup</h2>
                                 <p class="mt-1 text-[13.5px] leading-[1.6] text-muted">
-                                    Informasi wali siswa, nomor WhatsApp grup bimbingan, dan pilihan sesi belajar.
+                                    Informasi wali siswa (nama, nomor WhatsApp, dan email), nomor WhatsApp grup bimbingan, dan pilihan sesi belajar.
                                 </p>
                             </div>
                         </header>
@@ -394,6 +394,28 @@
                                     >
                                 </div>
                                 <p class="mt-1.5 hidden text-[12.5px] font-medium text-ember-700" data-error-for="wa_wali" role="alert"></p>
+                            </div>
+
+                            <div data-field>
+                                <label for="email" class="block text-[13.5px] font-bold text-ink">
+                                    Email Orang Tua / Wali <span class="text-bronze" aria-hidden="true">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    data-label="Email orang tua / wali"
+                                    data-control-surface
+                                    data-border-default="border-line"
+                                    required
+                                    autocomplete="email"
+                                    placeholder="nama@email.com"
+                                    class="mt-2 w-full rounded-xl border border-line bg-shell px-4 py-3.5 text-[15px] text-ink placeholder:text-muted/55 transition-colors focus:border-gold focus:bg-paper focus:ring-4 focus:ring-gold/20"
+                                >
+                                <p class="mt-2 text-[12.5px] leading-[1.6] text-muted">
+                                    Dipakai untuk|link pembayaran pendaftaran dan komunikasi dari admin.
+                                </p>
+                                <p class="mt-1.5 hidden text-[12.5px] font-medium text-ember-700" data-error-for="email" role="alert"></p>
                             </div>
 
                             <div class="sm:col-span-2" data-field>

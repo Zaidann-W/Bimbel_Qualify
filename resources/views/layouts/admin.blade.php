@@ -39,7 +39,7 @@
                     ['Keuangan & Transaksi', 'wallet', route('admin.keuangan'), 'admin.keuangan', null],
                     ['Manajemen Materi Ajar', 'book-open', route('admin.manajemenMateri'), 'admin.manajemenMateri', null],
                     ['Absensi & Jadwal', 'clipboard-check', route('admin.absensiJadwal'), 'admin.absensiJadwal', null],
-                    ['Klinik PR', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
+                    ['QualiFix', 'graduation-cap', route('admin.qualifix'), 'admin.qualifix*', '5'],
                     ['Laporan & Pengaturan', 'sliders', route('admin.laporanPengaturan'), 'admin.laporanPengaturan', null],
                 ];
             @endphp
@@ -125,6 +125,7 @@
         </header>
 
         <main class="flex-1">
+            @include('layouts.partials.flash')
             @yield('content')
         </main>
     </div>

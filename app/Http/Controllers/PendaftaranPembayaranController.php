@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PendaftaranPembayaranRequest;
 use App\Models\Application;
+use App\Services\XenditInvoiceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PendaftaranPembayaranController extends Controller
 {
+    public function __construct(private readonly XenditInvoiceService $xenditInvoiceService) {}
+
     /**
      * Show the payment page for an approved application.
      */
@@ -20,8 +23,13 @@ class PendaftaranPembayaranController extends Controller
             abort(403, 'Pendaftaran belum disetujui admin.');
         }
 
+        // Callback Xendit mungkin belum sampai (mis. aplikasi belum punya URL
+        // publik), jadi status dicek langsung ke Xendit.
+        $this->xenditInvoiceService->sinkronkanPendaftaran($application);
+
         if ($application->payment_status === 'lunas') {
-            abort(403, 'Pembayaran sudah lunas.');
+            // Pembayaran sudah selesai, arahkan wali ke pembuatan akun.
+            return redirect()->route('pendaftaran.buatAkun', $kode);
         }
 
         return view('pendaftaran.bayar', [
@@ -39,7 +47,6 @@ class PendaftaranPembayaranController extends Controller
         if ($application->status !== 'diterima') {
             abort(403, 'Pendaftaran belum disetujui admin.');
         }
-
         if ($application->payment_status === 'lunas') {
             abort(403, 'Pembayaran sudah lunas.');
         }

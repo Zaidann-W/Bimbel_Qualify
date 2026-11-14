@@ -66,6 +66,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::patch('/pendaftaran/{kode}/status', [PendaftaranController::class, 'updateStatus'])->name('pendaftaran.status');
     Route::patch('/pendaftaran/{kode}/pembayaran', [PendaftaranController::class, 'updatePembayaran'])->name('pendaftaran.pembayaran');
     Route::post('/pendaftaran/{kode}/link-pembayaran', [PendaftaranController::class, 'generateXenditLink'])->name('pendaftaran.link-pembayaran');
+    Route::patch('/pendaftaran/{kode}/email', [PendaftaranController::class, 'updateEmail'])->name('pendaftaran.email');
 
     Route::get('/data-siswa', [DataSiswaController::class, 'index'])->name('dataSiswa');
     Route::get('/data-siswa/create', [DataSiswaController::class, 'create'])->name('dataSiswa.create');
@@ -113,6 +114,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::delete('/manajemen-jadwal/ruang/{room}', [ManajemenJadwalController::class, 'destroyRuang'])->name('manajemenJadwal.ruang.destroy');
 
     Route::get('/qualifix', [QualifixController::class, 'index'])->name('qualifix');
+    Route::post('/qualifix/{ticket}/tugaskan', [QualifixController::class, 'assign'])->name('qualifix.assign');
+    Route::patch('/qualifix/{ticket}/status', [QualifixController::class, 'updateStatus'])->name('qualifix.status');
 
     Route::get('/laporan-pengaturan', [LaporanPengaturanController::class, 'index'])->name('laporanPengaturan');
 
@@ -121,6 +124,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::get('/laporan-presensi', [LaporanPresensiController::class, 'index'])->name('laporanPresensi');
     Route::get('/laporan-presensi/export', [LaporanPresensiController::class, 'export'])->name('laporanPresensi.export');
+
+    Route::get('/laporan-pendaftaran', [LaporanPendaftaranController::class, 'index'])->name('laporanPendaftaran');
+    Route::get('/laporan-pendaftaran/export', [LaporanPendaftaranController::class, 'export'])->name('laporanPendaftaran.export');
+
+    Route::get('/laporan-qualifix', [LaporanQualifixController::class, 'index'])->name('laporanQualifix');
+    Route::get('/laporan-qualifix/export', [LaporanQualifixController::class, 'export'])->name('laporanQualifix.export');
 
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
     Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
@@ -144,6 +153,8 @@ Route::get('/pendaftaran/{kode}/buat-akun', [PendaftaranBuatAkunController::clas
     ->name('pendaftaran.buatAkun');
 Route::post('/pendaftaran/{kode}/buat-akun', [PendaftaranBuatAkunController::class, 'store'])
     ->name('pendaftaran.buatAkun.simpan');
+Route::get('/pendaftaran/{kode}/status', [PendaftaranBuatAkunController::class, 'status'])
+    ->name('pendaftaran.status');
 Route::get('/pendaftaran/{kode}/berhasil', [PendaftaranBuatAkunController::class, 'berhasil'])
     ->name('pendaftaran.berhasil');
 
@@ -179,6 +190,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])->name('absensi.check-out');
 
         Route::get('/qualifix', [TentorQualifixController::class, 'index'])->name('qualifix');
+        Route::post('/qualifix/{ticket}/jawab', [TentorQualifixController::class, 'answer'])->name('qualifix.answer');
+        Route::patch('/qualifix/{ticket}/selesai', [TentorQualifixController::class, 'resolve'])->name('qualifix.resolve');
 
         Route::get('/materi', function () {
             return view('tentor.materi');
@@ -208,6 +221,7 @@ Route::middleware('auth')->group(function () {
             ->name('materi.unduh');
 
         Route::get('/qualifix', [StudentController::class, 'qualifix'])->name('qualifix');
+        Route::post('/qualifix', [StudentController::class, 'storeQualifix'])->name('qualifix.store');
 
         Route::get('/profil', [StudentController::class, 'profil'])->name('profil');
     });
