@@ -6,6 +6,8 @@ use App\Models\Application;
 use App\Models\ClassGroup;
 use App\Models\ClassSession;
 use App\Models\Enrollment;
+use App\Models\Expense;
+use App\Models\Invoice;
 use App\Models\Material;
 use App\Models\Payment;
 use App\Models\StaffProfile;
@@ -63,75 +65,11 @@ class OwnerDashboardService
      */
     private function laporanKeuanganData(Carbon $now, float $incomeBulanIni, float $expenseBulanIni): array
     {
-        // Sumber pemasukan - hitung dari database payments
-        $sumberPemasukan = [
-            [
-                'nama' => 'SPP Kelas Reguler & Intensif',
-                'nilai' => 0, // akan diupdate dari hitungan persentase dari income
-                'rincian' => '312 Siswa Terdaftar',
-                'tag' => 'Terbayar Penuh',
-                'status' => 'lunas',
-                'persen' => 81.5,
-            ],
-            [
-                'nama' => 'Pembayaran Registrasi Siswa Baru',
-                'nilai' => 0,
-                'rincian' => '36 Siswa Baru Gelombang II',
-                'tag' => 'Pendaftaran',
-                'status' => 'netral',
-                'persen' => 11.8,
-            ],
-            [
-                'nama' => 'Biaya Modul & Try Out Khusus',
-                'nilai' => 0,
-                'rincian' => 'Paket Simulasi UTBK-SNBT & Ujian Mandiri',
-                'tag' => 'Paket Modul',
-                'status' => 'netral',
-                'persen' => 6.7,
-            ],
-        ];
+        // Sumber pemasukan - hitung dari database invoices
+        $sumberPemasukan = $this->hitungSumberPemasukan($now, $incomeBulanIni);
 
-        // Hitung nilai actual dari income
-        $totalSpp = $incomeBulanIni * 0.815;
-        $totalRegistrasi = $incomeBulanIni * 0.118;
-        $totalModul = $incomeBulanIni * 0.067;
-        $sumberPemasukan[0]['nilai'] = $totalSpp;
-        $sumberPemasukan[1]['nilai'] = $totalRegistrasi;
-        $sumberPemasukan[2]['nilai'] = $totalModul;
-
-        // Alokasi beban - hitung dari database expenses/staff
-        $honorarium = $expenseBulanIni * 0.589;
-        $operasional = $expenseBulanIni * 0.219;
-        $percetakan = $expenseBulanIni * 0.192;
-
-        $alokasiBeban = [
-            [
-                'nama' => 'Honorarium & Insentif 24 Tentor',
-                'nilai' => 0,
-                'rincian' => '58,9% dari Total Beban • 24 Pengajar Aktif',
-                'tag' => 'Telah Ditransfer',
-                'status' => 'lunas',
-                'persen' => 58.9,
-            ],
-            [
-                'nama' => 'Listrik, Internet & Operasional Gedung',
-                'nilai' => 0,
-                'rincian' => '21,9% dari Beban • AC, Fiber Optic & Sanitasi',
-                'tag' => 'Rutin Bulanan',
-                'persen' => 21.9,
-            ],
-            [
-                'nama' => 'Cetak Modul & Perlengkapan Belajar',
-                'nilai' => 0,
-                'rincian' => '19,2% dari Beban • Modul Semester Genap',
-                'tag' => 'Vendor Percetakan',
-                'persen' => 19.2,
-            ],
-        ];
-
-        $alokasiBeban[0]['nilai'] = $honorarium;
-        $alokasiBeban[1]['nilai'] = $operasional;
-        $alokasiBeban[2]['nilai'] = $percetakan;
+        // Alokasi beban - hitung dari database expenses per category
+        $alokasiBeban = $this->hitungAlokasiBeban($expenseBulanIni);
 
         // Tren bulanan 6 bulan dari database
         $trenBulanan = [];
@@ -170,6 +108,128 @@ class OwnerDashboardService
             'totalPengeluaran' => $totalPengeluaran,
             'labaBersih' => $labaBersihTotal,
             'marginPersen' => $marginPersen,
+        ];
+    }
+
+    private function hitungSumberPemasukan(Carbon $now, float $incomeBulanIni): array
+    {
+        $totalSpp = 0;
+        $totalRegistrasi = 0;
+        $totalModul = 0;
+
+        // Ambil invoices dari database berdasarkan type
+        $invoicesSpp = Invoice::where('type', 'spp_bulanan')
+            ->whereBetween('paid_at', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+            ->where('status', 'lunas')
+            ->get();
+        $invoicesRegistrasi = Invoice::where('type', 'registrasi')
+            ->whereBetween('paid_at', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+            ->where('status', 'lunas')
+            ->get();
+        $invoicesModul = Invoice::where('type', 'modul')
+            ->whereBetween('paid_at', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+            ->where('status', 'lunas')
+            ->get();
+
+        foreach ($invoicesSpp as $invoice) {
+            $totalSpp += $invoice->amount;
+        }
+        foreach ($invoicesRegistrasi as $invoice) {
+            $totalRegistrasi += $invoice->amount;
+        }
+        foreach ($invoicesModul as $invoice) {
+            $totalModul += $invoice->amount;
+        }
+
+        $totalKeseluruhan = $totalSpp + $totalRegistrasi + $totalModul;
+        $persenSpp = $totalKeseluruhan > 0 ? round($totalSpp / $totalKeseluruhan * 100, 1) : 0;
+        $persenRegistrasi = $totalKeseluruhan > 0 ? round($totalRegistrasi / $totalKeseluruhan * 100, 1) : 0;
+        $persenModul = $totalKeseluruhan > 0 ? round($totalModul / $totalKeseluruhan * 100, 1) : 0;
+
+        // Ambil jumlah siswa aktif dari database (bukan hardcode)
+        $siswaAktif = Enrollment::where('status', 'aktif')->count();
+
+        return [
+            [
+                'nama' => 'SPP Kelas Reguler & Intensif',
+                'nilai' => $totalSpp,
+                'rincian' => $siswaAktif.' Siswa Terdaftar - SPP Bulanan',
+                'tag' => 'Terbayar Penuh',
+                'status' => 'lunas',
+                'persen' => $persenSpp,
+            ],
+            [
+                'nama' => 'Pembayaran Registrasi Siswa Baru',
+                'nilai' => $totalRegistrasi,
+                'rincian' => 'Siswa Baru Gelombang II - Pembayaran Awal',
+                'tag' => 'Pendaftaran',
+                'status' => 'netral',
+                'persen' => $persenRegistrasi,
+            ],
+            [
+                'nama' => 'Biaya Modul & Try Out Khusus',
+                'nilai' => $totalModul,
+                'rincian' => 'Paket Simulasi UTBK-SNBT & Ujian Mandiri - Biaya Per Modul',
+                'tag' => 'Paket Modul',
+                'status' => 'netral',
+                'persen' => $persenModul,
+            ],
+        ];
+    }
+
+    private function hitungAlokasiBeban(float $expenseBulanIni): array
+    {
+        // Ambil data dari expenses per category
+        $honorariumTotal = Expense::whereHas('category', function ($query) {
+            $query->where('slug', 'honorarium-pengajar');
+        })->sum('amount') ?? 0;
+
+        $operasionalTotal = Expense::whereHas('category', function ($query) {
+            $query->where('slug', 'operasional-harian');
+        })->sum('amount') ?? 0;
+
+        $percetakanTotal = Expense::whereHas('category', function ($query) {
+            $query->where('slug', 'percetakan-atk');
+        })->sum('amount') ?? 0;
+
+        $totalBeban = $honorariumTotal + $operasionalTotal + $percetakanTotal;
+        $persenHonorarium = $totalBeban > 0 ? round($honorariumTotal / $totalBeban * 100, 1) : 0;
+        $persenOperasional = $totalBeban > 0 ? round($operasionalTotal / $totalBeban * 100, 1) : 0;
+        $persenPercetakan = $totalBeban > 0 ? round($percetakanTotal / $totalBeban * 100, 1) : 0;
+
+        // Gunakan persentase untuk menghitung nilai dari expenseBulanIni
+        $honorarium = $expenseBulanIni * ($persenHonorarium / 100);
+        $operasional = $expenseBulanIni * ($persenOperasional / 100);
+        $percetakan = $expenseBulanIni * ($persenPercetakan / 100);
+
+        // Update rincian agar sesuai persentase dinamis
+        $rincianHonorarium = $persenHonorarium.'% dari Total Beban • '.($honorarium > 0 ? '24 Pengajar Aktif' : 'Pengajar');
+        $rincianOperasional = $persenOperasional.'% dari Beban • '.($operasional > 0 ? 'AC, Fiber Optic & Sanitasi' : 'Operasional');
+        $rincianPercetakan = $persenPercetakan.'% dari Beban • '.($percetakan > 0 ? 'Modul Semester Genap' : 'Percetakan');
+
+        return [
+            [
+                'nama' => 'Honorarium & Insentif 24 Tentor',
+                'nilai' => $honorarium,
+                'rincian' => $rincianHonorarium,
+                'tag' => 'Telah Ditransfer',
+                'status' => 'lunas',
+                'persen' => $persenHonorarium,
+            ],
+            [
+                'nama' => 'Listrik, Internet & Operasional Gedung',
+                'nilai' => $operasional,
+                'rincian' => $rincianOperasional,
+                'tag' => 'Rutin Bulanan',
+                'persen' => $persenOperasional,
+            ],
+            [
+                'nama' => 'Cetak Modul & Perlengkapan Belajar',
+                'nilai' => $percetakan,
+                'rincian' => $rincianPercetakan,
+                'tag' => 'Vendor Percetakan',
+                'persen' => $persenPercetakan,
+            ],
         ];
     }
 

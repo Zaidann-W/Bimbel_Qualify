@@ -18,6 +18,7 @@ class TentorDashboardService
      * @return array{
      *     user: User|null,
      *     staffProfile: StaffProfile|null,
+     *     jobTitle: string,
      *     stats: array<int, array<string, mixed>>,
      *     sessionsToday: Collection<int, array<string, mixed>>,
      *     qualifixTickets: Collection<int, array<string, mixed>>,
@@ -73,11 +74,12 @@ class TentorDashboardService
         return [
             'user' => $user,
             'staffProfile' => $staffProfile,
+            'jobTitle' => $staffProfile?->job_title ?? $user?->name ?? 'Tentor',
             'stats' => $this->statCards($totalSessionsToday, $attendancePending, $qualifixTickets->count(), $totalTeachingHours),
             'sessionsToday' => $sessionsToday->map(fn (StudySession $sesi) => $this->kartuSesi($sesi)),
             'qualifixTickets' => $qualifixTickets->map(fn (QualifixTicket $ticket) => $this->kartuKlinikPR($ticket)),
             'totalTeachingHours' => $totalTeachingHours,
-            'todayDate' => $today->locale('id')->translatedFormat('l, j F Y'),
+            'todayDate' => $today->locale('id')->translatedFormat('j F Y'),
             'todayTime' => now()->format('H:i'),
         ];
     }

@@ -4,22 +4,41 @@
 
 @section('content')
 
-    {{-- Top header --}}
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-[22px] font-bold tracking-tight text-bark-800">
+    {{-- Header: sambutan + informasi waktu --}}
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr] mb-6">
+
+        {{-- Card sambutan --}}
+        <div class="rounded-2xl border border-bark-100 bg-white p-5">
+            <span class="inline-flex items-center gap-1.5 rounded-md bg-ember-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-ember-700">
+                <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-ember-500"></span>
+                {{ $jobTitle }}
+            </span>
+            <h1 class="mt-3 text-[22px] font-bold tracking-tight text-bark-800">
                 Selamat datang, {{ $user?->name }}! 👋
             </h1>
-            <p class="text-[13px] text-bark-400">Pantau jadwal kelas hari ini, input kehadiran siswa, dan jawab pertanyaan QualiFix.</p>
+            <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">
+                Pantau jadwal kelas hari ini, input kehadiran siswa, dan jawab pertanyaan QualiFix.
+            </p>
         </div>
-        <div class="flex items-center gap-3 rounded-xl border border-bark-100 bg-bark-50 px-4 py-3">
-            <div class="flex flex-col items-center gap-1">
-                <span class="text-[11px] font-bold uppercase tracking-wide text-bark-400">{{ now()->locale('id')->translatedFormat('l') }}</span>
-                <span class="text-[13px] font-bold text-bark-800">{{ $todayDate }}</span>
+
+        {{-- Card hari, tanggal, dan jam --}}
+        <div class="rounded-2xl border border-bark-100 bg-white p-5">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold uppercase tracking-wide text-bark-400">Hari Ini</p>
+                    <p class="mt-1.5 text-[15px] font-bold leading-snug text-bark-800">{{ now()->locale('id')->translatedFormat('l') }}</p>
+                    <p class="mt-0.5 text-[12.5px] text-bark-400">{{ $todayDate }}</p>
+                </div>
+                <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-bark-50 text-bark-500">
+                    @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-4 w-4'])
+                </div>
             </div>
-            <div class="w-px h-5 bg-bark-200 mx-1"></div>
-            <span class="text-[13px] font-bold text-bark-800">{{ $todayTime }} WIB</span>
+            <div class="mt-4 flex items-center gap-2 border-t border-bark-100 pt-3">
+                @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-4 w-4 text-bark-400'])
+                <span class="text-[13px] font-bold text-bark-800">{{ $todayTime }} WIB</span>
+            </div>
         </div>
+
     </div>
 
     {{-- Stat cards --}}
