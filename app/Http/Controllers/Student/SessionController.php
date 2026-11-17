@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassSession;
 use App\Models\StudySession;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class SessionController extends Controller
 {
     /**
      * Tampilkan jadwal belajar siswa: sesi hari ini, sesi mendatang, dan sesi lampau.
+     *
+     * Menampilkan dua sumber jadwal sekaligus: sesi belajar (study_sessions)
+     * dan jadwal kelas (class_sessions) dari seluruh kelas aktif siswa.
      */
     public function schedule(Request $request): View
     {
@@ -19,6 +25,8 @@ class SessionController extends Controller
             ->orderBy('date')
             ->orderBy('start_time')
             ->get();
+
+        $classSessions = $this->classSessionsForStudent($request);
 
         return view('siswa.detail-pertemuan', [
             'todaySessions' => $sessions
@@ -33,8 +41,50 @@ class SessionController extends Controller
                 ->filter(fn (StudySession $session): bool => $session->date->lessThan(today()))
                 ->reverse()
                 ->values(),
+            'todayClassSessions' => $classSessions
+                ->filter(fn (ClassSession $session): bool => Carbon::parse($session->session_date)->isToday())
+                ->values(),
+            'upcomingClassSessions' => $classSessions
+                ->filter(fn (ClassSession $session): bool => Carbon::parse($session->session_date)->greaterThan(today()))
+                ->values(),
+            'pastClassSessions' => $classSessions
+                ->filter(fn (ClassSession $session): bool => Carbon::parse($session->session_date)->lessThan(today()))
+                ->reverse()
+                ->values(),
             'contextLabel' => $this->academicContextLabel($request->user()->load('student.enrollments.classGroup.academicPeriod')),
         ]);
+    }
+
+    /**
+     * Ambil seluruh jadwal kelas (class_sessions) dari kelas aktif siswa yang login.
+     *
+     * Hanya sesi yang tidak dibatalkan yang ikut ditampilkan.
+     *
+     * @return Collection<int, ClassSession>
+     */
+    private function classSessionsForStudent(Request $request): Collection
+    {
+        $student = $request->user()->student;
+
+        if ($student === null) {
+            return collect();
+        }
+
+        $classGroupIds = $student->enrollments()
+            ->where('status', 'aktif')
+            ->pluck('class_group_id');
+
+        if ($classGroupIds->isEmpty()) {
+            return collect();
+        }
+
+        return ClassSession::query()
+            ->with(['subject', 'staff', 'room'])
+            ->whereIn('class_group_id', $classGroupIds)
+            ->where('status', '!=', 'dibatalkan')
+            ->orderBy('session_date')
+            ->orderBy('start_time')
+            ->get();
     }
 
     /**

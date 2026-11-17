@@ -34,12 +34,12 @@ class StudentDashboardService
         if ($classGroups instanceof ClassGroup) {
             $classGroups = [$classGroups];
         }
-        
-        if ($classGroups instanceof \Illuminate\Support\Collection) {
+
+        if ($classGroups instanceof Collection) {
             $classGroups = $classGroups->all();
         }
-        
-        if (!is_array($classGroups)) {
+
+        if (! is_array($classGroups)) {
             $classGroups = (array) $classGroups;
         }
 
@@ -71,6 +71,7 @@ class StudentDashboardService
             if (is_array($cg)) {
                 return $cg['id'] ?? null;
             }
+
             return null;
         }, $classGroups);
 
@@ -83,16 +84,16 @@ class StudentDashboardService
     private function firstClassGroup(array $classGroups): ?ClassGroup
     {
         $first = $classGroups[0] ?? null;
-        
+
         if ($first instanceof ClassGroup) {
             return $first;
         }
-        
+
         if (is_array($first)) {
             // Kalau berupa array, konversi balik ke object (atau buat minimal)
             return ClassGroup::find($first['id'] ?? null);
         }
-        
+
         return null;
     }
 
@@ -105,12 +106,22 @@ class StudentDashboardService
         // Ambil class group pertama saja untuk label display
         $cg = $this->firstClassGroup($classGroups);
 
-        return trim(sprintf(
-            'Kelas %s %s – %s',
-            $cg?->grade ?? '',
-            $cg?->education_level ?? '',
-            $cg?->major ?? '',
-        ));
+        if ($cg === null) {
+            return 'Siswa';
+        }
+
+        // Susun label dari bagian yang punya data (tanpa tanda –)
+        $bagian = array_filter([
+            $cg->grade,
+            $cg->education_level,
+            $cg->major,
+        ]);
+
+        if (empty($bagian)) {
+            return 'Siswa';
+        }
+
+        return 'Kelas '.implode(' ', $bagian);
     }
 
     private function labelPeriode(array $classGroups, Carbon $pekan): string
@@ -134,10 +145,10 @@ class StudentDashboardService
     private function statCards(?Student $student, array $classGroups): array
     {
         $classGroupIds = $this->extractClassGroupIds($classGroups);
-        
+
         $modul = Material::query()
             ->where('status', 'terbit')
-            ->when(!empty($classGroupIds), fn ($q) => $q->whereHas(
+            ->when(! empty($classGroupIds), fn ($q) => $q->whereHas(
                 'classGroups',
                 fn ($q) => $q->whereIn('class_groups.id', $classGroupIds),
             ))
@@ -206,7 +217,7 @@ class StudentDashboardService
     private function rekapPresensi(?Student $student, array $classGroups): array
     {
         $classGroupIds = $this->extractClassGroupIds($classGroups);
-        
+
         if ($student === null || empty($classGroupIds)) {
             return [0, 0, 0.0];
         }
@@ -233,7 +244,7 @@ class StudentDashboardService
     private function jadwalPekan(?Student $student, array $classGroups, Carbon $pekan): Collection
     {
         $classGroupIds = $this->extractClassGroupIds($classGroups);
-        
+
         if (empty($classGroupIds) || $student === null) {
             return collect();
         }
@@ -258,7 +269,7 @@ class StudentDashboardService
     private function sesiUnggulan(array $classGroups): ?array
     {
         $classGroupIds = $this->extractClassGroupIds($classGroups);
-        
+
         if (empty($classGroupIds)) {
             return null;
         }
@@ -316,11 +327,11 @@ class StudentDashboardService
     private function modulBaru(array $classGroup): Collection
     {
         $classGroupIds = $this->extractClassGroupIds($classGroup);
-        
+
         return Material::query()
             ->with('file')
             ->where('status', 'terbit')
-            ->when(!empty($classGroupIds), fn ($q) => $q->whereHas(
+            ->when(! empty($classGroupIds), fn ($q) => $q->whereHas(
                 'classGroups',
                 fn ($q) => $q->whereIn('class_groups.id', $classGroupIds),
             ))
@@ -356,11 +367,11 @@ class StudentDashboardService
     private function pengumuman(array $classGroups): ?Announcement
     {
         $classGroupIds = $this->extractClassGroupIds($classGroups);
-        
+
         return Announcement::query()
             ->with('room')
             ->whereNotNull('published_at')
-            ->when(!empty($classGroupIds), fn ($q) => $q->where(
+            ->when(! empty($classGroupIds), fn ($q) => $q->where(
                 fn ($q) => $q->whereNull('class_group_id')->orWhereIn('class_group_id', $classGroupIds),
             ))
             ->orderByDesc('published_at')

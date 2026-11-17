@@ -136,7 +136,7 @@ test('dashboard siswa menampilkan data dari basis data', function () {
     $this->get('/siswa')
         ->assertStatus(200)
         ->assertSee('Halo, Aisyah!')
-        ->assertSee('Kelas 12 SMA – IPA')
+        ->assertSee('Kelas 12 SMA IPA')
         ->assertSee('Matematika Saintek')
         ->assertSee('Integral Substitusi &amp; Parsial', false)
         ->assertSee('Ruang Eureka Lt. 2')

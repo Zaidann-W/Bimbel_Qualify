@@ -59,34 +59,34 @@
                     <h2 class="text-[15px] font-bold text-bark-800">Jadwal Belajar Pekan Ini</h2>
                     <p class="mt-0.5 text-[11.5px] text-bark-400">{{ $periode }}</p>
                 </div>
-                <a href="{{ route('siswa.jadwal') }}" class="text-[12px] font-bold text-ember-600 hover:underline">Kalender Lengkap →</a>
+                <a href="{{ route('siswa.jadwal.detail') }}" class="text-[12px] font-bold text-ember-600 hover:underline">Kalender Lengkap →</a>
             </div>
 
             <div class="mt-4 space-y-2.5">
                 @forelse ($jadwal as $sesi)
                     <div @class([
-                        'relative flex flex-wrap items-center gap-3 rounded-xl border p-3 pr-4',
+                        'relative flex flex-wrap items-center gap-3 rounded-xl border p-4',
                         'border-gold bg-gold/5' => $sesi['hari_ini'],
                         'border-bark-100' => ! $sesi['hari_ini'],
                     ])>
                         @if ($sesi['hari_ini'])
-                            <span class="absolute right-3 top-3 rounded-md bg-gold px-2 py-0.5 text-[9.5px] font-bold text-espresso">Hari Ini</span>
+                            <span class="absolute right-4 top-4 rounded-md bg-gold px-2.5 py-1 text-[10px] font-bold text-espresso">Hari Ini</span>
                         @endif
                         <div @class([
-                            'grid h-12 w-12 shrink-0 place-items-center rounded-xl',
+                            'grid h-14 w-14 shrink-0 place-items-center rounded-xl',
                             'bg-gold text-espresso' => $sesi['hari_ini'],
                             'bg-bark-50 text-bark-500' => ! $sesi['hari_ini'],
                         ])>
-                            <span class="text-[9px] font-bold uppercase tracking-wide">{{ $sesi['hari'] }}</span>
-                            <span class="text-[15px] font-bold leading-none">{{ $sesi['tgl'] }}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wide">{{ $sesi['hari'] }}</span>
+                            <span class="text-[18px] font-bold leading-none">{{ $sesi['tgl'] }}</span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p class="text-[13.5px] font-bold text-bark-800">{{ $sesi['mapel'] }}</p>
-                            <p class="mt-0.5 text-[12.5px] font-semibold text-ember-700">{{ $sesi['topik'] }}</p>
-                            <p class="mt-1 text-[11px] text-bark-400">{{ $sesi['waktu'] }}</p>
-                            <p class="mt-0.5 text-[11px] text-bark-400">{{ $sesi['tentor'] }}</p>
+                            <p class="text-[15px] font-bold text-bark-800">{{ $sesi['mapel'] }}</p>
+                            <p class="mt-1 text-[14px] font-semibold text-ember-700">{{ $sesi['topik'] }}</p>
+                            <p class="mt-2 text-[12.5px] text-bark-400">{{ $sesi['waktu'] }}</p>
+                            <p class="mt-1 text-[12.5px] text-bark-400">{{ $sesi['tentor'] }}</p>
                         </div>
-                        <a href="{{ route('siswa.jadwal') }}" class="shrink-0 self-center pt-4 text-[12px] font-bold text-bark-500 transition hover:text-ember-600 @if ($sesi['hari_ini']) mr-16 @endif">Lihat Detail</a>
+                        <a href="{{ route('siswa.jadwal') }}" class="shrink-0 self-end rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-semibold text-bark-600 transition hover:border-ember-300 hover:text-ember-600">Lihat Detail</a>
                     </div>
                 @empty
                     <p class="rounded-xl border border-dashed border-bark-100 px-4 py-8 text-center text-[12px] text-bark-400">
