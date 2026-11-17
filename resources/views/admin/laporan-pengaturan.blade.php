@@ -2,23 +2,21 @@
 
 @section('title', 'Laporan & Pengaturan')
 
-{{-- Halaman masih memakai data mock UI sesuai rancangan docs/laporan-admin.png;
-     sambungkan ke pembuatan berkas ekspor + tabel preferensi sistem begitu modulnya aktif --}}
 @section('content')
-@php
-    $berkas = [
-        ['ikon' => 'wallet', 'judul' => 'Laporan Keuangan & SPP', 'keterangan' => 'Arus kas, uang gedung, dan pelunasan SPP', 'route' => route('admin.laporanKeuangan.export')],
-        ['ikon' => 'clipboard-check', 'judul' => 'Presensi & Jadwal Mengajar', 'keterangan' => 'Kehadiran siswa dan jam mengajar tentor', 'route' => route('admin.laporanPresensi.export')],
-        ['ikon' => 'user-plus', 'judul' => 'Pendaftaran Siswa Baru', 'keterangan' => 'Data pendaftar baru dan status registrasi berkas', 'route' => route('laporanPendaftaran.export')],
-        ['ikon' => 'book-open', 'judul' => 'Rekap Sesi QualiFix', 'keterangan' => 'Sesi konsultasi belajar dan rekap materi', 'route' => route('laporanQualifix.export')],
-    ];
-@endphp
+@if (session('error'))
+    <div class="px-4 pt-4 sm:px-6">
+        <div class="flex items-start gap-2 rounded-xl border border-ember-200 bg-ember-50 px-4 py-3 text-[13px] font-semibold text-ember-700">
+            @include('layouts.partials.icon', ['name' => 'siren', 'class' => 'mt-px h-4 w-4 shrink-0'])
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
 
 <section class="bg-white px-4 pb-6 pt-5 sm:px-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div class="max-w-2xl">
             <h1 class="text-[28px] font-extrabold leading-[1.12] tracking-tight text-ink sm:text-[32px]">
-                Laporan & Pengaturan
+                Laporan &amp; Pengaturan
             </h1>
             <p class="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-muted">
                 Unduh berkas rekapitulasi operasional dan pengaturan preferensi sistem.
@@ -46,7 +44,7 @@
                 @include('layouts.partials.icon', ['name' => 'file-text', 'class' => 'h-5 w-5'])
             </span>
             <div class="min-w-0">
-                <h2 class="text-[16px] font-extrabold leading-snug tracking-tight text-ink">Ekspor Laporan Operasional</h2>
+                <h2 class="text-[16px]  font-extrabold leading-snug tracking-tight text-ink">Ekspor Laporan Operasional</h2>
                 <p class="mt-1 max-w-md text-[12px] leading-relaxed text-muted">
                     Pilih berkas rekapitulasi berkala dalam format Excel atau PDF
                 </p>
@@ -67,12 +65,12 @@
 
                     <div class="flex shrink-0 items-center gap-2">
                         @if ($item['route'])
-                            <a href="{{ $item['route'] }}?format=pdf"
+                            <a href="{{ route($item['route']) }}?format=pdf"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-[12px] font-bold text-espresso transition hover:bg-sand">
                                 @include('layouts.partials.icon', ['name' => 'layout-grid', 'class' => 'h-3.5 w-3.5 text-forest-600'])
                                 PDF
                             </a>
-                            <a href="{{ $item['route'] }}?format=csv"
+                            <a href="{{ route($item['route']) }}?format=csv"
                                class="inline-flex items-center gap-1.5 rounded-lg bg-espresso px-3 py-2 text-[12px] font-bold text-white transition hover:bg-bark-800">
                                 @include('layouts.partials.icon', ['name' => 'file', 'class' => 'h-3.5 w-3.5 text-gold'])
                                 Excel
@@ -81,12 +79,12 @@
                             <button type="button" disabled
                                     class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-sand px-3 py-2 text-[12px] font-bold text-bark-300 cursor-not-allowed">
                                 @include('layouts.partials.icon', ['name' => 'layout-grid', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-                                Excel
+                                PDF
                             </button>
                             <button type="button" disabled
                                     class="inline-flex items-center gap-1.5 rounded-lg bg-sand px-3 py-2 text-[12px] font-bold text-bark-300 cursor-not-allowed">
                                 @include('layouts.partials.icon', ['name' => 'file', 'class' => 'h-3.5 w-3.5 text-bark-400'])
-                                PDF
+                                Excel
                             </button>
                         @endif
                     </div>
@@ -94,8 +92,6 @@
             @endforeach
         </ul>
     </section>
-
-    {{-- Sisa fitur akan diimplementasikan saat modul aktif --}}
 
 </div>
 

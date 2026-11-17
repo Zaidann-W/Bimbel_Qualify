@@ -18,8 +18,8 @@ class LaporanPengaturanController extends Controller
         $berkas = [
             ['ikon' => 'wallet', 'judul' => 'Laporan Keuangan & SPP', 'keterangan' => 'Arus kas, uang gedung, dan pelunasan SPP', 'route' => 'admin.laporanKeuangan.export'],
             ['ikon' => 'clipboard-check', 'judul' => 'Presensi & Jadwal Mengajar', 'keterangan' => 'Kehadiran siswa dan jam mengajar tentor', 'route' => 'admin.laporanPresensi.export'],
-            ['ikon' => 'user-plus', 'judul' => 'Pendaftaran Siswa Baru', 'keterangan' => 'Data pendaftar baru dan status registrasi berkas', 'route' => null],
-            ['ikon' => 'book-open', 'judul' => 'Rekap Sesi Klinik PR', 'keterangan' => 'Sesi konsultasi belajar dan rekap materi', 'route' => null],
+            ['ikon' => 'user-plus', 'judul' => 'Pendaftaran Siswa Baru', 'keterangan' => 'Data pendaftar baru dan status registrasi berkas', 'route' => 'admin.laporanPendaftaran.export'],
+            ['ikon' => 'book-open', 'judul' => 'Rekap Sesi QualiFix', 'keterangan' => 'Sesi konsultasi belajar dan rekap materi', 'route' => 'admin.laporanQualifix.export'],
         ];
 
         $notifikasi = [

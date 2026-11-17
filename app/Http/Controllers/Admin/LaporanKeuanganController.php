@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminLaporanKeuanganService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -125,7 +126,7 @@ class LaporanKeuanganController extends Controller
             'rows' => $rows,
         ];
 
-        $pdf = PDF::loadView('admin.laporan-keuangan-pdf', ['data' => $pdfData]);
+        $pdf = Pdf::loadView('admin.laporan-keuangan-pdf', ['data' => $pdfData]);
 
         return response()->streamDownload(function () use ($pdf): void {
             echo $pdf->output();

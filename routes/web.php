@@ -7,8 +7,10 @@ use App\Http\Controllers\Admin\IzinController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KeuanganController;
 use App\Http\Controllers\Admin\LaporanKeuanganController;
+use App\Http\Controllers\Admin\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\LaporanPengaturanController;
 use App\Http\Controllers\Admin\LaporanPresensiController;
+use App\Http\Controllers\Admin\LaporanQualifixController;
 use App\Http\Controllers\Admin\ManajemenJadwalController;
 use App\Http\Controllers\Admin\ManajemenMateriController;
 use App\Http\Controllers\Admin\PendaftaranController;
@@ -34,6 +36,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Tentor\AbsensiController;
+use App\Http\Controllers\Tentor\MateriController;
 use App\Http\Controllers\Tentor\ProfilController;
 use App\Http\Controllers\Tentor\TentorDashboardController;
 use App\Http\Controllers\Tentor\TentorQualifixController;
@@ -131,7 +134,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/laporan-qualifix', [LaporanQualifixController::class, 'index'])->name('laporanQualifix');
     Route::get('/laporan-qualifix/export', [LaporanQualifixController::class, 'export'])->name('laporanQualifix.export');
 
-    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
     Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
@@ -193,9 +195,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/qualifix/{ticket}/jawab', [TentorQualifixController::class, 'answer'])->name('qualifix.answer');
         Route::patch('/qualifix/{ticket}/selesai', [TentorQualifixController::class, 'resolve'])->name('qualifix.resolve');
 
-        Route::get('/materi', function () {
-            return view('tentor.materi');
-        })->name('materi');
+        Route::get('/materi', [MateriController::class, 'index'])->name('materi');
+        Route::get('/materi/{materi}/unduh', [MateriController::class, 'unduh'])
+            ->whereNumber('materi')
+            ->name('materi.unduh');
 
         Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
         Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');

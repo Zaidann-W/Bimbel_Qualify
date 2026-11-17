@@ -28,62 +28,122 @@ class StudentDashboardService
      *     pengumuman: Announcement|null
      * }
      */
-    public function dashboard(?Student $student, ?ClassGroup $classGroup): array
+    public function dashboard(?Student $student, $classGroups): array
     {
+        // Normalisasi input: bisa berupa object tunggal, collection, atau array
+        if ($classGroups instanceof ClassGroup) {
+            $classGroups = [$classGroups];
+        }
+        
+        if ($classGroups instanceof \Illuminate\Support\Collection) {
+            $classGroups = $classGroups->all();
+        }
+        
+        if (!is_array($classGroups)) {
+            $classGroups = (array) $classGroups;
+        }
+
         $pekan = now();
 
         return [
-            'kelas' => $this->labelKelas($classGroup),
-            'periode' => $this->labelPeriode($classGroup, $pekan),
-            'stats' => $this->statCards($student, $classGroup),
-            'jadwal' => $this->jadwalPekan($classGroup, $pekan),
-            'sesiUnggulan' => $this->sesiUnggulan($classGroup),
-            'modulBaru' => $this->modulBaru($classGroup),
-            'pengumuman' => $this->pengumuman($classGroup),
+            'kelas' => $this->labelKelas($classGroups),
+            'periode' => $this->labelPeriode($classGroups, $pekan),
+            'stats' => $this->statCards($student, $classGroups),
+            'jadwal' => $this->jadwalPekan($student, $classGroups, $pekan),
+            'sesiUnggulan' => $this->sesiUnggulan($classGroups),
+            'modulBaru' => $this->modulBaru($classGroups),
+            'pengumuman' => $this->pengumuman($classGroups),
         ];
     }
 
-    private function labelKelas(?ClassGroup $classGroup): string
+    /**
+     * Ekstrak ID dari array/collection class groups secara aman.
+     * Handle: array of objects, array of arrays, collection of objects.
+     *
+     * @return array<int, int>
+     */
+    private function extractClassGroupIds(array $classGroups): array
     {
-        if ($classGroup === null) {
+        $ids = array_map(function ($cg) {
+            if (is_object($cg)) {
+                return $cg->id ?? null;
+            }
+            if (is_array($cg)) {
+                return $cg['id'] ?? null;
+            }
+            return null;
+        }, $classGroups);
+
+        return array_values(array_filter($ids));
+    }
+
+    /**
+     * Ambil ClassGroup pertama dari array untuk display label.
+     */
+    private function firstClassGroup(array $classGroups): ?ClassGroup
+    {
+        $first = $classGroups[0] ?? null;
+        
+        if ($first instanceof ClassGroup) {
+            return $first;
+        }
+        
+        if (is_array($first)) {
+            // Kalau berupa array, konversi balik ke object (atau buat minimal)
+            return ClassGroup::find($first['id'] ?? null);
+        }
+        
+        return null;
+    }
+
+    private function labelKelas(array $classGroups): string
+    {
+        if (empty($classGroups)) {
             return 'Siswa';
         }
 
+        // Ambil class group pertama saja untuk label display
+        $cg = $this->firstClassGroup($classGroups);
+
         return trim(sprintf(
             'Kelas %s %s – %s',
-            $classGroup->grade ?? '',
-            $classGroup->education_level ?? '',
-            $classGroup->major ?? '',
+            $cg?->grade ?? '',
+            $cg?->education_level ?? '',
+            $cg?->major ?? '',
         ));
     }
 
-    private function labelPeriode(?ClassGroup $classGroup, Carbon $pekan): string
+    private function labelPeriode(array $classGroups, Carbon $pekan): string
     {
         $awal = $pekan->copy()->startOfWeek()->locale('id')->translatedFormat('j M');
         $akhir = $pekan->copy()->endOfWeek()->locale('id')->translatedFormat('j M Y');
+
+        $kelasLabel = empty($classGroups) ? 'Belum ada kelas aktif' : $this->labelKelas($classGroups);
 
         return trim(sprintf(
             'Periode %s – %s • %s',
             $awal,
             $akhir,
-            $classGroup === null ? 'Belum ada kelas aktif' : $this->labelKelas($classGroup),
+            $kelasLabel,
         ));
     }
 
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function statCards(?Student $student, ?ClassGroup $classGroup): array
+    private function statCards(?Student $student, array $classGroups): array
     {
+        $classGroupIds = $this->extractClassGroupIds($classGroups);
+        
         $modul = Material::query()
             ->where('status', 'terbit')
-            ->when($classGroup !== null, fn ($q) => $q->whereHas(
+            ->when(!empty($classGroupIds), fn ($q) => $q->whereHas(
                 'classGroups',
-                fn ($q) => $q->where('class_groups.id', $classGroup->id),
+                fn ($q) => $q->whereIn('class_groups.id', $classGroupIds),
             ))
             ->count();
 
-        [$hadir, $totalSesi, $persen] = $this->rekapPresensi($student, $classGroup);
+        [$hadir, $totalSesi, $persen] = $this->rekapPresensi($student, $classGroups);
 
         $tiket = QualifixTicket::query()->where('student_id', $student?->id);
         $aktif = (clone $tiket)->whereIn('status', ['menunggu_tentor', 'sedang_dibahas'])->count();
@@ -143,21 +203,23 @@ class StudentDashboardService
     /**
      * @return array{0: int, 1: int, 2: float}
      */
-    private function rekapPresensi(?Student $student, ?ClassGroup $classGroup): array
+    private function rekapPresensi(?Student $student, array $classGroups): array
     {
-        if ($student === null || $classGroup === null) {
+        $classGroupIds = $this->extractClassGroupIds($classGroups);
+        
+        if ($student === null || empty($classGroupIds)) {
             return [0, 0, 0.0];
         }
 
         $totalSesi = ClassSession::query()
-            ->where('class_group_id', $classGroup->id)
+            ->whereIn('class_group_id', $classGroupIds)
             ->where('status', '!=', 'dibatalkan')
             ->count();
 
         $hadir = StudentAttendance::query()
             ->where('student_id', $student->id)
             ->where('status', 'hadir')
-            ->whereHas('classSession', fn ($q) => $q->where('class_group_id', $classGroup->id))
+            ->whereHas('classSession', fn ($q) => $q->whereIn('class_group_id', $classGroupIds))
             ->count();
 
         $persen = $totalSesi === 0 ? 0.0 : round($hadir / $totalSesi * 100, 1);
@@ -168,19 +230,22 @@ class StudentDashboardService
     /**
      * @return Collection<int, array<string, mixed>>
      */
-    private function jadwalPekan(?ClassGroup $classGroup, Carbon $pekan): Collection
+    private function jadwalPekan(?Student $student, array $classGroups, Carbon $pekan): Collection
     {
-        if ($classGroup === null) {
+        $classGroupIds = $this->extractClassGroupIds($classGroups);
+        
+        if (empty($classGroupIds) || $student === null) {
             return collect();
         }
 
         return ClassSession::query()
             ->with(['subject', 'staff', 'room'])
-            ->where('class_group_id', $classGroup->id)
+            ->whereIn('class_group_id', $classGroupIds)
             ->whereBetween('session_date', [
                 $pekan->copy()->startOfWeek()->toDateString(),
                 $pekan->copy()->endOfWeek()->toDateString(),
             ])
+            ->where('status', '!=', 'dibatalkan')
             ->orderBy('session_date')
             ->orderBy('start_time')
             ->get()
@@ -190,15 +255,17 @@ class StudentDashboardService
     /**
      * @return array<string, mixed>|null
      */
-    private function sesiUnggulan(?ClassGroup $classGroup): ?array
+    private function sesiUnggulan(array $classGroups): ?array
     {
-        if ($classGroup === null) {
+        $classGroupIds = $this->extractClassGroupIds($classGroups);
+        
+        if (empty($classGroupIds)) {
             return null;
         }
 
         $sesi = ClassSession::query()
             ->with(['subject', 'staff', 'room'])
-            ->where('class_group_id', $classGroup->id)
+            ->whereIn('class_group_id', $classGroupIds)
             ->whereDate('session_date', '>=', today())
             ->where('status', '!=', 'dibatalkan')
             ->orderBy('session_date')
@@ -246,14 +313,16 @@ class StudentDashboardService
     /**
      * @return Collection<int, array<string, mixed>>
      */
-    private function modulBaru(?ClassGroup $classGroup): Collection
+    private function modulBaru(array $classGroup): Collection
     {
+        $classGroupIds = $this->extractClassGroupIds($classGroup);
+        
         return Material::query()
             ->with('file')
             ->where('status', 'terbit')
-            ->when($classGroup !== null, fn ($q) => $q->whereHas(
+            ->when(!empty($classGroupIds), fn ($q) => $q->whereHas(
                 'classGroups',
-                fn ($q) => $q->where('class_groups.id', $classGroup->id),
+                fn ($q) => $q->whereIn('class_groups.id', $classGroupIds),
             ))
             ->orderByDesc('published_at')
             ->take(3)
@@ -284,13 +353,15 @@ class StudentDashboardService
         return $jenis.' • '.$ukuran;
     }
 
-    private function pengumuman(?ClassGroup $classGroup): ?Announcement
+    private function pengumuman(array $classGroups): ?Announcement
     {
+        $classGroupIds = $this->extractClassGroupIds($classGroups);
+        
         return Announcement::query()
             ->with('room')
             ->whereNotNull('published_at')
-            ->when($classGroup !== null, fn ($q) => $q->where(
-                fn ($q) => $q->whereNull('class_group_id')->orWhere('class_group_id', $classGroup->id),
+            ->when(!empty($classGroupIds), fn ($q) => $q->where(
+                fn ($q) => $q->whereNull('class_group_id')->orWhereIn('class_group_id', $classGroupIds),
             ))
             ->orderByDesc('published_at')
             ->first();

@@ -17,11 +17,15 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $student = $request->user()->student;
-        $classGroup = $student?->enrollments()->where('status', 'aktif')->first()?->classGroup;
 
-        return view('siswa.dashboard', $this->service->dashboard($student, $classGroup) + [
+        // Ambil SEMUA kelas aktif yang siswa pendaftar (bukan hanya kelas pertama)
+        // Gunakan ->all() agar tetap berupa array of OBJECTS (bukan array of arrays)
+        $activeEnrollments = $student?->enrollments()->where('status', 'aktif')->get() ?? collect();
+        $classGroups = $activeEnrollments->pluck('classGroup')->filter()->unique()->values()->all();
+
+        return view('siswa.dashboard', $this->service->dashboard($student, $classGroups) + [
             'student' => $student,
-            'classGroup' => $classGroup,
+            'classGroups' => $classGroups,
         ]);
     }
 }

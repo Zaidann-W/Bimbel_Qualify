@@ -7,20 +7,9 @@ use App\Models\WebsiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\View\View;
 
 class PengaturanController extends Controller
 {
-    /**
-     * Tampilkan halaman pengaturan sistem dengan nilai dari database.
-     */
-    public function index(): View
-    {
-        $settings = WebsiteSetting::pluck('value', 'key')->toArray();
-
-        return view('admin.pengaturan', compact('settings'));
-    }
-
     /**
      * Simpan pengaturan sistem ke tabel website_settings.
      */
@@ -37,27 +26,14 @@ class PengaturanController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($validated) {
-                $mappings = [
-                    'tahun_ajaran' => 'tahun_ajaran',
-                    'semester' => 'semester',
-                    'penanggung_jawab' => 'penanggung_jawab_cabang',
-                    'biaya_pendaftaran' => 'biaya_pendaftaran',
-                    'notif_struk' => 'notif_struk',
-                    'notif_absensi' => 'notif_absensi',
-                    'notif_tagihan' => 'notif_tagihan',
-                ];
-
-                foreach ($mappings as $inputKey => $settingKey) {
-                    if (! array_key_exists($inputKey, $validated)) {
-                        continue;
-                    }
-
-                    $value = $validated[$inputKey] === true ? '1' : ($validated[$inputKey] ?? null);
-
+            DB::transaction(function () use ($validated): void {
+                foreach ($validated as $key => $value) {
                     WebsiteSetting::updateOrCreate(
-                        ['key' => $settingKey],
-                        ['value' => $value, 'description' => ucfirst(str_replace('_', ' ', $settingKey))]
+                        ['key' => $key],
+                        [
+                            'value' => is_bool($value) ? ($value ? '1' : '0') : $value,
+                            'description' => ucfirst(str_replace('_', ' ', $key)),
+                        ]
                     );
                 }
             });

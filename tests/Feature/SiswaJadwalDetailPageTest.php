@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\AcademicPeriod;
+use App\Models\ClassGroup;
+use App\Models\Enrollment;
+use App\Models\Student;
 use App\Models\StudySession;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -8,7 +12,7 @@ use Illuminate\Support\Carbon;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Waktu dibekukan supaya status "berjalan" dan "terjadwal" tidak
+    // Waktu dibekukan supaya pengelompokan "hari ini" tidak
     // bergantung pada jam serta tanggal saat test dijalankan.
     Carbon::setTestNow(Carbon::parse('2026-11-12 16:00:00'));
 
@@ -34,37 +38,120 @@ beforeEach(function () {
         'room_name' => 'Ruang Volta (Lantai 2)',
         'tutor_name' => 'Dr Hartanto, M.Pd',
     ]);
+
+    StudySession::factory()->create([
+        'title' => 'Fisika Modern & Mekanika Kuantum',
+        'category_badge' => 'Fisika Saintek',
+        'date' => today()->subDays(2),
+        'start_time' => '15:30:00',
+        'end_time' => '17:00:00',
+        'room_name' => 'Ruangan Newton (Lantai 1)',
+        'tutor_name' => 'Kak Salsabila Rahma, S.Pd',
+    ]);
 });
 
 afterEach(function () {
     Carbon::setTestNow();
 });
 
-test('detail pertemuan siswa page returns a successful response', function () {
+test('halaman jadwal siswa mengembalikan respons sukses', function () {
     $response = $this->get('/siswa/jadwal/detail');
 
     $response->assertStatus(200);
     $response->assertSee('Jadwal Belajar Siswa');
-    $response->assertSee('Sesi Berjalan Hari Ini');
     $response->assertSee('Kalkulus &amp; Integral Lanjutan', false);
     $response->assertSee('Termokimia &amp; Kesetimbangan Kimia', false);
-    $response->assertSee('Kak Hendra Wijaya, M.Sc');
+    $response->assertSee('Fisika Modern &amp; Mekanika Kuantum', false);
+    $response->assertSee('Kak Hendra Wijaya');
 });
 
-test('detail pertemuan siswa is reachable from its named route', function () {
+test('halaman jadwal siswa dapat diakses lewat rutenya yang bernama', function () {
     $this->get(route('siswa.jadwal.detail'))->assertStatus(200);
 });
 
-test('detail pertemuan siswa menampilkan statis sesi dari database', function () {
-    $this->get('/siswa/jadwal/detail')
-        ->assertStatus(200)
-        ->assertSee('Matematika Saintek')
-        ->assertSee('Kimia Saintek')
-        ->assertSee('Sesi Berjalan')
-        ->assertSee('Terjadwal');
+test('sesi dikelompokkan menjadi hari ini, selanjutnya, dan sebelumnya', function () {
+    $response = $this->get('/siswa/jadwal/detail');
+
+    $response->assertStatus(200)
+        ->assertSee('Hari Ini')
+        ->assertSee('Selanjutnya')
+        ->assertSee('Sebelumnya');
 });
 
-test('detail pertemuan siswa menampilkan empty state tanpa data', function () {
+test('setiap sesi menampilkan waktu, tentor, dan ruangan', function () {
+    $response = $this->get('/siswa/jadwal/detail');
+
+    $response->assertStatus(200)
+        ->assertSee('15:30 – 17:00')
+        ->assertSee('Kak Hendra Wijaya')
+        ->assertSee('Ruang Eureka, Lt. 2')
+        ->assertSee('Ruang Volta, Lt. 2');
+});
+
+test('seluruh sesi tertaut ke halaman detail sesi', function () {
+    $response = $this->get('/siswa/jadwal/detail');
+
+    StudySession::query()->get()->each(function (StudySession $session) use ($response) {
+        $response->assertSee(route('siswa.jadwal.show', $session), false);
+    });
+});
+
+test('header menampilkan semester dan kelas siswa yang sedang aktif', function () {
+    $periode = AcademicPeriod::create([
+        'academic_year' => '2026/2027',
+        'semester' => 'ganjil',
+        'starts_on' => '2026-07-01',
+        'ends_on' => '2026-12-31',
+        'is_active' => true,
+    ]);
+
+    $kelas = ClassGroup::create([
+        'academic_period_id' => $periode->id,
+        'code' => '12-IPA-1',
+        'education_level' => 'SMA',
+        'grade' => '12',
+        'major' => 'IPA',
+        'status' => 'aktif',
+    ]);
+
+    $siswa = Student::create([
+        'user_id' => auth()->id(),
+        'full_name' => 'Aisyah Putri Azzahra',
+        'status' => 'aktif',
+    ]);
+
+    Enrollment::create([
+        'student_id' => $siswa->id,
+        'class_group_id' => $kelas->id,
+        'started_on' => '2026-07-14',
+        'status' => 'aktif',
+    ]);
+
+    $this->get('/siswa/jadwal/detail')
+        ->assertStatus(200)
+        ->assertSee('Semester Ganjil 2026/2027')
+        ->assertSee('Kelas 12 IPA');
+});
+
+test('sesi hari ini tidak ikut masuk ke bagian sebelumnya', function () {
+    $html = $this->get('/siswa/jadwal/detail')
+        ->assertStatus(200)
+        ->getContent();
+
+    expect(substr_count($html, 'Kalkulus &amp; Integral Lanjutan'))->toBe(1)
+        ->and(substr_count($html, 'Fisika Modern &amp; Mekanika Kuantum'))->toBe(1);
+});
+
+test('kartu statistik dan filter lama tidak lagi ditampilkan', function () {
+    $response = $this->get('/siswa/jadwal/detail');
+
+    $response->assertStatus(200)
+        ->assertDontSee('Sesi Berjalan Hari Ini')
+        ->assertDontSee('Total Sesi Pekan Ini')
+        ->assertDontSee('Semua Matpel');
+});
+
+test('halaman jadwal siswa menampilkan empty state tanpa data', function () {
     StudySession::query()->delete();
 
     $this->get('/siswa/jadwal/detail')

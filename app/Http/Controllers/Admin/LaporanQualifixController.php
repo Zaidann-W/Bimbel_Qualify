@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminLaporanQualifixService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -12,7 +13,7 @@ class LaporanQualifixController extends Controller
 {
     public function __construct(private readonly AdminLaporanQualifixService $service) {}
 
-    /** 
+    /**
      * Tampilkan halaman laporan qualifix.
      */
     public function index(Request $request): View
@@ -28,7 +29,7 @@ class LaporanQualifixController extends Controller
         return view('admin.laporan-qualifix', $data);
     }
 
-    /** 
+    /**
      * Ekspor laporan qualifix ke CSV atau PDF.
      */
     public function export(Request $request): StreamedResponse
@@ -75,7 +76,7 @@ class LaporanQualifixController extends Controller
         ]);
     }
 
-    /** 
+    /**
      * Ekspor laporan qualifix sebagai PDF menggunakan DomPDF.
      */
     protected function exportAsPdf(array $rawData, string $filename): StreamedResponse
@@ -111,7 +112,7 @@ class LaporanQualifixController extends Controller
             'rows' => $rows,
         ];
 
-        $pdf = PDF::loadView('admin.laporan-qualifix-pdf', ['data' => $pdfData]);
+        $pdf = Pdf::loadView('admin.laporan-qualifix-pdf', ['data' => $pdfData]);
 
         return response()->streamDownload(function () use ($pdf): void {
             echo $pdf->output();

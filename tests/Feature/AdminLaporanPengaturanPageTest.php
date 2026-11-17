@@ -40,10 +40,63 @@ test('laporan dan pengaturan lists every exportable report in both formats', fun
     $response->assertSee('Kehadiran siswa dan jam mengajar tentor', false);
     $response->assertSee('Pendaftaran Siswa Baru');
     $response->assertSee('Data pendaftar baru dan status registrasi berkas', false);
-    $response->assertSee('Rekap Sesi Klinik PR');
+    $response->assertSee('Rekap Sesi QualiFix');
     $response->assertSee('Sesi konsultasi belajar dan rekap materi', false);
     $response->assertSee('Excel');
     $response->assertSee('PDF');
+});
+
+test('laporan dan pengaturan links to every operational export route', function () {
+    $response = $this->get(route('admin.laporanPengaturan'));
+
+    $response->assertStatus(200);
+
+    foreach ([
+        'admin.laporanKeuangan.export',
+        'admin.laporanPresensi.export',
+        'admin.laporanPendaftaran.export',
+        'admin.laporanQualifix.export',
+    ] as $routeName) {
+        $response->assertSee(route($routeName), false);
+    }
+});
+
+test('laporan dan pengaturan menyimpan preferensi sistem', function () {
+    $this->post(route('admin.pengaturan.update'), [
+        'tahun_ajaran' => '2025/2026',
+        'semester' => 'Semester Genap',
+        'penanggung_jawab' => 'Ust. Uji Coba, M.Pd.',
+        'biaya_pendaftaran' => 150000,
+        'notif_struk' => '1',
+        'notif_absensi' => '0',
+        'notif_tagihan' => '1',
+    ])->assertRedirect();
+
+    $this->assertDatabaseHas('website_settings', ['key' => 'tahun_ajaran', 'value' => '2025/2026']);
+    $this->assertDatabaseHas('website_settings', ['key' => 'semester', 'value' => 'Semester Genap']);
+    $this->assertDatabaseHas('website_settings', ['key' => 'penanggung_jawab', 'value' => 'Ust. Uji Coba, M.Pd.']);
+    $this->assertDatabaseHas('website_settings', ['key' => 'biaya_pendaftaran', 'value' => 150000]);
+    $this->assertDatabaseHas('website_settings', ['key' => 'notif_struk', 'value' => '1']);
+    $this->assertDatabaseHas('website_settings', ['key' => 'notif_absensi', 'value' => '0']);
+    $this->assertDatabaseHas('website_settings', ['key' => 'notif_tagihan', 'value' => '1']);
+});
+
+test('laporan dan pengaturan menampilkan nilai tersimpan di form', function () {
+    $this->post(route('admin.pengaturan.update'), [
+        'tahun_ajaran' => '2030/2031',
+        'semester' => 'Semester Genap',
+        'penanggung_jawab' => 'Ust. Tersimpan, M.Pd.',
+        'biaya_pendaftaran' => 250000,
+        'notif_struk' => '1',
+        'notif_absensi' => '1',
+        'notif_tagihan' => '1',
+    ]);
+
+    $this->get(route('admin.laporanPengaturan'))
+        ->assertStatus(200)
+        ->assertSee('2030/2031')
+        ->assertSee('Ust. Tersimpan, M.Pd.')
+        ->assertSee('250000');
 });
 
 test('laporan dan pengaturan shows whatsapp notification switches', function () {

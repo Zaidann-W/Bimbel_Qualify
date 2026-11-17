@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminLaporanPendaftaranService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -12,7 +13,7 @@ class LaporanPendaftaranController extends Controller
 {
     public function __construct(private readonly AdminLaporanPendaftaranService $service) {}
 
-    /** 
+    /**
      * Tampilkan halaman laporan pendaftaran.
      */
     public function index(Request $request): View
@@ -27,7 +28,7 @@ class LaporanPendaftaranController extends Controller
         return view('admin.laporan-pendaftaran', $data);
     }
 
-    /** 
+    /**
      * Ekspor laporan pendaftaran ke CSV atau PDF.
      */
     public function export(Request $request): StreamedResponse
@@ -73,7 +74,7 @@ class LaporanPendaftaranController extends Controller
         ]);
     }
 
-    /** 
+    /**
      * Ekspor laporan pendaftaran sebagai PDF menggunakan DomPDF.
      */
     protected function exportAsPdf(array $rawData, string $filename): StreamedResponse
@@ -113,7 +114,7 @@ class LaporanPendaftaranController extends Controller
             'rows' => $rows,
         ];
 
-        $pdf = PDF::loadView('admin.laporan-pendaftaran-pdf', ['data' => $pdfData]);
+        $pdf = Pdf::loadView('admin.laporan-pendaftaran-pdf', ['data' => $pdfData]);
 
         return response()->streamDownload(function () use ($pdf): void {
             echo $pdf->output();

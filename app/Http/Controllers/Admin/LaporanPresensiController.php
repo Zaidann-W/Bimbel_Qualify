@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminLaporanPresensiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -12,7 +13,7 @@ class LaporanPresensiController extends Controller
 {
     public function __construct(private readonly AdminLaporanPresensiService $service) {}
 
-    /** 
+    /**
      * Tampilkan halaman laporan presensi dengan data real dari DB.
      */
     public function index(Request $request): View
@@ -30,7 +31,7 @@ class LaporanPresensiController extends Controller
         return view('admin.laporan-presensi', $data);
     }
 
-    /** 
+    /**
      * Ekspor laporan presensi ke CSV atau PDF.
      */
     public function export(Request $request): StreamedResponse
@@ -79,7 +80,7 @@ class LaporanPresensiController extends Controller
         ]);
     }
 
-    /** 
+    /**
      * Ekspor laporan presensi sebagai PDF menggunakan DomPDF.
      */
     protected function exportAsPdf(array $rawData, string $filename): StreamedResponse
@@ -119,7 +120,7 @@ class LaporanPresensiController extends Controller
             'rows' => $rows,
         ];
 
-        $pdf = PDF::loadView('admin.laporan-presensi-pdf', ['data' => $pdfData]);
+        $pdf = Pdf::loadView('admin.laporan-presensi-pdf', ['data' => $pdfData]);
 
         return response()->streamDownload(function () use ($pdf): void {
             echo $pdf->output();

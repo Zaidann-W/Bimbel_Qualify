@@ -2,197 +2,153 @@
 
 @section('title', 'Materi Pembelajaran')
 
-{{-- shortcut: filter jenjang/kategori, pencarian, dropdown mapel, dan tombol buka materi masih mock UI; sambungkan ke repository materi kalau modelnya sudah ada --}}
 @section('content')
-@php
-    $stats = [
-        ['Modul Tersedia', '38', 'Modul Lengkap', 'Sesuai Kurikulum Nasional Terintegrasi', 'book-open', 'bg-ember-50 text-ember-600'],
-        ['Paket Latihan', '14', 'Paket Soal SNBT', 'Dilengkapi Kunci & Pembahasan', 'check-circle', 'bg-emerald-50 text-emerald-600'],
-        ['Slide Presentasi', '26', 'Berkas Bahan Ajar', 'Siap Tayang di Smartboard / Layar', 'presentation', 'bg-bark-50 text-bark-500'],
-    ];
+<div class="space-y-5">
 
-    $jenjang = ['Semua Kelas', '10 SMA', '11 SMA', '12 SMA / SNBT', 'SMP / Persiapan'];
-    $kategori = ['Semua (78)', 'Mapel Matematika Diampu', 'Bank Soal UTBK', 'Slide Presentasi Ajar'];
-
-    // [chipKiri, chipKanan, chipKananTone, judul, deskripsi, rilis, tag, tagTone, cta, ctaTone]
-    $materi = [
-        ['12 SMA Intensif • Matematika', 'Modul PDF (Baca Online)', 'emerald',
-         'Kalkulus Diferensial & Aplikasi Integral Luas/Volume',
-         'Teorema dasar kalkulus, substitusi trigonometri, integral parsial cepat, serta strategi visual batas area.',
-         'Rilis 5 Mar 2025', 'Kurikulum Riset', 'emerald', 'Buka Materi', 'bark'],
-
-        ['12 SMA & Alumni • Lembaga Ajar', 'Modul PDF (Baca Online)', 'emerald',
-         'Barisan, Deret Geometri Tak Hingga & Notasi Sigma',
-         'Komposisi tipe soal pembiasaan kuantitatif analitis, pola rekursif, dan problem solving berjenjang.',
-         'Rilis 2 Mar 2025', '30 Soal HOTS', 'ember', 'Buka Materi', 'bark'],
-
-        ['SuperCamp SNBT • TPS', 'Modul PDF (Baca Online)', 'emerald',
-         'Penalaran Kuantitatif: Trik Eliminasi Cepat & Logika Angka',
-         'Strategi pengerjaan di bawah 60 detik per soal, estimasi pecahan desimal, dan penyaringan opsi jawaban.',
-         'Rilis 28 Feb 2025', 'Target: 45/60 Soal', 'ember', 'Buka Materi', 'bark'],
-
-        ['Fisika Saintek • Kelas Modul', 'Modul PDF (Baca Online)', 'emerald',
-         'Fisika Modern, Radiasi Benda Hitam & Relativitas Khusus',
-         'Dualisme gelombang-partikel, kontradiksi Lorentz, efek fotolistrik, dan relevansinya dengan teknologi masa kini.',
-         'Rilis 24 Feb 2025', 'Garansi Kedalaman', 'ember', 'Buka Materi', 'bark'],
-
-        ['Bank Soal • Paket 01–05', 'Modul PDF (Baca Online)', 'emerald',
-         'Kompilasi Tryout Akbar SNBT: Matematika & Fisika',
-         'Kumpulan naskah asli tryout regional bimbel terpadu, lengkap dengan tabel sebaran skor dan analisis butir.',
-         'Rilis 20 Feb 2025', 'Bisa Edit Terbuka', 'ember', 'Buka Materi', 'bark'],
-
-        ['Bahan Tayang • Smart Screen', 'Slide Presentasi', 'ember',
-         'Slide Interaktif: Matriks & Transformasi Geometri',
-         'Animasi vektor interaktif 40fps untuk simulasi perputaran dinding rotasi, distorsi matriks, dan komposisi transformasi.',
-         'Rilis 18 Feb 2025', 'Touchscreen Ready', 'ember', 'Buka Slide', 'ember'],
-    ];
-@endphp
-
-<div class="space-y-6">
+    {{-- Breadcrumb --}}
+    <ol class="flex flex-wrap items-center gap-1.5 text-[12px] text-bark-400">
+        <li><a href="{{ route('tentor.dashboard') }}" class="font-medium hover:text-ember-600">Dasbor Tentor</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="font-semibold text-bark-700">Materi Pembelajaran</li>
+    </ol>
 
     {{-- Header --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="max-w-2xl">
             <h1 class="text-[22px] font-bold tracking-tight text-bark-800">Bank Materi &amp; Bahan Ajar</h1>
-            <p class="mt-1 text-[13px] text-bark-400">Repositori modul kurikulum riset dan bank tayang ajak kelas terverifikasi. Terstandarisasi untuk Semester Genap 2024/2025.</p>
+            <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">Modul ajar terbit untuk kelas yang Anda ampu. Berkas dapat dibuka langsung di kelas atau diunduh bila diizinkan.</p>
         </div>
         <div class="flex max-w-xs items-start gap-2.5 rounded-xl border border-ember-200 bg-ember-50 px-4 py-3">
             @include('layouts.partials.icon', ['name' => 'info', 'class' => 'mt-0.5 h-4 w-4 shrink-0 text-ember-500'])
             <div>
-                <p class="text-[12.5px] font-bold text-bark-700">Mode Baca Langsung</p>
-                <p class="mt-0.5 text-[11.5px] leading-relaxed text-bark-500">Bahan hanya dapat dibaca &amp; ditayangkan di kelas</p>
+                <p class="text-[12.5px] font-bold text-bark-700">Modul per Kelas</p>
+                <p class="mt-0.5 text-[11.5px] leading-relaxed text-bark-500">Daftar mengikuti kelas tempat Anda mengajar</p>
             </div>
         </div>
     </div>
 
     {{-- Stat cards --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        @foreach ($stats as [$label, $value, $unit, $sub, $icon, $tone])
+        @foreach ($stats as $stat)
             <div class="relative overflow-hidden rounded-2xl border border-bark-100 bg-white p-5">
                 <div class="absolute inset-x-0 top-0 h-1 bg-ember-400"></div>
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">{{ $label }}</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">{{ $stat['label'] }}</p>
                         <div class="mt-2 flex items-baseline gap-1.5">
-                            <span class="text-[28px] font-bold leading-none tracking-tight text-bark-800">{{ $value }}</span>
-                            <span class="text-[12px] font-medium text-bark-400">{{ $unit }}</span>
+                            <span class="text-[28px] font-bold leading-none tracking-tight text-bark-800">{{ $stat['value'] }}</span>
+                            <span class="text-[12px] font-medium text-bark-400">{{ $stat['unit'] }}</span>
                         </div>
                     </div>
-                    <div @class(['grid h-9 w-9 place-items-center rounded-xl', $tone])>
-                        @include('layouts.partials.icon', ['name' => $icon, 'class' => 'h-[18px] w-[18px]'])
+                    <div @class(['grid h-9 w-9 place-items-center rounded-xl', $stat['tone']])>
+                        @include('layouts.partials.icon', ['name' => $stat['icon'], 'class' => 'h-[18px] w-[18px]'])
                     </div>
                 </div>
-                <p class="mt-3 text-[11px] text-bark-400">{{ $sub }}</p>
+                <p class="mt-3 text-[11px] text-bark-400">{{ $stat['sub'] }}</p>
             </div>
         @endforeach
     </div>
 
-    {{-- Pencarian + filter --}}
+    {{-- Filter --}}
     <section class="rounded-2xl border border-bark-100 bg-white p-4">
-        <div class="flex flex-wrap items-center gap-3">
+        <form method="GET" action="{{ route('tentor.materi') }}" class="flex flex-wrap items-center gap-3">
             <div class="relative min-w-[220px] flex-1">
-                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bark-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Cari judul modul, bab, atau materi…"
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bark-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-4-4"/></svg>
+                <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Cari judul modul, bab, atau materi…"
                        class="w-full rounded-lg border border-bark-200 bg-white py-2.5 pl-9 pr-3 text-[13px] text-bark-800 placeholder:text-bark-300 focus:border-ember-300 focus:outline-none focus:ring-2 focus:ring-ember-100">
             </div>
-            <select class="rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[12.5px] font-medium text-bark-600 focus:border-ember-300 focus:outline-none">
-                <option>Matematika Saintek</option>
-                <option>Fisika Saintek</option>
-                <option>Biologi Saintek</option>
-            </select>
-            <select class="rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[12.5px] font-medium text-bark-600 focus:border-ember-300 focus:outline-none">
-                <option>Kelas 12 SMA &amp; Alumni / UTBK</option>
-                <option>Kelas 10 SMA</option>
-                <option>Kelas 11 SMA</option>
-                <option>SMP / Persiapan</option>
-            </select>
-        </div>
 
-        <div class="mt-4 space-y-2.5">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-bark-400">Jenjang Kelas</span>
-                @foreach ($jenjang as $i => $j)
-                    @php $active = $j === 'Semua Kelas'; @endphp
-                    <button type="button"
-                            @class([
-                                'rounded-lg px-3 py-1.5 text-[12px] font-semibold transition',
-                                'bg-bark-800 text-white' => $active,
-                                'border border-ember-300 bg-ember-50 text-ember-700' => $j === '12 SMA / SNBT',
-                                'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => ! $active && $j !== '12 SMA / SNBT',
-                            ])>{{ $j }}</button>
+            <select name="subject_id" class="rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[12.5px] font-medium text-bark-600 focus:border-ember-300 focus:outline-none">
+                <option value="">Semua Mata Pelajaran</option>
+                @foreach ($subjects as $subject)
+                    <option value="{{ $subject->id }}" @selected($filters['subject_id'] === $subject->id)>{{ $subject->name }}</option>
                 @endforeach
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-bark-400">Kategori</span>
-                @foreach ($kategori as $k)
-                    @php $active = str_starts_with($k, 'Semua'); @endphp
-                    <button type="button"
-                            @class([
-                                'rounded-lg px-3 py-1.5 text-[12px] font-semibold transition',
-                                'bg-bark-800 text-white' => $active,
-                                'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => ! $active,
-                            ])>{{ $k }}</button>
+            </select>
+
+            <select name="class_group_id" class="rounded-lg border border-bark-200 bg-white px-3 py-2.5 text-[12.5px] font-medium text-bark-600 focus:border-ember-300 focus:outline-none">
+                <option value="">Semua Kelas</option>
+                @foreach ($classGroups as $kelas)
+                    <option value="{{ $kelas->id }}" @selected($filters['class_group_id'] === $kelas->id)>{{ $kelas->code }}</option>
                 @endforeach
-            </div>
-        </div>
+            </select>
+
+            <button type="submit" class="rounded-lg bg-bark-800 px-3.5 py-2.5 text-[12.5px] font-semibold text-white transition hover:bg-bark-900">
+                Terapkan
+            </button>
+
+            @if ($filters['q'] !== '' || $filters['subject_id'] !== null || $filters['class_group_id'] !== null)
+                <a href="{{ route('tentor.materi') }}" class="rounded-lg border border-bark-200 bg-white px-3.5 py-2.5 text-[12.5px] font-semibold text-bark-500 transition hover:bg-bark-50">
+                    Reset
+                </a>
+            @endif
+        </form>
     </section>
 
-    {{-- Grid materi --}}
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        @foreach ($materi as [$chipKiri, $chipKanan, $chipTone, $judul, $deskripsi, $rilis, $tag, $tagTone, $cta, $ctaTone])
-            <article class="flex flex-col rounded-2xl border border-bark-100 bg-white p-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span class="rounded-md bg-bark-100 px-2 py-1 text-[10px] font-bold text-bark-500">{{ $chipKiri }}</span>
-                    <span @class([
-                        'rounded-md px-2 py-1 text-[10px] font-bold',
-                        'bg-emerald-50 text-emerald-600' => $chipTone === 'emerald',
-                        'bg-ember-100 text-ember-700' => $chipTone === 'ember',
-                    ])>{{ $chipKanan }}</span>
-                </div>
+    {{-- Grid modul --}}
+    @if ($materials->isNotEmpty())
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @foreach ($materials as $m)
+                <article class="flex flex-col rounded-2xl border border-bark-100 bg-white p-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex flex-wrap gap-1.5">
+                            @if ($m->subject)
+                                <span class="rounded-md bg-bark-100 px-2 py-0.5 text-[9.5px] font-bold text-bark-500">{{ $m->subject->name }}</span>
+                            @endif
+                            @if ($m->published_at && $m->published_at->gt(now()->subDays(7)))
+                                <span class="rounded-md bg-gold px-2 py-0.5 text-[9.5px] font-bold text-espresso">Baru</span>
+                            @endif
+                        </div>
+                        <span @class([
+                            'rounded-md px-2 py-0.5 text-[9.5px] font-bold',
+                            'bg-sand text-muted' => $m->allow_download,
+                            'bg-sandgold text-bronze' => ! $m->allow_download,
+                        ])>{{ $m->access_label }}</span>
+                    </div>
 
-                <h3 class="mt-3 text-[14.5px] font-bold leading-snug text-bark-800">{{ $judul }}</h3>
-                <p class="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-bark-400">{{ $deskripsi }}</p>
+                    <h3 class="mt-3 text-[14px] font-bold leading-snug text-bark-800">{{ $m->title }}</h3>
+                    <p class="mt-1.5 line-clamp-2 flex-1 text-[12px] leading-relaxed text-bark-400">{{ $m->description ?? 'Tidak ada deskripsi.' }}</p>
 
-                <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
-                    <p class="inline-flex items-center gap-1.5 text-[11px] text-bark-400">
-                        @include('layouts.partials.icon', ['name' => 'calendar', 'class' => 'h-3.5 w-3.5'])
-                        {{ $rilis }}
-                    </p>
-                    <span @class([
-                        'rounded-md px-2 py-0.5 text-[10px] font-bold',
-                        'bg-emerald-50 text-emerald-600' => $tagTone === 'emerald',
-                        'bg-ember-100 text-ember-700' => $tagTone === 'ember',
-                    ])>{{ $tag }}</span>
-                </div>
+                    <div class="mt-3 flex flex-wrap items-center gap-1.5">
+                        @foreach ($m->classGroups as $kelas)
+                            <span class="rounded-md bg-bark-50 px-2 py-0.5 text-[10px] font-bold text-bark-500">{{ $kelas->code }}</span>
+                        @endforeach
+                    </div>
 
-                <button type="button"
-                        @class([
-                            'mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-[12px] font-bold transition',
-                            'bg-bark-800 text-white hover:bg-bark-900' => $ctaTone === 'bark',
-                            'bg-ember-500 text-white hover:bg-ember-600' => $ctaTone === 'ember',
-                        ])>
-                    @include('layouts.partials.icon', ['name' => $ctaTone === 'ember' ? 'presentation' : 'book-open', 'class' => 'h-3.5 w-3.5'])
-                    {{ $cta }}
-                </button>
-            </article>
-        @endforeach
-    </div>
+                    <div class="mt-3 flex items-center justify-between gap-2 border-t border-bark-100 pt-3">
+                        <p class="inline-flex items-center gap-1.5 text-[11px] text-bark-500">
+                            @include('layouts.partials.icon', ['name' => $m->file_icon, 'class' => 'h-3.5 w-3.5 text-bark-400'])
+                            {{ $m->file_type }}
+                        </p>
+                        <p class="shrink-0 text-[10.5px] text-bark-400">{{ $m->formatted_date }}</p>
+                    </div>
 
-    {{-- Usulan kurikulum --}}
-    <section class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-bark-100 bg-white px-5 py-4">
-        <div class="flex items-start gap-3">
-            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ember-50 text-ember-500">
-                @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-5 w-5'])
-            </div>
-            <div>
-                <h2 class="text-[14px] font-bold text-bark-800">Perlu usulan penambahan suplemen materi?</h2>
-                <p class="mt-0.5 text-[12px] text-bark-400">Sebagai tentor terverifikasi, Anda dapat mengajukan usulan naskah soal tambahan atau koreksi redaksional modul literasi.</p>
+                    @if ($m->allow_download)
+                        <a href="{{ route('tentor.materi.unduh', $m) }}"
+                           class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-bark-800 px-3 py-2.5 text-[12px] font-bold text-white transition hover:bg-bark-900">
+                            @include('layouts.partials.icon', ['name' => 'book-open', 'class' => 'h-3.5 w-3.5'])
+                            Buka / Unduh Modul
+                        </a>
+                    @else
+                        <span class="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-bark-200 bg-bark-50 px-3 py-2.5 text-[12px] font-bold text-bark-500">
+                            @include('layouts.partials.icon', ['name' => 'eye', 'class' => 'h-4 w-4'])
+                            Hanya Baca di Kelas
+                        </span>
+                    @endif
+                </article>
+            @endforeach
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[11.5px] text-bark-400">Menampilkan {{ $materials->firstItem() }} – {{ $materials->lastItem() }} dari {{ $materials->total() }} modul</p>
+            <div class="flex items-center gap-1.5">
+                {{ $materials->links() }}
             </div>
         </div>
-        <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
-            @include('layouts.partials.icon', ['name' => 'plus', 'class' => 'h-4 w-4'])
-            Ajukan ke Tim Kurikulum
-        </button>
-    </section>
+    @else
+        <div class="rounded-2xl border border-dashed border-bark-100 bg-bark-50/50 p-12 text-center">
+            <p class="text-[12px] text-bark-400">Belum ada modul ajar untuk kelas yang Anda ampu.</p>
+        </div>
+    @endif
+
 </div>
 @endsection
