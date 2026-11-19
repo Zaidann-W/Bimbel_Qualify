@@ -45,10 +45,7 @@ class StudentController extends Controller
             ['label' => 'Relevan Skor UTBK', 'value' => '0%', 'unit' => 'Rekomendasi UTBK', 'sub' => 'Selaras kisi-kisi SNBT', 'icon' => 'star', 'tone' => 'bg-ember-50 text-ember-600'],
         ];
 
-        $jenjang = ['Semua bentuk', 'Kelas 12 X/UTBK', 'Kelas 11 SMA', 'Kelas 10 SMA', 'SMP/SD'];
-        $activeJenjang = $classGroup?->grade === '12' ? 'Kelas 12 X/UTBK' : 'Semua bentuk';
-
-        return view('siswa.materi', compact('materials', 'stats', 'jenjang', 'activeJenjang'));
+        return view('siswa.materi', compact('materials', 'stats'));
     }
 
     /**

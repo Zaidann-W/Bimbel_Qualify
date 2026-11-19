@@ -112,18 +112,7 @@
             </button>
         </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-2">
-            <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-bark-400">Jenjang</span>
-            @foreach ($jenjang as $j)
-                @php($active = $j === $activeJenjang)
-                <button type="button"
-                        @class([
-                            'rounded-lg px-3 py-1.5 text-[12px] font-semibold transition',
-                            'bg-ember-400 text-bark-900' => $active,
-                            'border border-bark-200 bg-white text-bark-500 hover:bg-bark-50' => ! $active,
-                        ])>{{ $j }}</button>
-            @endforeach
-        </div>
+        
     </section>
 
     {{-- Grid modul --}}
