@@ -12,10 +12,6 @@
             <li aria-hidden="true">›</li>
             <li class="font-semibold text-bark-700">Materi Pembelajaran</li>
         </ol>
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-ember-50 px-3 py-1.5 text-[11px] font-bold text-ember-700 ring-1 ring-ember-200">
-            @include('layouts.partials.icon', ['name' => 'graduation-cap', 'class' => 'h-3.5 w-3.5'])
-            Target: UTBK SNBT 2025 • Regional Intensif 12 IPA
-        </span>
     </div>
 
     {{-- Header --}}
@@ -24,16 +20,6 @@
             <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-ember-600">Pusat Repositori Akademik</p>
             <h1 class="mt-1.5 text-[22px] font-bold tracking-tight text-bark-800">Katalog & Bank Modul Belajar Digital</h1>
             <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">Ribuan modul PDF, video pelajaran, dan bank soal berkualitas tersusun sistematis sesuai jenjang/rapor akademik dan universitas Qualify.</p>
-        </div>
-        <div class="flex shrink-0 gap-2">
-            <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-3.5 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
-                @include('layouts.partials.icon', ['name' => 'bookmark', 'class' => 'h-4 w-4'])
-                Simpananku
-            </button>
-            <button type="button" class="inline-flex items-center gap-2 rounded-lg border border-bark-200 bg-white px-3.5 py-2.5 text-[12.5px] font-bold text-bark-600 transition hover:bg-bark-50">
-                @include('layouts.partials.icon', ['name' => 'star', 'class' => 'h-4 w-4'])
-                Rekomendasi Belajar
-            </button>
         </div>
     </div>
 
@@ -64,27 +50,6 @@
             </div>
         </section>
     @endif
-
-    {{-- Stat cards --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach ($stats as $stat)
-            <div class="rounded-2xl border border-bark-100 bg-white p-4">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-bark-400">{{ $stat['label'] }}</p>
-                        <div class="mt-1.5 flex items-baseline gap-1.5">
-                            <span class="text-[26px] font-bold leading-none tracking-tight text-bark-800">{{ $stat['value'] }}</span>
-                            <span class="text-[11.5px] font-medium text-bark-400">{{ $stat['unit'] }}</span>
-                        </div>
-                    </div>
-                    <div @class(['grid h-9 w-9 place-items-center rounded-xl', $stat['tone']])>
-                        @include('layouts.partials.icon', ['name' => $stat['icon'], 'class' => 'h-[18px] w-[18px]'])
-                    </div>
-                </div>
-                <p class="mt-3 text-[10.5px] text-bark-400">{{ $stat['sub'] }}</p>
-            </div>
-        @endforeach
-    </div>
 
     {{-- Filter --}}
     <section class="rounded-2xl border border-bark-100 bg-white p-4">

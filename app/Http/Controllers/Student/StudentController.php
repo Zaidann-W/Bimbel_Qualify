@@ -38,14 +38,7 @@ class StudentController extends Controller
             ->orderByDesc('published_at')
             ->paginate(12);
 
-        $stats = [
-            ['label' => 'Modul Tersedia', 'value' => (string) $materials->total(), 'unit' => 'Modul', 'sub' => 'Terverifikasi kurikulum', 'icon' => 'book-open', 'tone' => 'bg-ember-50 text-ember-600'],
-            ['label' => 'Latihan Mengerjakan', 'value' => '0', 'unit' => 'Paket', 'sub' => 'Bank soal tiap pekan', 'icon' => 'check-circle', 'tone' => 'bg-emerald-50 text-emerald-600'],
-            ['label' => 'Video Penjelasan', 'value' => '0', 'unit' => 'Video', 'sub' => 'Ringkasan animatif', 'icon' => 'presentation', 'tone' => 'bg-bark-50 text-bark-500'],
-            ['label' => 'Relevan Skor UTBK', 'value' => '0%', 'unit' => 'Rekomendasi UTBK', 'sub' => 'Selaras kisi-kisi SNBT', 'icon' => 'star', 'tone' => 'bg-ember-50 text-ember-600'],
-        ];
-
-        return view('siswa.materi', compact('materials', 'stats'));
+        return view('siswa.materi', compact('materials'));
     }
 
     /**
