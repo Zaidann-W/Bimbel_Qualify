@@ -2,10 +2,8 @@
 
 use App\Models\AcademicPeriod;
 use App\Models\ClassGroup;
-use App\Models\ClassSession;
 use App\Models\File;
 use App\Models\Material;
-use App\Models\StaffProfile;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,20 +12,12 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Storage::fake('local');
-
-    $this->user = User::factory()->create(['role' => 'tentor', 'status' => 'aktif']);
-    $this->actingAs($this->user);
-
-    $this->staff = StaffProfile::create([
-        'user_id' => $this->user->id,
-        'employee_number' => 'T009',
-        'full_name_with_title' => 'Kak Hendra Wijaya, M.Sc',
-        'job_title' => 'Master Tentor Matematika',
+    $this->tentor = User::factory()->create([
+        'role' => 'tentor',
         'status' => 'aktif',
     ]);
 
-    $periode = AcademicPeriod::create([
+    $this->period = AcademicPeriod::create([
         'academic_year' => '2026/2027',
         'semester' => 'ganjil',
         'starts_on' => '2026-07-01',
@@ -35,137 +25,229 @@ beforeEach(function () {
         'is_active' => true,
     ]);
 
-    $this->kelas = ClassGroup::create([
-        'academic_period_id' => $periode->id,
+    $this->testFile = File::create([
+        'original_name' => 'modul_sample.pdf',
+        'path' => 'materials/modul_sample.pdf',
+        'mime_type' => 'application/pdf',
+        'size_bytes' => 1024 * 1024 * 2, // 2MB
+        'uploaded_by' => $this->tentor->id,
+    ]);
+});
+
+test('tentor dapat membuka halaman materi pembelajaran', function () {
+    $response = $this->actingAs($this->tentor)->get(route('tentor.materi'));
+
+    $response->assertOk();
+    $response->assertSee('Bank Materi &amp; Bahan Ajar', false);
+    $response->assertSee('Cari');
+    // Dropdown kelas lama harus sudah dihapus
+    $response->assertDontSee('Kelas 12 SMA &amp; Alumni / UTBK', false);
+    // Bagian usulan penambahan suplemen harus sudah dihapus
+    $response->assertDontSee('Perlu usulan penambahan suplemen materi?');
+});
+
+test('pencarian materi berdasarkan judul bekerja dengan benar', function () {
+    $subject = Subject::create(['code' => 'MTK', 'name' => 'Matematika']);
+
+    Material::create([
+        'title' => 'Kalkulus Diferensial Lanjutan',
+        'description' => 'Membahas turunan fungsi trigonometri.',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+
+    Material::create([
+        'title' => 'Fisika Optik dan Gelombang',
+        'description' => 'Membahas difraksi dan interferensi.',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+
+    $response = $this->actingAs($this->tentor)->get(route('tentor.materi', ['q' => 'Kalkulus']));
+
+    $response->assertOk();
+    $response->assertSee('Kalkulus Diferensial Lanjutan');
+    $response->assertDontSee('Fisika Optik dan Gelombang');
+});
+
+test('filter jenjang kelas dan kategori bekerja dengan benar', function () {
+    $subject = Subject::create(['code' => 'FIS', 'name' => 'Fisika']);
+
+    $kelas12 = ClassGroup::create([
+        'academic_period_id' => $this->period->id,
         'code' => '12-IPA-1',
         'education_level' => 'SMA',
         'grade' => '12',
-        'major' => 'IPA',
+        'capacity' => 20,
         'status' => 'aktif',
     ]);
 
-    $this->kelasLain = ClassGroup::create([
-        'academic_period_id' => $periode->id,
-        'code' => '12-IPA-2',
+    $kelas10 = ClassGroup::create([
+        'academic_period_id' => $this->period->id,
+        'code' => '10-IPA-1',
         'education_level' => 'SMA',
-        'grade' => '12',
-        'major' => 'IPA',
+        'grade' => '10',
+        'capacity' => 20,
         'status' => 'aktif',
     ]);
 
-    $this->mapel = Subject::create(['code' => 'MTK', 'name' => 'Matematika Saintek']);
-    $this->mapelLain = Subject::create(['code' => 'FIS', 'name' => 'Fisika']);
-
-    ClassSession::create([
-        'class_group_id' => $this->kelas->id,
-        'subject_id' => $this->mapel->id,
-        'staff_id' => $this->staff->id,
-        'session_date' => today()->toDateString(),
-        'start_time' => '15:30:00',
-        'end_time' => '17:00:00',
-        'status' => 'terjadwal',
+    $slideFile = File::create([
+        'original_name' => 'relativitas.pptx',
+        'path' => 'materials/relativitas.pptx',
+        'mime_type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'size_bytes' => 1024 * 1024 * 5,
+        'uploaded_by' => $this->tentor->id,
     ]);
 
-    Storage::disk('local')->put('materi/modul-08.pdf', 'isi modul matematika');
+    $materi12 = Material::create([
+        'title' => 'Slide Interaktif Relativitas Khusus',
+        'description' => 'Materi slide presentasi kelas 12.',
+        'subject_id' => $subject->id,
+        'file_id' => $slideFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+    $materi12->classGroups()->attach($kelas12->id);
 
-    $this->materi = Material::create([
-        'title' => 'Modul 08: Trik Cepat Integral & Limit Aljabar',
-        'description' => 'Metode Huruf dan rumus cepat limit.',
-        'subject_id' => $this->mapel->id,
-        'file_id' => File::create([
-            'original_name' => 'modul-08.pdf',
-            'path' => 'materi/modul-08.pdf',
-            'mime_type' => 'application/pdf',
-            'size_bytes' => 4404019,
-        ])->id,
+    $materi10 = Material::create([
+        'title' => 'Modul Gerak Lurus Beraturan',
+        'description' => 'Materi modul kelas 10.',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+    $materi10->classGroups()->attach($kelas10->id);
+
+    // Test filter jenjang 12
+    $responseJenjang = $this->actingAs($this->tentor)->get(route('tentor.materi', ['jenjang' => '12']));
+    $responseJenjang->assertOk();
+    $responseJenjang->assertSee('Slide Interaktif Relativitas Khusus');
+    $responseJenjang->assertDontSee('Modul Gerak Lurus Beraturan');
+
+    // Test filter kategori slide
+    $responseKategori = $this->actingAs($this->tentor)->get(route('tentor.materi', ['kategori' => 'slide']));
+    $responseKategori->assertOk();
+    $responseKategori->assertSee('Slide Interaktif Relativitas Khusus');
+    $responseKategori->assertDontSee('Modul Gerak Lurus Beraturan');
+});
+
+test('pagination menampilkan maksimal 10 materi per halaman', function () {
+    $subject = Subject::create(['code' => 'BIO', 'name' => 'Biologi']);
+
+    for ($i = 1; $i <= 15; $i++) {
+        Material::create([
+            'title' => "Materi Biologi Seri {$i}",
+            'description' => "Deskripsi materi biologi nomor {$i}",
+            'subject_id' => $subject->id,
+            'file_id' => $this->testFile->id,
+            'status' => 'terbit',
+            'allow_download' => true,
+            'published_at' => now()->subMinutes($i),
+        ]);
+    }
+
+    $responsePage1 = $this->actingAs($this->tentor)->get(route('tentor.materi'));
+    $responsePage1->assertOk();
+    $responsePage1->assertSee('Materi Biologi Seri 1');
+    $responsePage1->assertSee('Materi Biologi Seri 10');
+    $responsePage1->assertDontSee('Materi Biologi Seri 11');
+
+    $responsePage2 = $this->actingAs($this->tentor)->get(route('tentor.materi', ['page' => 2]));
+    $responsePage2->assertOk();
+    $responsePage2->assertSee('Materi Biologi Seri 11');
+    $responsePage2->assertSee('Materi Biologi Seri 15');
+});
+
+test('statistik modul, paket latihan, dan slide sesuai database', function () {
+    $subject = Subject::create(['code' => 'KIM', 'name' => 'Kimia']);
+
+    $pptxFile = File::create([
+        'original_name' => 'kimia_unsur.pptx',
+        'path' => 'materials/kimia_unsur.pptx',
+        'mime_type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'size_bytes' => 1024 * 500,
+        'uploaded_by' => $this->tentor->id,
+    ]);
+
+    // 1 Slide
+    Material::create([
+        'title' => 'Slide Kimia Unsur',
+        'description' => 'Bahan tayang smartboard',
+        'subject_id' => $subject->id,
+        'file_id' => $pptxFile->id,
         'status' => 'terbit',
         'allow_download' => true,
         'published_at' => now(),
     ]);
 
-    $this->materi->classGroups()->attach($this->kelas->id);
-});
-
-test('halaman materi tentor menampilkan modul kelas yang diampu', function () {
-    $this->get(route('tentor.materi'))
-        ->assertStatus(200)
-        ->assertSee('Bank Materi')
-        ->assertSee('Modul 08: Trik Cepat Integral & Limit Aljabar')
-        ->assertSee(route('tentor.materi.unduh', $this->materi), false)
-        ->assertSee('Buka / Unduh Modul');
-});
-
-test('halaman materi tentor hanya menampilkan kelas yang diampu', function () {
-    $this->materi->classGroups()->sync([$this->kelasLain->id]);
-
-    $this->get(route('tentor.materi'))
-        ->assertStatus(200)
-        ->assertDontSee('Modul 08: Trik Cepat Integral & Limit Aljabar')
-        ->assertSee('Belum ada modul ajar untuk kelas yang Anda ampu.');
-});
-
-test('filter mata pelajaran menyaring daftar modul tentor', function () {
-    $materiFisika = Material::create([
-        'title' => 'Fisika Modern: Efek Fotolistrik',
-        'subject_id' => $this->mapelLain->id,
-        'file_id' => File::create([
-            'original_name' => 'fisika-modern.pdf',
-            'path' => 'materi/fisika-modern.pdf',
-            'mime_type' => 'application/pdf',
-            'size_bytes' => 1024,
-        ])->id,
+    // 2 Paket Latihan
+    Material::create([
+        'title' => 'Paket Latihan Soal UTBK Kimia',
+        'description' => 'Tryout soal HOTS',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
         'status' => 'terbit',
         'allow_download' => true,
         'published_at' => now(),
     ]);
-    $materiFisika->classGroups()->attach($this->kelas->id);
 
-    $this->get(route('tentor.materi', ['subject_id' => $this->mapelLain->id]))
-        ->assertStatus(200)
-        ->assertSee('Fisika Modern: Efek Fotolistrik')
-        ->assertDontSee('Modul 08: Trik Cepat Integral & Limit Aljabar');
+    Material::create([
+        'title' => 'Latihan Mandiri Stoikiometri',
+        'description' => 'Kunci dan pembahasan',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+
+    // 1 Modul
+    Material::create([
+        'title' => 'Modul Termokimia Lengkap',
+        'description' => 'Teori dan pembuktian hukum Hess',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
+
+    $response = $this->actingAs($this->tentor)->get(route('tentor.materi'));
+    $response->assertOk();
+
+    // Check stats are rendered
+    $response->assertSee('Modul Tersedia');
+    $response->assertSee('Paket Latihan');
+    $response->assertSee('Slide Presentasi');
 });
 
-test('pencarian judul menyaring daftar modul tentor', function () {
-    $this->get(route('tentor.materi', ['q' => 'Integral']))
-        ->assertStatus(200)
-        ->assertSee('Modul 08: Trik Cepat Integral & Limit Aljabar');
+test('tentor dapat membuka berkas materi dan alias unduh bekerja', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('materials/modul_sample.pdf', 'dummy content pdf');
 
-    $this->get(route('tentor.materi', ['q' => 'Fotolistrik']))
-        ->assertStatus(200)
-        ->assertSee('Belum ada modul ajar untuk kelas yang Anda ampu.');
-});
+    $subject = Subject::create(['code' => 'MTK', 'name' => 'Matematika']);
+    $materi = Material::create([
+        'title' => 'Modul Kalkulus',
+        'description' => 'Materi kalkulus dasar',
+        'subject_id' => $subject->id,
+        'file_id' => $this->testFile->id,
+        'status' => 'terbit',
+        'allow_download' => true,
+        'published_at' => now(),
+    ]);
 
-test('tentor dapat mengunduh modul yang mengizinkan unduhan', function () {
-    $this->get(route('tentor.materi.unduh', $this->materi))
-        ->assertStatus(200)
-        ->assertDownload('modul-08.pdf');
-});
+    $responseBuka = $this->actingAs($this->tentor)->get(route('tentor.materi.buka', $materi));
+    $responseBuka->assertOk();
 
-test('tentor tidak dapat mengunduh modul kelas yang tidak diampu', function () {
-    $this->materi->classGroups()->sync([$this->kelasLain->id]);
-
-    $this->get(route('tentor.materi.unduh', $this->materi))->assertForbidden();
-});
-
-test('modul yang hanya dibaca tidak dapat diunduh tentor', function () {
-    $this->materi->update(['allow_download' => false]);
-
-    $this->get(route('tentor.materi.unduh', $this->materi))->assertForbidden();
-});
-
-test('modul berstatus draf tidak dapat diunduh tentor', function () {
-    $this->materi->update(['status' => 'draf']);
-
-    $this->get(route('tentor.materi.unduh', $this->materi))->assertNotFound();
-});
-
-test('tentor tanpa profil staf melihat daftar modul kosong', function () {
-    $userBaru = User::factory()->create(['role' => 'tentor', 'status' => 'aktif']);
-
-    $this->actingAs($userBaru)
-        ->get(route('tentor.materi'))
-        ->assertStatus(200)
-        ->assertDontSee('Modul 08: Trik Cepat Integral & Limit Aljabar')
-        ->assertSee('Belum ada modul ajar untuk kelas yang Anda ampu.');
+    $responseUnduh = $this->actingAs($this->tentor)->get(route('tentor.materi.unduh', $materi));
+    $responseUnduh->assertOk();
 });

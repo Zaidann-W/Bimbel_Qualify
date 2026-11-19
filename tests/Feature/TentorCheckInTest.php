@@ -316,3 +316,183 @@ test('sesi yang dibatalkan tidak muncul di daftar sesi', function () {
         ->assertOk()
         ->assertSee('Tidak Ada Sesi');
 });
+
+test('tentor dapat memasukkan status kehadiran siswa', function () {
+    $studentId = DB::table('students')->insertGetId([
+        'full_name' => 'Budi Santoso',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('enrollments')->insert([
+        'student_id' => $studentId,
+        'class_group_id' => $this->classId,
+        'started_on' => '2026-07-01',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $response = $this->post(route('tentor.absensi.store'), [
+        'session_id' => $this->sessionId,
+        'attendances' => [
+            $studentId => [
+                'student_id' => $studentId,
+                'status' => 'hadir',
+                'arrived_at' => '15:35',
+            ],
+        ],
+    ]);
+
+    $response->assertRedirect(route('tentor.absensi', ['session_id' => $this->sessionId]));
+    $response->assertSessionHas('success', 'Absensi berhasil disimpan.');
+
+    $this->assertDatabaseHas('student_attendance', [
+        'class_session_id' => $this->sessionId,
+        'student_id' => $studentId,
+        'status' => 'hadir',
+    ]);
+});
+
+test('sesi yang belum disimpan absensinya menampilkan status belum disimpan', function () {
+    $studentId = DB::table('students')->insertGetId([
+        'full_name' => 'Citra Lestari',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('enrollments')->insert([
+        'student_id' => $studentId,
+        'class_group_id' => $this->classId,
+        'started_on' => '2026-07-01',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->get(route('tentor.absensi', ['session_id' => $this->sessionId]))
+        ->assertOk()
+        ->assertSee('Absensi Belum Disimpan')
+        ->assertSee('Simpan Presensi Kelas')
+        ->assertDontSee('Absensi Telah Tersimpan');
+});
+
+test('sesi yang telah disimpan absensinya dapat diedit saat jam pembelajaran berlangsung', function () {
+    Carbon::setTestNow(Carbon::parse(today()->toDateString().' 16:00:00'));
+
+    $studentId = DB::table('students')->insertGetId([
+        'full_name' => 'Dewi Anggraini',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('enrollments')->insert([
+        'student_id' => $studentId,
+        'class_group_id' => $this->classId,
+        'started_on' => '2026-07-01',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('student_attendance')->insert([
+        'class_session_id' => $this->sessionId,
+        'student_id' => $studentId,
+        'status' => 'hadir',
+        'recorded_by' => auth()->id(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->get(route('tentor.absensi', ['session_id' => $this->sessionId]))
+        ->assertOk()
+        ->assertSee('Absensi Telah Tersimpan')
+        ->assertSee('Edit Absensi')
+        ->assertSee('Edit Presensi');
+
+    // Coba edit status menjadi izin saat jam sesi
+    $response = $this->post(route('tentor.absensi.store'), [
+        'session_id' => $this->sessionId,
+        'attendances' => [
+            $studentId => [
+                'student_id' => $studentId,
+                'status' => 'izin',
+                'note' => 'Izin keperluan keluarga',
+            ],
+        ],
+    ]);
+
+    $response->assertRedirect(route('tentor.absensi', ['session_id' => $this->sessionId]));
+    $response->assertSessionHas('success', 'Absensi berhasil disimpan.');
+
+    $this->assertDatabaseHas('student_attendance', [
+        'class_session_id' => $this->sessionId,
+        'student_id' => $studentId,
+        'status' => 'izin',
+    ]);
+});
+
+test('sesi yang telah disimpan absensinya tidak dapat diedit di luar jam pembelajaran', function () {
+    // Sesi 15:30 - 17:30, uji coba waktu pukul 18:00 (sudah lewat jam pembelajaran)
+    Carbon::setTestNow(Carbon::parse(today()->toDateString().' 18:00:00'));
+
+    $studentId = DB::table('students')->insertGetId([
+        'full_name' => 'Fajar Pratama',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('enrollments')->insert([
+        'student_id' => $studentId,
+        'class_group_id' => $this->classId,
+        'started_on' => '2026-07-01',
+        'status' => 'aktif',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::table('student_attendance')->insert([
+        'class_session_id' => $this->sessionId,
+        'student_id' => $studentId,
+        'status' => 'hadir',
+        'recorded_by' => auth()->id(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $this->get(route('tentor.absensi', ['session_id' => $this->sessionId]))
+        ->assertOk()
+        ->assertSee('Edit Hanya Saat Jam Pembelajaran')
+        ->assertSee('Terkunci di Luar Jam Sesi');
+
+    // Coba kirim request edit absensi di luar jam pembelajaran
+    $response = $this->post(route('tentor.absensi.store'), [
+        'session_id' => $this->sessionId,
+        'attendances' => [
+            $studentId => [
+                'student_id' => $studentId,
+                'status' => 'alpa',
+            ],
+        ],
+    ]);
+
+    $response->assertSessionHasErrors('error');
+
+    // Data di database tetap 'hadir' (tidak berubah)
+    $this->assertDatabaseHas('student_attendance', [
+        'class_session_id' => $this->sessionId,
+        'student_id' => $studentId,
+        'status' => 'hadir',
+    ]);
+});
+
+test('dashboard tentor menyediakan tautan langsung ke absensi sesi hari ini', function () {
+    $response = $this->get(route('tentor.dashboard'));
+    $response->assertOk();
+    $response->assertSee(route('tentor.absensi', ['session_id' => $this->sessionId]));
+    $response->assertSee('Input Absen Kelas');
+});

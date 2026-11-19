@@ -7,6 +7,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-bark-50 font-sans text-bark-800 antialiased">
+@php
+    $layoutUser = auth()->user();
+    $layoutStaff = $layoutUser?->staffProfile;
+    $layoutTentorName = $layoutStaff?->full_name_with_title ?? $layoutUser?->name ?? 'Tentor';
+    $layoutInitials = \Illuminate\Support\Str::of($layoutTentorName)
+        ->replaceMatches('/[.,]/', '')
+        ->explode(' ')
+        ->reject(fn (string $word): bool => in_array(\Illuminate\Support\Str::lower($word), ['kak', 'dr', 'drs', 'ir', 'prof'], true))
+        ->filter()
+        ->take(2)
+        ->map(fn (string $word): string => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($word, 0, 1)))
+        ->implode('') ?: 'T';
+@endphp
 <div class="flex min-h-screen p-0 lg:h-screen lg:overflow-hidden">
 
     {{-- Sidebar --}}
@@ -61,7 +74,7 @@
                 <span class="h-1.5 w-1.5 rounded-full bg-ember-400"></span>
                 <p class="text-[9px] font-bold uppercase tracking-[0.15em] text-bark-200">Tentor</p>
             </div>
-            <p class="mt-0.5 text-[13px] font-semibold text-white">Farhan Kamil</p>
+            <p class="mt-0.5 truncate text-[13px] font-semibold text-white" title="{{ $layoutTentorName }}">{{ $layoutTentorName }}</p>
 
             <form action="{{ route('logout') }}" method="POST" class="mt-2.5 border-t border-bark-600 pt-2">
                 @csrf
@@ -88,20 +101,52 @@
                     <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-ember-400 ring-2 ring-bark-50"></span>
                 </button>
                 <div class="flex items-center gap-2">
-                    <div class="grid h-9 w-9 place-items-center rounded-full bg-ember-100 text-[12px] font-bold text-ember-700">KH</div>
+                    <div class="grid h-9 w-9 place-items-center rounded-full bg-ember-100 text-[12px] font-bold text-ember-700">{{ $layoutInitials }}</div>
                     <div class="hidden leading-tight sm:block">
-                        <p class="text-[13px] font-semibold text-bark-800">Kak Hendra</p>
+                        <p class="text-[13px] font-semibold text-bark-800">{{ $layoutTentorName }}</p>
                         <p class="text-[11px] text-bark-400">Tentor</p>
                     </div>
-                    <svg class="hidden h-4 w-4 text-bark-400 sm:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
                 </div>
             </div>
         </header>
 
         <main class="flex-1 px-4 pb-6 sm:px-6">
+            @if (session('success'))
+                <div class="mb-5 flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] font-semibold text-emerald-800">
+                    @include('layouts.partials.icon', ['name' => 'check-circle', 'class' => 'h-4 w-4 shrink-0 text-emerald-600'])
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-5 flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] font-semibold text-rose-800">
+                    @include('layouts.partials.icon', ['name' => 'siren', 'class' => 'h-4 w-4 shrink-0 text-rose-600'])
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if (session('info'))
+                <div class="mb-5 flex items-center gap-2.5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-[13px] font-semibold text-sky-800">
+                    @include('layouts.partials.icon', ['name' => 'info', 'class' => 'h-4 w-4 shrink-0 text-sky-600'])
+                    <span>{{ session('info') }}</span>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-800">
+                    <p class="font-bold">Terjadi kesalahan:</p>
+                    <ul class="mt-1 list-disc pl-5 text-[12px] space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>
 </div>
+@stack('scripts')
 </body>
 </html>

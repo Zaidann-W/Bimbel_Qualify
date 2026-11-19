@@ -36,9 +36,9 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\Student\SessionController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Tentor\AbsensiController;
-use App\Http\Controllers\Tentor\MateriController;
 use App\Http\Controllers\Tentor\ProfilController;
 use App\Http\Controllers\Tentor\TentorDashboardController;
+use App\Http\Controllers\Tentor\TentorMateriController;
 use App\Http\Controllers\Tentor\TentorQualifixController;
 use App\Http\Controllers\XenditWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -134,6 +134,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/laporan-qualifix', [LaporanQualifixController::class, 'index'])->name('laporanQualifix');
     Route::get('/laporan-qualifix/export', [LaporanQualifixController::class, 'export'])->name('laporanQualifix.export');
 
+    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
     Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
@@ -193,12 +194,14 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/qualifix', [TentorQualifixController::class, 'index'])->name('qualifix');
         Route::post('/qualifix/{ticket}/jawab', [TentorQualifixController::class, 'answer'])->name('qualifix.answer');
+        Route::put('/qualifix/jawaban/{answer}', [TentorQualifixController::class, 'updateAnswer'])->name('qualifix.answer.update');
+        Route::post('/qualifix/{ticket}/ambil', [TentorQualifixController::class, 'claim'])->name('qualifix.claim');
         Route::patch('/qualifix/{ticket}/selesai', [TentorQualifixController::class, 'resolve'])->name('qualifix.resolve');
+        Route::get('/qualifix/file/{file}', [TentorQualifixController::class, 'downloadFile'])->name('qualifix.file');
 
-        Route::get('/materi', [MateriController::class, 'index'])->name('materi');
-        Route::get('/materi/{materi}/unduh', [MateriController::class, 'unduh'])
-            ->whereNumber('materi')
-            ->name('materi.unduh');
+        Route::get('/materi', [TentorMateriController::class, 'index'])->name('materi');
+        Route::get('/materi/{material}/buka', [TentorMateriController::class, 'buka'])->name('materi.buka');
+        Route::get('/materi/{material}/unduh', [TentorMateriController::class, 'buka'])->name('materi.unduh');
 
         Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
         Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');

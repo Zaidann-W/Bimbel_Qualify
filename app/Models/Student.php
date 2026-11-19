@@ -62,6 +62,19 @@ class Student extends Model
         return $this->hasMany(Enrollment::class);
     }
 
+    public function classGroups()
+    {
+        return $this->belongsToMany(ClassGroup::class, 'enrollments', 'student_id', 'class_group_id')
+            ->withPivot('started_on', 'ended_on', 'status')
+            ->withTimestamps();
+    }
+
+    public function classGroup()
+    {
+        return $this->hasOneThrough(ClassGroup::class, Enrollment::class, 'student_id', 'id', 'id', 'class_group_id')
+            ->where('enrollments.status', 'aktif');
+    }
+
     public function studyShift()
     {
         return $this->belongsTo(StudyShift::class, 'study_shift_id');

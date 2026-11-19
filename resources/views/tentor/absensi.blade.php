@@ -101,18 +101,22 @@
                     </thead>
                     <tbody class="divide-y divide-bark-100">
                         @foreach ($barisSesi as $baris)
+                            @php
+                                $isSelected = $session && $session->id === $baris['id'];
+                                $sesiUrl = route('tentor.absensi', [
+                                    'session_id' => $baris['id'],
+                                    'dari' => $dari->toDateString(),
+                                    'sampai' => $sampai->toDateString(),
+                                ]);
+                            @endphp
                             <tr @class([
-                                'transition',
-                                'bg-ember-50/60' => $session && $session->id === $baris['id'],
-                                'hover:bg-bark-50' => ! $session || $session->id !== $baris['id'],
-                            ])>
+                                'transition cursor-pointer group',
+                                'bg-ember-50/70 border-l-4 border-l-ember-500 font-medium' => $isSelected,
+                                'hover:bg-bark-50/80 border-l-4 border-l-transparent' => ! $isSelected,
+                            ]) onclick="window.location.href='{{ $sesiUrl }}'">
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('tentor.absensi', [
-                                        'session_id' => $baris['id'],
-                                        'dari' => $dari->toDateString(),
-                                        'sampai' => $sampai->toDateString(),
-                                    ]) }}"
-                                       class="text-[12.5px] font-bold text-bark-800 hover:text-ember-600">
+                                    <a href="{{ $sesiUrl }}"
+                                       class="text-[12.5px] font-bold text-bark-800 group-hover:text-ember-600 {{ $isSelected ? 'text-ember-600' : '' }}">
                                         {{ $baris['label_tanggal'] }}
                                     </a>
                                 </td>
@@ -261,10 +265,76 @@
             @endforeach
         </div>
 
+        {{-- Status Penyimpanan Absensi --}}
+        @if ($isSaved)
+            @if ($isDuringClassHours)
+                <div id="attendanceLockBanner" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-100 text-emerald-700">
+                            @include('layouts.partials.icon', ['name' => 'lock', 'class' => 'h-5 w-5'])
+                        </div>
+                        <div>
+                            <p class="text-[13.5px] font-bold text-emerald-900">Absensi Telah Tersimpan</p>
+                            <p class="text-[11.5px] text-emerald-700">Status kehadiran terkunci. Anda dapat mengedit kehadiran karena saat ini jam pembelajaran sedang berlangsung ({{ substr((string)$session->start_time, 0, 5) }} – {{ substr((string)$session->end_time, 0, 5) }} WIB).</p>
+                        </div>
+                    </div>
+                    <button type="button" id="btnEditAbsensi"
+                            class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-[12px] font-bold text-white shadow-sm transition hover:bg-emerald-700">
+                        @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-3.5 w-3.5 text-white'])
+                        Edit Absensi
+                    </button>
+                </div>
+            @else
+                <div id="attendanceLockBanner" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-bark-200 bg-bark-50/80 p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-bark-200 text-bark-600">
+                            @include('layouts.partials.icon', ['name' => 'lock', 'class' => 'h-5 w-5'])
+                        </div>
+                        <div>
+                            <p class="text-[13.5px] font-bold text-bark-800">Absensi Telah Tersimpan & Terkunci</p>
+                            <p class="text-[11.5px] text-bark-500">Edit absensi hanya dapat dilakukan saat jam pembelajaran sesi ini berlangsung ({{ substr((string)$session->start_time, 0, 5) }} – {{ substr((string)$session->end_time, 0, 5) }} WIB).</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 rounded-xl border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-semibold text-bark-400 cursor-not-allowed">
+                        @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-3.5 w-3.5 text-bark-400'])
+                        Edit Hanya Saat Jam Pembelajaran
+                    </span>
+                </div>
+            @endif
+
+            <div id="attendanceEditBanner" class="hidden flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+                <div class="flex items-center gap-3">
+                    <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-700">
+                        @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-5 w-5'])
+                    </div>
+                    <div>
+                        <p class="text-[13.5px] font-bold text-amber-900">Mode Edit Absensi Aktif</p>
+                        <p class="text-[11.5px] text-amber-700">Anda sedang mengubah data kehadiran siswa. Klik "Simpan Perubahan Presensi" setelah selesai.</p>
+                    </div>
+                </div>
+                <button type="button" id="btnBatalEdit"
+                        class="inline-flex items-center gap-2 rounded-xl border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-semibold text-bark-600 shadow-sm transition hover:bg-bark-50">
+                    Batal Edit
+                </button>
+            </div>
+        @else
+            <div class="flex items-center gap-3 rounded-2xl border border-bark-100 bg-white p-4">
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-bark-50 text-bark-500">
+                    @include('layouts.partials.icon', ['name' => 'clipboard-check', 'class' => 'h-5 w-5'])
+                </div>
+                <div>
+                    <p class="text-[13.5px] font-bold text-bark-800">Absensi Belum Disimpan</p>
+                    <p class="text-[11.5px] text-bark-400">Silakan input status kehadiran siswa di bawah ini, lalu klik "Simpan Presensi Kelas".</p>
+                </div>
+            </div>
+        @endif
+
         {{-- Form absensi --}}
-        <form action="{{ route('tentor.absensi.store') }}" method="POST" class="space-y-5">
+        <form action="{{ route('tentor.absensi.store') }}" method="POST" id="attendanceForm" class="space-y-5">
             @csrf
             <input type="hidden" name="session_id" value="{{ $session->id }}">
+            <input type="hidden" name="dari" value="{{ $dari->toDateString() }}">
+            <input type="hidden" name="sampai" value="{{ $sampai->toDateString() }}">
 
             {{-- Tabel kehadiran --}}
             <section class="overflow-hidden rounded-2xl border border-bark-100 bg-white">
@@ -281,7 +351,10 @@
                                    id="searchInput">
                         </div>
                         <button type="button" id="setAllHadirBtn"
-                                class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-[12px] font-semibold text-emerald-700 transition hover:bg-emerald-100">
+                                @class([
+                                    'inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-[12px] font-semibold text-emerald-700 transition hover:bg-emerald-100',
+                                    'hidden' => $isSaved,
+                                ])>
                             @include('layouts.partials.icon', ['name' => 'check', 'class' => 'h-3.5 w-3.5'])
                             Set Semua Hadir
                         </button>
@@ -322,18 +395,26 @@
                                     <td class="px-5 py-3.5">
                                         <input type="time" name="attendances[{{ $siswa->id }}][arrived_at]"
                                                value="{{ $waktu }}"
-                                               class="w-full rounded-lg border border-bark-200 bg-bark-50 py-1.5 pl-2 pr-3 text-[12px] placeholder:text-bark-300 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100">
+                                               @if ($isSaved) disabled @endif
+                                               class="time-input w-full rounded-lg border border-bark-200 bg-bark-50 py-1.5 pl-2 pr-3 text-[12px] placeholder:text-bark-300 focus:border-ember-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ember-100 disabled:opacity-60 disabled:bg-bark-100/50">
                                         <input type="hidden" name="attendances[{{ $siswa->id }}][student_id]" value="{{ $siswa->id }}">
                                     </td>
                                     <td class="px-5 py-3.5">
-                                        <div class="inline-flex rounded-lg bg-bark-50 p-0.5 ring-1 ring-bark-100">
+                                        <div @class([
+                                            'status-group inline-flex rounded-lg bg-bark-50 p-0.5 ring-1 ring-bark-100',
+                                            'pointer-events-none opacity-90' => $isSaved,
+                                        ])>
                                             @foreach ($sessionStatusOptions as $key => $opt)
+                                                @php
+                                                    $isActive = ($key === $currentStatus);
+                                                @endphp
                                                 <button type="button"
                                                         data-student="{{ $siswa->id }}"
                                                         data-status="{{ $key }}"
+                                                        @if ($isSaved) disabled @endif
                                                         class="status-btn px-2.5 py-1 text-[11px] font-semibold rounded-md transition
-                                                            {{ $key === $currentStatus ? $badge.' ring-1' : 'text-bark-400 hover:text-bark-600' }}"
-                                                        @class(['cursor-pointer', $key !== $currentStatus])
+                                                            {{ $isActive ? $badge.' ring-1' : 'text-bark-400 hover:text-bark-600' }}"
+                                                        @class(['cursor-pointer' => ! $isSaved, 'cursor-default' => $isSaved])
                                                 >
                                                     {{ $opt }}
                                                 </button>
@@ -356,12 +437,33 @@
                         Menampilkan <span class="font-bold text-bark-600">{{ $totalSiswa }}</span> siswa terdaftar.
                     </p>
                     <div class="flex items-center gap-2">
-                        <button type="button" id="resetBtn" class="rounded-lg border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50">
+                        <button type="button" id="resetBtn"
+                                @class([
+                                    'rounded-lg border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-semibold text-bark-600 transition hover:bg-bark-50',
+                                    'hidden' => $isSaved,
+                                ])>
                             Reset Form
                         </button>
-                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-ember-600">
+                        @if ($isSaved && $isDuringClassHours)
+                            <button type="button" id="footerEditBtn"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-bark-200 bg-white px-3.5 py-2 text-[12px] font-semibold text-bark-700 shadow-sm transition hover:bg-bark-50">
+                                @include('layouts.partials.icon', ['name' => 'pen-line', 'class' => 'h-3.5 w-3.5 text-ember-600'])
+                                Edit Presensi
+                            </button>
+                        @elseif ($isSaved)
+                            <span class="inline-flex items-center gap-1.5 rounded-lg border border-bark-200 bg-bark-100/60 px-3.5 py-2 text-[11.5px] font-medium text-bark-400 cursor-not-allowed" title="Edit hanya dapat dilakukan saat jam sesi berlangsung">
+                                @include('layouts.partials.icon', ['name' => 'lock', 'class' => 'h-3 w-3 text-bark-400'])
+                                Terkunci di Luar Jam Sesi
+                            </span>
+                        @endif
+                        <button type="submit" id="submitBtn"
+                                @class([
+                                    'inline-flex items-center gap-1.5 rounded-lg bg-ember-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-sm transition hover:bg-ember-600',
+                                    'hidden' => $isSaved,
+                                ])
+                                @if ($students->isEmpty()) disabled @endif>
                             @include('layouts.partials.icon', ['name' => 'clipboard-check', 'class' => 'h-3.5 w-3.5'])
-                            Simpan Presensi Kelas
+                            <span id="submitBtnText">{{ $isSaved ? 'Simpan Perubahan Presensi' : 'Simpan Presensi Kelas' }}</span>
                         </button>
                     </div>
                 </footer>
@@ -435,30 +537,162 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Status button toggle
+    const isInitiallySaved = {{ $isSaved ? 'true' : 'false' }};
+    const canEdit = {{ ($isSaved && ! $isDuringClassHours) ? 'false' : 'true' }};
+    let isEditMode = !isInitiallySaved;
+
+    const badgeClasses = {
+        hadir: 'bg-emerald-100 text-emerald-700 ring-emerald-200',
+        izin: 'bg-amber-50 text-amber-700 ring-amber-200',
+        sakit: 'bg-sky-50 text-sky-700 ring-sky-200',
+        alpa: 'bg-rose-50 text-rose-700 ring-rose-200',
+    };
+
+    // Simpan nilai awal untuk fungsi batal edit
+    const originalData = [];
+    document.querySelectorAll('#attendanceTableBody tr[data-nama]').forEach(row => {
+        const studentInput = row.querySelector('.status-input');
+        const timeInput = row.querySelector('.time-input');
+        if (studentInput) {
+            originalData.push({
+                studentId: studentInput.dataset.student,
+                status: studentInput.value,
+                time: timeInput ? timeInput.value : '',
+            });
+        }
+    });
+
+    function updateStudentStatusVisual(studentId, status) {
+        document.querySelectorAll(`.status-btn[data-student="${studentId}"]`).forEach(b => {
+            const isActive = b.dataset.status === status;
+            if (isActive) {
+                b.className = 'status-btn px-2.5 py-1 text-[11px] font-semibold rounded-md transition ' + badgeClasses[status] + ' ring-1 ' + (isEditMode ? 'cursor-pointer' : 'cursor-default');
+            } else {
+                b.className = 'status-btn px-2.5 py-1 text-[11px] font-semibold rounded-md transition text-bark-400 hover:text-bark-600 ' + (isEditMode ? 'cursor-pointer' : 'cursor-default');
+            }
+        });
+    }
+
+    function setEditMode(editable) {
+        isEditMode = editable;
+
+        // Toggle banner
+        const lockBanner = document.getElementById('attendanceLockBanner');
+        const editBanner = document.getElementById('attendanceEditBanner');
+        if (lockBanner && editBanner) {
+            if (editable) {
+                lockBanner.classList.add('hidden');
+                editBanner.classList.remove('hidden');
+            } else {
+                lockBanner.classList.remove('hidden');
+                editBanner.classList.add('hidden');
+            }
+        }
+
+        // Toggle grup status dan tombol status
+        document.querySelectorAll('.status-group').forEach(group => {
+            if (editable) {
+                group.classList.remove('pointer-events-none', 'opacity-90');
+            } else {
+                group.classList.add('pointer-events-none', 'opacity-90');
+            }
+        });
+
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.disabled = !editable;
+            if (editable) {
+                btn.classList.add('cursor-pointer');
+                btn.classList.remove('cursor-default');
+            } else {
+                btn.classList.remove('cursor-pointer');
+                btn.classList.add('cursor-default');
+            }
+        });
+
+        // Toggle input waktu datang
+        document.querySelectorAll('.time-input').forEach(input => {
+            input.disabled = !editable;
+        });
+
+        // Toggle tombol aksi
+        const setAllHadirBtn = document.getElementById('setAllHadirBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const footerEditBtn = document.getElementById('footerEditBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+
+        if (setAllHadirBtn) setAllHadirBtn.classList.toggle('hidden', !editable);
+        if (resetBtn) resetBtn.classList.toggle('hidden', !editable);
+        if (footerEditBtn) footerEditBtn.classList.toggle('hidden', editable);
+        if (submitBtn) {
+            submitBtn.classList.toggle('hidden', !editable);
+            if (submitBtnText) {
+                submitBtnText.textContent = isInitiallySaved ? 'Simpan Perubahan Presensi' : 'Simpan Presensi Kelas';
+            }
+        }
+    }
+
+    // Tombol Edit Presensi
+    const btnEditAbsensi = document.getElementById('btnEditAbsensi');
+    const footerEditBtn = document.getElementById('footerEditBtn');
+    [btnEditAbsensi, footerEditBtn].forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!canEdit) {
+                    alert('Edit absensi hanya dapat dilakukan saat jam pembelajaran sesi ini berlangsung.');
+                    return;
+                }
+                setEditMode(true);
+            });
+        }
+    });
+
+    // Tombol Batal Edit
+    const btnBatalEdit = document.getElementById('btnBatalEdit');
+    if (btnBatalEdit) {
+        btnBatalEdit.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Kembalikan ke data awal
+            originalData.forEach(item => {
+                const statusInput = document.querySelector(`.status-input[data-student="${item.studentId}"]`);
+                if (statusInput) statusInput.value = item.status;
+
+                const timeInput = document.querySelector(`input[name="attendances[${item.studentId}][arrived_at]"]`);
+                if (timeInput) timeInput.value = item.time;
+
+                updateStudentStatusVisual(item.studentId, item.status);
+            });
+            setEditMode(false);
+        });
+    }
+
+    // Tombol ganti status siswa
     document.querySelectorAll('.status-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+            if (!isEditMode) return;
             const studentId = this.dataset.student;
             const status = this.dataset.status;
 
             // Update hidden input
-            document.querySelector(`.status-input[data-student="${studentId}"]`).value = status;
+            const statusInput = document.querySelector(`.status-input[data-student="${studentId}"]`);
+            if (statusInput) statusInput.value = status;
 
             // Update button styles
-            document.querySelectorAll(`.status-btn[data-student="${studentId}"]`).forEach(b => {
-                const isActive = b.dataset.status === status;
-                const badgeClasses = {
-                    hadir: 'bg-emerald-100 text-emerald-700 ring-emerald-200',
-                    izin: 'bg-amber-50 text-amber-700 ring-amber-200',
-                    sakit: 'bg-sky-50 text-sky-700 ring-sky-200',
-                    alpa: 'bg-rose-50 text-rose-700 ring-rose-200',
-                };
-                if (isActive) {
-                    b.className = 'status-btn px-2.5 py-1 text-[11px] font-semibold rounded-md transition ' + badgeClasses[status] + ' ring-1 cursor-pointer';
-                } else {
-                    b.className = 'status-btn px-2.5 py-1 text-[11px] font-semibold rounded-md transition text-bark-400 hover:text-bark-600 cursor-pointer';
+            updateStudentStatusVisual(studentId, status);
+
+            // Auto-fill jam saat dipilih hadir jika belum ada jam, dan kosongkan jika status bukan hadir
+            const timeInput = document.querySelector(`input[name="attendances[${studentId}][arrived_at]"]`);
+            if (timeInput) {
+                if (status === 'hadir' && !timeInput.value) {
+                    const now = new Date();
+                    const hh = String(now.getHours()).padStart(2, '0');
+                    const mm = String(now.getMinutes()).padStart(2, '0');
+                    timeInput.value = `${hh}:${mm}`;
+                } else if (status !== 'hadir') {
+                    timeInput.value = '';
                 }
-            });
+            }
         });
     });
 
@@ -478,6 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const setAllHadirBtn = document.getElementById('setAllHadirBtn');
     if (setAllHadirBtn) {
         setAllHadirBtn.addEventListener('click', function() {
+            if (!isEditMode) return;
             document.querySelectorAll('.status-btn[data-status="hadir"]').forEach(btn => {
                 btn.click();
             });
@@ -488,11 +723,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
+            if (!isEditMode) return;
             if (confirm('Reset semua status ke Alpa dan kosongkan waktu datang?')) {
                 document.querySelectorAll('.status-btn[data-status="alpa"]').forEach(btn => {
                     btn.click();
                 });
-                document.querySelectorAll('input[type="time"]').forEach(input => {
+                document.querySelectorAll('.time-input').forEach(input => {
                     input.value = '';
                 });
             }

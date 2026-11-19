@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\QualifixTicket;
-use Illuminate\Support\Collection;
 
 class AdminLaporanQualifixService
 {

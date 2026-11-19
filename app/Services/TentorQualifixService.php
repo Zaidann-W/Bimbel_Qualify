@@ -18,40 +18,74 @@ class TentorQualifixService
      *     staffProfile: StaffProfile|null,
      *     stats: array<int, array<string, mixed>>,
      *     tabs: array<int, array<string, mixed>>,
+     *     activeTab: string,
      *     antrean: array<int, array<string, mixed>>,
+     *     tickets: Collection<int, QualifixTicket>,
+     *     selectedTicket: QualifixTicket|null,
      *     selected: array<string, mixed>|null,
      *     todayDate: string,
      * }
      */
-    public function qualifix(?User $user): array
+    public function qualifix(?User $user, string $activeTab = 'semua', ?int $selectedTicketId = null): array
     {
         $staffProfile = $user !== null
             ? StaffProfile::where('user_id', $user->id)->first()
             : null;
 
-        $tickets = $staffProfile !== null
-            ? QualifixTicket::query()
-                ->whereHas('staff', fn ($q) => $q->where('staff_profiles.id', $staffProfile->id))
-                ->with(['student', 'subject'])
-                ->orderByDesc('submitted_at')
-                ->get()
-            : collect();
+        // Requirement 3: Semua pertanyaan muncul (bukan hanya pertanyaan yang sesuai Mapel tentor)
+        $tickets = QualifixTicket::query()
+            ->with([
+                'student',
+                'subject',
+                'classGroup',
+                'staff',
+                'attachments.file',
+                'answers.staff.user',
+                'answers.attachments.file',
+            ])
+            ->orderByDesc('submitted_at')
+            ->get();
 
-        $menunggu = $tickets->where('status', 'menunggu_tentor');
-        $selesai = $tickets->where('status', 'selesai');
-        $selesaiMingguIni = $this->countSelesaiMingguIni($selesai);
+        $menungguCount = $tickets->where('status', 'menunggu_tentor')->count();
+        $sudahDijawabCount = $tickets->where('status', 'sedang_dibahas')->count();
+        $selesaiCount = $tickets->where('status', 'selesai')->count();
+        $totalCount = $tickets->count();
+        $selesaiMingguIni = $this->countSelesaiMingguIni($tickets->where('status', 'selesai'));
 
-        $stats = $this->statCards($menunggu->count(), $selesaiMingguIni);
-        $tabs = $this->tabs($tickets->count(), $menunggu->count(), $selesai->count());
-        $antrean = $tickets->map(fn (QualifixTicket $ticket) => $this->kartuAntrean($ticket))->all();
+        $activeTab = in_array($activeTab, ['semua', 'menunggu', 'sudah_dijawab', 'selesai'], true) ? $activeTab : 'semua';
+
+        $filteredTickets = match ($activeTab) {
+            'menunggu' => $tickets->where('status', 'menunggu_tentor')->values(),
+            'sudah_dijawab' => $tickets->where('status', 'sedang_dibahas')->values(),
+            'selesai' => $tickets->where('status', 'selesai')->values(),
+            default => $tickets->values(),
+        };
+
+        // Memilih tiket yang dipencet atau tiket pertama dari daftar terfilter
+        $selectedTicket = null;
+        if ($selectedTicketId !== null) {
+            $selectedTicket = $filteredTickets->firstWhere('id', $selectedTicketId);
+        }
+        $selectedTicket ??= $filteredTickets->first();
+
+        $stats = $this->statCards($menungguCount, $selesaiMingguIni);
+        $tabs = $this->tabs($totalCount, $menungguCount, $sudahDijawabCount, $selesaiCount, $activeTab);
+
+        $antrean = $filteredTickets->map(function (QualifixTicket $ticket) use ($selectedTicket) {
+            return $this->kartuAntrean($ticket, $selectedTicket && $selectedTicket->id === $ticket->id);
+        })->all();
 
         return [
             'user' => $user,
             'staffProfile' => $staffProfile,
             'stats' => $stats,
             'tabs' => $tabs,
+            'activeTab' => $activeTab,
             'antrean' => $antrean,
-            'selected' => $antrean[0] ?? null,
+            'tickets' => $tickets,
+            'totalCount' => $totalCount,
+            'selectedTicket' => $selectedTicket,
+            'selected' => $selectedTicket ? $this->kartuAntrean($selectedTicket, true) : null,
             'todayDate' => now()->locale('id')->translatedFormat('l, j F Y'),
         ];
     }
@@ -66,7 +100,7 @@ class TentorQualifixService
                 'Pertanyaan Menunggu',
                 (string) $menunggu,
                 'Pertanyaan',
-                'Antrean menunggu respons tanggapan Anda',
+                'Antrean menunggu respons tanggapan',
                 'clock',
                 'text-ember-600',
                 $menunggu > 0 ? 'bg-ember-50 text-ember-600' : 'bg-bark-50 text-bark-500',
@@ -86,35 +120,104 @@ class TentorQualifixService
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function tabs(int $total, int $menunggu, int $selesai): array
+    private function tabs(int $total, int $menunggu, int $sudahDijawab, int $selesai, string $activeTab): array
     {
         return [
-            ['Semua', $total, false],
-            ['Menunggu Respons', $menunggu, true],
-            ['Selesai', $selesai, false],
+            [
+                0 => 'Semua',
+                1 => $total,
+                2 => $activeTab === 'semua',
+                'key' => 'semua',
+                'label' => 'Semua',
+                'count' => $total,
+                'active' => $activeTab === 'semua',
+            ],
+            [
+                0 => 'Menunggu Respons',
+                1 => $menunggu,
+                2 => $activeTab === 'menunggu',
+                'key' => 'menunggu',
+                'label' => 'Menunggu Respons',
+                'count' => $menunggu,
+                'active' => $activeTab === 'menunggu',
+            ],
+            [
+                0 => 'Sudah Dijawab',
+                1 => $sudahDijawab,
+                2 => $activeTab === 'sudah_dijawab',
+                'key' => 'sudah_dijawab',
+                'label' => 'Sudah Dijawab',
+                'count' => $sudahDijawab,
+                'active' => $activeTab === 'sudah_dijawab',
+            ],
+            [
+                0 => 'Selesai',
+                1 => $selesai,
+                2 => $activeTab === 'selesai',
+                'key' => 'selesai',
+                'label' => 'Selesai',
+                'count' => $selesai,
+                'active' => $activeTab === 'selesai',
+            ],
         ];
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<string|int, mixed>
      */
-    private function kartuAntrean(QualifixTicket $ticket): array
+    private function kartuAntrean(QualifixTicket $ticket, bool $isSelected): array
     {
         $student = $ticket->student;
         $subject = $ticket->subject;
         $waktu = $ticket->submitted_at?->diffForHumans() ?? 'baru saja';
+        $hasAnswers = $ticket->answers->isNotEmpty();
+
+        $latestAnswer = $ticket->answers->sortByDesc('sent_at')->first();
+        $pemberiJawaban = $latestAnswer?->staff?->full_name_with_title
+            ?? $latestAnswer?->staff?->user?->name
+            ?? null;
+
+        $statusLabel = match ($ticket->status) {
+            'selesai' => 'Selesai',
+            'sedang_dibahas' => 'Sudah Dijawab',
+            default => 'Menunggu',
+        };
+
+        $isMenunggu = $ticket->status === 'menunggu_tentor';
+        $isSudahDijawab = $ticket->status === 'sedang_dibahas';
+        $isSelesai = $ticket->status === 'selesai';
+
+        $kelasLabel = $ticket->classGroup?->name
+            ?? $ticket->classGroup?->code
+            ?? ($student?->school_grade ? 'Kelas '.$student->school_grade : 'Siswa');
+        $metaText = $kelasLabel.' • '.$waktu;
 
         return [
-            $this->initials($student?->full_name ?? 'Siswa'),        // 0: initial
-            $student?->full_name ?? 'Siswa',                         // 1: nama
-            $ticket->status === 'menunggu_tentor' ? 'Menunggu' : 'Selesai', // 2: status
-            ($student?->class_group_id !== null ? 'Kelas '.$student->class_group_id : '-').' • '.$waktu, // 3: meta
-            $ticket->title,                                          // 4: topik
-            $ticket->question,                                       // 5: preview
-            [$subject?->name ?? 'Mata Pelajaran'],                   // 6: tags
-            $ticket->status === 'menunggu_tentor',                   // 7: active
-            $ticket->id,                                             // 8: ticket id
-            $ticket->ticket_number,                                  // 9: ticket number
+            0 => $this->initials($student?->full_name ?? 'Siswa'),
+            1 => $student?->full_name ?? 'Siswa',
+            2 => $statusLabel,
+            3 => $metaText,
+            4 => $ticket->title,
+            5 => $ticket->question,
+            6 => [$subject?->name ?? 'Mata Pelajaran'],
+            7 => $isSelected,
+            8 => $ticket->id,
+            9 => $ticket->ticket_number,
+            'id' => $ticket->id,
+            'initial' => $this->initials($student?->full_name ?? 'Siswa'),
+            'nama' => $student?->full_name ?? 'Siswa',
+            'status' => $statusLabel,
+            'is_menunggu' => $isMenunggu,
+            'is_sudah_dijawab' => $isSudahDijawab,
+            'is_selesai' => $isSelesai,
+            'meta' => $metaText,
+            'topik' => $ticket->title,
+            'preview' => $ticket->question,
+            'tags' => [$subject?->name ?? 'Mata Pelajaran'],
+            'active' => $isSelected,
+            'ticket_number' => $ticket->ticket_number,
+            'pemberi_jawaban' => $pemberiJawaban,
+            'ticket' => $ticket,
         ];
     }
 

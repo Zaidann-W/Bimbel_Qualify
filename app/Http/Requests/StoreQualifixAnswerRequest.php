@@ -24,8 +24,8 @@ class StoreQualifixAnswerRequest extends FormRequest
     {
         return [
             'body' => ['required', 'string'],
-            'files' => ['nullable', 'array', 'max:2'],
-            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'files' => ['nullable', 'array', 'max:5'],
+            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
     }
 
@@ -39,10 +39,10 @@ class StoreQualifixAnswerRequest extends FormRequest
         return [
             'body.required' => 'Teks jawaban harus diisi.',
             'files.array' => 'Lampiran harus berupa berkas.',
-            'files.max' => 'Maksimal 2 berkas lampiran.',
+            'files.max' => 'Maksimal 5 berkas lampiran.',
             'files.*.file' => 'Setiap lampiran harus berupa berkas.',
             'files.*.mimes' => 'Format lampiran yang diizinkan: JPG, PNG, atau PDF.',
-            'files.*.max' => 'Ukuran setiap lampiran maksimal 2 MB.',
+            'files.*.max' => 'Ukuran setiap lampiran maksimal 5 MB.',
         ];
     }
 }

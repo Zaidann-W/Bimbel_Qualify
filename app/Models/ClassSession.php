@@ -102,4 +102,23 @@ class ClassSession extends Model
 
         return $this->status;
     }
+
+    /**
+     * Apakah waktu saat ini berada pada jam pembelajaran sesi ini.
+     */
+    public function isDuringClassHours(): bool
+    {
+        if (! $this->tanggal->isToday()) {
+            return false;
+        }
+
+        if (! $this->start_time || ! $this->end_time) {
+            return true;
+        }
+
+        $mulai = Carbon::parse($this->session_date)->setTimeFromTimeString((string) $this->start_time);
+        $selesai = Carbon::parse($this->session_date)->setTimeFromTimeString((string) $this->end_time);
+
+        return now()->between($mulai, $selesai);
+    }
 }

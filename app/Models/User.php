@@ -42,6 +42,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Profil staf/tentor yang terhubung dengan akun ini.
+     */
+    public function staffProfile(): HasOne
+    {
+        return $this->hasOne(StaffProfile::class);
+    }
+
+    /**
      * Cek apakah user memiliki role tertentu.
      */
     public function hasRole(string $role): bool

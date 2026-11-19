@@ -61,13 +61,19 @@ class AbsensiController extends Controller
         $session = null;
         $selectedSessionId = $request->query('session_id');
 
-        if (is_string($selectedSessionId) && $selectedSessionId !== '') {
+        if (! empty($selectedSessionId)) {
             $session = ClassSession::with(['classGroup', 'subject', 'room', 'studyShift', 'tutorAttendance'])
                 ->where('staff_id', $staffProfile->id)
                 ->find($selectedSessionId);
         }
 
         $session ??= $sessions->first();
+
+        // Pastikan sesi aktif ada di daftar sesi agar bisa disorot di tabel
+        if ($session && ! $sessions->contains('id', $session->id)) {
+            $sessions->push($session);
+            $sessions = $sessions->sortBy(['session_date', 'start_time'])->values();
+        }
 
         $students = collect();
         $attendances = collect();
@@ -89,12 +95,17 @@ class AbsensiController extends Controller
                 ->keyBy('student_id');
         }
 
+        $isSaved = $attendances->isNotEmpty();
+        $isDuringClassHours = $session ? $session->isDuringClassHours() : false;
+
         return view('tentor.absensi', [
             'sessions' => $sessions,
             'barisSesi' => $this->barisSesi($sessions),
             'session' => $session,
             'students' => $students,
             'attendances' => $attendances,
+            'isSaved' => $isSaved,
+            'isDuringClassHours' => $isDuringClassHours,
             'staffProfile' => $staffProfile,
             'dari' => $dari,
             'sampai' => $sampai,
@@ -262,10 +273,10 @@ class AbsensiController extends Controller
 
         $validated = $request->validate([
             'session_id' => 'required|exists:class_sessions,id',
-            'attendances' => 'required|array',
+            'attendances' => 'nullable|array',
             'attendances.*.student_id' => 'required|exists:students,id',
             'attendances.*.status' => 'required|in:hadir,izin,sakit,alpa',
-            'attendances.*.arrived_at' => 'nullable|date_format:H:i',
+            'attendances.*.arrived_at' => 'nullable|string',
             'attendances.*.note' => 'nullable|string',
         ]);
 
@@ -276,10 +287,37 @@ class AbsensiController extends Controller
             return back()->withErrors(['error' => 'Anda tidak berhak menginput absensi untuk sesi ini.']);
         }
 
+        // Cek apakah ini aksi edit (absensi untuk sesi ini sudah pernah disimpan)
+        $isEditing = StudentAttendance::where('class_session_id', $session->id)->exists();
+
+        if ($isEditing && ! $session->isDuringClassHours()) {
+            $jamMulai = substr((string) $session->start_time, 0, 5);
+            $jamSelesai = substr((string) $session->end_time, 0, 5);
+
+            return back()->withErrors([
+                'error' => "Edit absensi hanya dapat dilakukan saat jam pembelajaran berlangsung ({$jamMulai} – {$jamSelesai} WIB).",
+            ]);
+        }
+
+        $redirectParams = array_filter([
+            'session_id' => $session->id,
+            'dari' => $request->input('dari'),
+            'sampai' => $request->input('sampai'),
+        ]);
+
+        if (empty($validated['attendances'])) {
+            return redirect()->route('tentor.absensi', $redirectParams)
+                ->with('info', 'Tidak ada data kehadiran siswa yang disimpan.');
+        }
+
         foreach ($validated['attendances'] as $attendanceData) {
             $arrivedAt = null;
-            if (! empty($attendanceData['arrived_at'])) {
-                $arrivedAt = Carbon::parse($session->session_date)->setTimeFromTimeString($attendanceData['arrived_at']);
+            if ($attendanceData['status'] === 'hadir' && ! empty($attendanceData['arrived_at'])) {
+                try {
+                    $arrivedAt = Carbon::parse($session->session_date.' '.$attendanceData['arrived_at']);
+                } catch (\Throwable) {
+                    $arrivedAt = null;
+                }
             }
 
             StudentAttendance::updateOrCreate(
@@ -296,6 +334,7 @@ class AbsensiController extends Controller
             );
         }
 
-        return back()->with('success', 'Absensi berhasil disimpan.');
+        return redirect()->route('tentor.absensi', $redirectParams)
+            ->with('success', 'Absensi berhasil disimpan.');
     }
 }

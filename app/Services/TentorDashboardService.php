@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\ClassSession;
+use App\Models\Enrollment;
 use App\Models\QualifixTicket;
 use App\Models\StaffProfile;
+use App\Models\StudySession;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -33,22 +35,68 @@ class TentorDashboardService
             ? StaffProfile::where('user_id', $user->id)->first()
             : null;
 
+        $tutorName = $staffProfile?->full_name_with_title ?? $user?->name ?? '';
         $jobTitle = $staffProfile?->job_title ?? $user?->name ?? 'Tentor';
         $today = today();
         $weekStart = now()->startOfWeek();
         $weekEnd = now()->endOfWeek();
 
         // Sesi mengajar hari ini untuk tentor ini
-        $sessionsToday = $this->sesiMengajar($staffProfile, $today, $today);
+        $sessionsToday = collect();
+        if ($staffProfile !== null) {
+            $classSessionsToday = ClassSession::with(['classGroup', 'subject', 'room', 'studyShift', 'attendance', 'tutorAttendance'])
+                ->where('staff_id', $staffProfile->id)
+                ->whereDate('session_date', $today)
+                ->where('status', '!=', 'dibatalkan')
+                ->orderBy('start_time')
+                ->get();
+
+            if ($classSessionsToday->isNotEmpty()) {
+                $sessionsToday = $classSessionsToday;
+            }
+        }
+
+        if ($sessionsToday->isEmpty()) {
+            $sessionsToday = StudySession::query()
+                ->when($tutorName !== '', fn ($q) => $q->where('tutor_name', 'like', '%'.$tutorName.'%'))
+                ->whereDate('date', $today)
+                ->orderBy('start_time')
+                ->get();
+        }
 
         // Sesi minggu ini untuk tentor ini
-        $sessionsThisWeek = $this->sesiMengajar($staffProfile, $weekStart, $weekEnd);
+        $totalMinutes = 0;
+        if ($staffProfile !== null) {
+            $classSessionsThisWeek = ClassSession::query()
+                ->where('staff_id', $staffProfile->id)
+                ->whereBetween('session_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+                ->where('status', '!=', 'dibatalkan')
+                ->get();
+
+            foreach ($classSessionsThisWeek as $cs) {
+                if ($cs->start_time && $cs->end_time) {
+                    $start = Carbon::parse($cs->session_date.' '.$cs->start_time);
+                    $end = Carbon::parse($cs->session_date.' '.$cs->end_time);
+                    $totalMinutes += $start->diffInMinutes($end);
+                }
+            }
+        }
+
+        if ($totalMinutes === 0) {
+            $sessionsThisWeek = StudySession::query()
+                ->when($tutorName !== '', fn ($q) => $q->where('tutor_name', 'like', '%'.$tutorName.'%'))
+                ->whereBetween('date', [$weekStart, $weekEnd])
+                ->orderBy('date')
+                ->orderBy('start_time')
+                ->get();
+            $totalMinutes = $sessionsThisWeek->sum('duration_minutes');
+        }
 
         // Statistik kehadiran hari ini
         $totalSessionsToday = $sessionsToday->count();
         $attendancePending = $this->countAttendancePending($sessionsToday);
 
-        // Tiket Klinik PR yang menunggu tanggapan tentor
+        // Tiket Qualifix yang menunggu tanggapan tentor
         $qualifixTickets = $staffProfile !== null
             ? QualifixTicket::query()
                 ->whereHas('staff', fn ($q) => $q->where('staff_profiles.id', $staffProfile->id))
@@ -59,7 +107,6 @@ class TentorDashboardService
             : collect();
 
         // Total jam mengajar minggu ini
-        $totalMinutes = $sessionsThisWeek->sum(fn (ClassSession $sesi): int => $this->durasiMenit($sesi));
         $totalTeachingHours = $totalMinutes > 0 ? round($totalMinutes / 60, 1) : 0.0;
 
         return [
@@ -67,7 +114,7 @@ class TentorDashboardService
             'staffProfile' => $staffProfile,
             'jobTitle' => $jobTitle,
             'stats' => $this->statCards($totalSessionsToday, $attendancePending, $qualifixTickets->count(), $totalTeachingHours),
-            'sessionsToday' => $sessionsToday->map(fn (ClassSession $sesi) => $this->kartuSesi($sesi)),
+            'sessionsToday' => $sessionsToday->map(fn (ClassSession|StudySession $sesi) => $this->kartuSesi($sesi)),
             'qualifixTickets' => $qualifixTickets->map(fn (QualifixTicket $ticket) => $this->kartuKlinikPR($ticket)),
             'totalTeachingHours' => $totalTeachingHours,
             'todayDate' => $today->locale('id')->translatedFormat('j F Y'),
@@ -76,61 +123,25 @@ class TentorDashboardService
     }
 
     /**
-     * Sesi mengajar milik satu tentor pada rentang tanggal tertentu.
-     *
-     * Sesi dibaca dari tabel class_sessions (sistem jadwal terbaru) dan
-     * dicocokkan lewat staff_id, bukan lagi lewat teks nama tentor.
-     *
-     * @return Collection<int, ClassSession>
-     */
-    private function sesiMengajar(?StaffProfile $staffProfile, Carbon $dari, Carbon $sampai): Collection
-    {
-        if ($staffProfile === null) {
-            return collect();
-        }
-
-        return ClassSession::query()
-            ->with([
-                'classGroup' => fn ($q) => $q->withCount([
-                    'enrollments' => fn ($e) => $e->where('status', 'aktif'),
-                ]),
-                'subject',
-                'room',
-            ])
-            ->withCount('attendance')
-            ->where('staff_id', $staffProfile->id)
-            ->where('status', '!=', 'dibatalkan')
-            ->whereBetween('session_date', [$dari->toDateString(), $sampai->toDateString()])
-            ->orderBy('session_date')
-            ->orderBy('start_time')
-            ->get();
-    }
-
-    /**
      * Hitung berapa sesi yang belum diinput absensinya sama sekali.
-     *
-     * @param  Collection<int, ClassSession>  $sessions
      */
     private function countAttendancePending(Collection $sessions): int
     {
-        return $sessions
-            ->filter(fn (ClassSession $sesi): bool => $sesi->attendance_count === 0)
-            ->count();
-    }
+        $pending = 0;
 
-    /**
-     * Durasi satu sesi dalam menit, dihitung dari jam mulai dan selesai.
-     */
-    private function durasiMenit(ClassSession $sesi): int
-    {
-        $mulai = Carbon::parse($sesi->start_time);
-        $selesai = Carbon::parse($sesi->end_time);
-
-        if ($selesai->lessThan($mulai)) {
-            $selesai->addDay();
+        foreach ($sessions as $sesi) {
+            if ($sesi instanceof ClassSession) {
+                if (! $sesi->attendance()->exists()) {
+                    $pending++;
+                }
+            } elseif ($sesi instanceof StudySession) {
+                if (! $sesi->attendances()->exists()) {
+                    $pending++;
+                }
+            }
         }
 
-        return (int) $mulai->diffInMinutes($selesai);
+        return $pending;
     }
 
     /**
@@ -154,7 +165,7 @@ class TentorDashboardService
                 'icon' => 'calendar',
             ],
             [
-                'label' => 'Klinik PR Siswa',
+                'label' => 'Qualifix',
                 'value' => (string) $menungguTanggapan,
                 'sub' => 'Butuh respons Anda',
                 'tone' => $menungguTanggapan > 0 ? 'bg-ember-50 text-ember-600' : 'bg-bark-50 text-bark-500',
@@ -173,17 +184,59 @@ class TentorDashboardService
     /**
      * @return array<string, mixed>
      */
-    private function kartuSesi(ClassSession $sesi): array
+    private function kartuSesi(ClassSession|StudySession $sesi): array
     {
-        $tanggal = $sesi->tanggal;
+        if ($sesi instanceof ClassSession) {
+            $tanggal = $sesi->tanggal;
+            $start = substr((string) $sesi->start_time, 0, 5);
+            $end = substr((string) $sesi->end_time, 0, 5);
+            $startFmt = str_replace(':', '.', $start);
+            $endFmt = str_replace(':', '.', $end);
+
+            $hasAttendance = $sesi->attendance()->exists();
+            $enrollmentCount = Enrollment::where('class_group_id', $sesi->class_group_id)
+                ->where('status', 'aktif')
+                ->count();
+
+            return [
+                'id' => $sesi->id,
+                'waktu' => sprintf('%s – %s WIB', $startFmt, $endFmt),
+                'mapel' => $sesi->subject?->name ?? $sesi->topic ?? 'Mata Pelajaran',
+                'desc' => $sesi->topic ? 'Topik: '.$sesi->topic : ($sesi->classGroup?->education_level.' '.$sesi->classGroup?->grade ?? '-'),
+                'kelas' => $sesi->classGroup?->code ?? '-',
+                'ruang' => $sesi->room?->name ?? '-',
+                'siswa' => $enrollmentCount.' Siswa Terdaftar',
+                'badge' => $hasAttendance ? 'Absensi Selesai' : ($tanggal->isToday() ? 'Akan Dimulai Segera' : null),
+                'badgeTone' => $hasAttendance ? 'emerald' : 'amber',
+                'actions' => [
+                    [
+                        'label' => $hasAttendance ? 'Lihat / Edit Absen' : 'Input Absen Kelas',
+                        'icon' => 'clipboard-form',
+                        'tone' => 'ember',
+                        'url' => route('tentor.absensi', ['session_id' => $sesi->id]),
+                        'href' => route('tentor.absensi', ['session_id' => $sesi->id]),
+                    ],
+                    [
+                        'label' => 'Buka Modul Ajar',
+                        'icon' => 'book-open',
+                        'tone' => 'bark',
+                        'url' => route('tentor.materi'),
+                        'href' => route('tentor.materi'),
+                    ],
+                ],
+            ];
+        }
+
+        $tanggal = Carbon::parse($sesi->date);
 
         return [
-            'waktu' => sprintf('%s – %s WIB', $this->jam($sesi->start_time), $this->jam($sesi->end_time)),
-            'mapel' => $sesi->subject?->name ?? $sesi->topic ?? 'Mata Pelajaran',
-            'desc' => $sesi->topic ?? '-',
-            'kelas' => $sesi->classGroup?->code ?? '-',
-            'ruang' => $this->ruang($sesi),
-            'siswa' => ($sesi->classGroup?->enrollments_count ?? 0).' Siswa Terdaftar',
+            'id' => $sesi->id,
+            'waktu' => sprintf('%s – %s WIB', $sesi->start_time->format('H.i'), $sesi->end_time->format('H.i')),
+            'mapel' => $sesi->title,
+            'desc' => $sesi->description ?? '-',
+            'kelas' => $sesi->category_badge ?? '-',
+            'ruang' => $sesi->room_name ?? '-',
+            'siswa' => $sesi->attendances()->count().' Siswa Terdaftar',
             'badge' => $tanggal->isToday() ? 'Akan Dimulai Segera' : null,
             'badgeTone' => 'amber',
             'actions' => [
@@ -191,37 +244,18 @@ class TentorDashboardService
                     'label' => 'Input Absen Kelas',
                     'icon' => 'clipboard-form',
                     'tone' => 'ember',
-                    'href' => route('tentor.absensi', ['session_id' => $sesi->id]),
+                    'url' => route('tentor.absensi'),
+                    'href' => route('tentor.absensi'),
                 ],
                 [
                     'label' => 'Buka Modul Ajar',
                     'icon' => 'book-open',
                     'tone' => 'bark',
-                    'href' => route('tentor.materi', [
-                        'subject_id' => $sesi->subject_id,
-                        'class_group_id' => $sesi->class_group_id,
-                    ]),
+                    'url' => route('tentor.materi'),
+                    'href' => route('tentor.materi'),
                 ],
             ],
         ];
-    }
-
-    /**
-     * Nama ruang beserta lantai, dengan nilai cadangan bila belum ditentukan.
-     */
-    private function ruang(ClassSession $sesi): string
-    {
-        $nama = trim(sprintf('%s %s', $sesi->room?->name ?? '', $sesi->room?->floor ?? ''));
-
-        return $nama === '' ? 'Ruang belum ditentukan' : $nama;
-    }
-
-    /**
-     * Jam dalam format Indonesia, misalnya "15.30".
-     */
-    private function jam(?string $waktu): string
-    {
-        return $waktu === null ? '-' : str_replace(':', '.', substr($waktu, 0, 5));
     }
 
     /**
@@ -233,6 +267,7 @@ class TentorDashboardService
         $subject = $ticket->subject;
 
         return [
+            'id' => $ticket->id,
             'initials' => $this->initials($student?->full_name ?? 'Siswa'),
             'nama' => $student?->full_name ?? 'Siswa',
             'status' => 'Menunggu',

@@ -47,4 +47,14 @@ class QualifixTicket extends Model
     {
         return $this->belongsToMany(StaffProfile::class, 'qualifix_assignments', 'ticket_id', 'staff_id');
     }
+
+    public function answers()
+    {
+        return $this->hasMany(QualifixAnswer::class, 'ticket_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(QualifixAttachment::class, 'ticket_id');
+    }
 }

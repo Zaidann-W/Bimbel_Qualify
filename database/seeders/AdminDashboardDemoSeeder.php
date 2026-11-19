@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 
 class AdminDashboardDemoSeeder extends Seeder
 {
@@ -17,7 +15,7 @@ class AdminDashboardDemoSeeder extends Seeder
         // Check if data already exists (admin user from RoleSeeder)
         $adminExists = DB::table('users')->where('email', 'admin@qualify.test')->exists();
 
-        if (!$adminExists) {
+        if (! $adminExists) {
             // Admin user already exists from RoleSeeder, skip
             $this->command->info('Admin user already exists from RoleSeeder, skipping admin creation.');
         } else {
@@ -26,7 +24,7 @@ class AdminDashboardDemoSeeder extends Seeder
 
         // Create study shifts if not exist
         $shift1Exists = DB::table('study_shifts')->where('name', 'Sesi Sore')->exists();
-        if (!$shift1Exists) {
+        if (! $shift1Exists) {
             DB::table('study_shifts')->insert([
                 ['name' => 'Sesi Sore', 'starts_at' => '15:30:00', 'ends_at' => '17:30:00', 'created_at' => now(), 'updated_at' => now()],
             ]);
@@ -36,7 +34,7 @@ class AdminDashboardDemoSeeder extends Seeder
         }
 
         $shift2Exists = DB::table('study_shifts')->where('name', 'Sesi Malam')->exists();
-        if (!$shift2Exists) {
+        if (! $shift2Exists) {
             DB::table('study_shifts')->insert([
                 ['name' => 'Sesi Malam', 'starts_at' => '18:30:00', 'ends_at' => '20:30:00', 'created_at' => now(), 'updated_at' => now()],
             ]);
@@ -48,7 +46,7 @@ class AdminDashboardDemoSeeder extends Seeder
         // Create academic period if not exist
         $periodExists = DB::table('academic_periods')->where('academic_year', '2025/2026')
             ->where('semester', 'ganjil')->exists();
-        if (!$periodExists) {
+        if (! $periodExists) {
             DB::table('academic_periods')->insert([
                 ['academic_year' => '2025/2026', 'semester' => 'ganjil',
                     'starts_on' => '2025-07-01', 'ends_on' => '2025-12-31',
@@ -71,7 +69,7 @@ class AdminDashboardDemoSeeder extends Seeder
                 ->where('name', 'Gelombang 1')
                 ->where('wave_number', 1)
                 ->exists();
-            if (!$batchExists) {
+            if (! $batchExists) {
                 DB::table('admission_batches')->insert([
                     'name' => 'Gelombang 1',
                     'wave_number' => 1,
@@ -90,7 +88,7 @@ class AdminDashboardDemoSeeder extends Seeder
 
         // Create subjects if not exist
         $mtkExists = DB::table('subjects')->where('code', 'MTK')->exists();
-        if (!$mtkExists) {
+        if (! $mtkExists) {
             DB::table('subjects')->insert(['code' => 'MTK', 'name' => 'Matematika', 'created_at' => now(), 'updated_at' => now()]);
             $this->command->info('Subject MTK created.');
         } else {
@@ -98,7 +96,7 @@ class AdminDashboardDemoSeeder extends Seeder
         }
 
         $indoExists = DB::table('subjects')->where('code', 'IND')->exists();
-        if (!$indoExists) {
+        if (! $indoExists) {
             DB::table('subjects')->insert(['code' => 'IND', 'name' => 'Indonesia', 'created_at' => now(), 'updated_at' => now()]);
             $this->command->info('Subject IND created.');
         } else {
@@ -106,7 +104,7 @@ class AdminDashboardDemoSeeder extends Seeder
         }
 
         $ipaExists = DB::table('subjects')->where('code', 'IPA')->exists();
-        if (!$ipaExists) {
+        if (! $ipaExists) {
             DB::table('subjects')->insert(['code' => 'IPA', 'name' => 'IPA', 'created_at' => now(), 'updated_at' => now()]);
             $this->command->info('Subject IPA created.');
         } else {
@@ -115,7 +113,7 @@ class AdminDashboardDemoSeeder extends Seeder
 
         // Create rooms if not exist
         $room1Exists = DB::table('rooms')->where('name', 'Ruang 1')->exists();
-        if (!$room1Exists) {
+        if (! $room1Exists) {
             DB::table('rooms')->insert(['name' => 'Ruang 1', 'floor' => '1', 'capacity' => 30, 'status' => 'aktif',
                 'created_at' => now(), 'updated_at' => now()]);
             $this->command->info('Room Ruang 1 created.');
@@ -124,7 +122,7 @@ class AdminDashboardDemoSeeder extends Seeder
         }
 
         $room2Exists = DB::table('rooms')->where('name', 'Ruang 2')->exists();
-        if (!$room2Exists) {
+        if (! $room2Exists) {
             DB::table('rooms')->insert(['name' => 'Ruang 2', 'floor' => '1', 'capacity' => 30, 'status' => 'aktif',
                 'created_at' => now(), 'updated_at' => now()]);
             $this->command->info('Room Ruang 2 created.');
@@ -137,7 +135,7 @@ class AdminDashboardDemoSeeder extends Seeder
             $cg1Exists = DB::table('class_groups')
                 ->where('academic_period_id', $academicPeriod)
                 ->where('code', '10-IPA-1')->exists();
-            if (!$cg1Exists) {
+            if (! $cg1Exists) {
                 DB::table('class_groups')->insert([
                     'academic_period_id' => $academicPeriod,
                     'code' => '10-IPA-1', 'education_level' => 'SMA', 'grade' => '10',
@@ -153,7 +151,7 @@ class AdminDashboardDemoSeeder extends Seeder
             $cg2Exists = DB::table('class_groups')
                 ->where('academic_period_id', $academicPeriod)
                 ->where('code', '11-IPA-1')->exists();
-            if (!$cg2Exists) {
+            if (! $cg2Exists) {
                 DB::table('class_groups')->insert([
                     'academic_period_id' => $academicPeriod,
                     'code' => '11-IPA-1', 'education_level' => 'SMA', 'grade' => '11',
@@ -176,7 +174,7 @@ class AdminDashboardDemoSeeder extends Seeder
                 $tsExists = DB::table('tutor_subjects')
                     ->where('staff_id', 1)
                     ->where('subject_id', $mathSubjectId)->exists();
-                if (!$tsExists) {
+                if (! $tsExists) {
                     DB::table('tutor_subjects')->insert(['staff_id' => 1, 'subject_id' => $mathSubjectId]);
                     $this->command->info('Tutor subject MTK created.');
                 } else {

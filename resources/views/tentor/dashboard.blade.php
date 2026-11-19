@@ -14,7 +14,7 @@
                 {{ $jobTitle }}
             </span>
             <h1 class="mt-3 text-[22px] font-bold tracking-tight text-bark-800">
-                Selamat datang, {{ $user?->name }}! 👋
+                Selamat datang, {{ $staffProfile?->full_name_with_title ?? $user?->name }}! 👋
             </h1>
             <p class="mt-1.5 text-[13px] leading-relaxed text-bark-400">
                 Pantau jadwal kelas hari ini, input kehadiran siswa, dan jawab pertanyaan QualiFix.
@@ -35,7 +35,7 @@
             </div>
             <div class="mt-4 flex items-center gap-2 border-t border-bark-100 pt-3">
                 @include('layouts.partials.icon', ['name' => 'clock', 'class' => 'h-4 w-4 text-bark-400'])
-                <span class="text-[13px] font-bold text-bark-800">{{ $todayTime }} WIB</span>
+                <span id="liveClock" class="text-[13px] font-bold text-bark-800">{{ $todayTime }} WIB</span>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
 
                         <div class="flex gap-2">
                             @foreach ($sesi['actions'] as $action)
-                                <a href="{{ $action['href'] }}" @class([
+                                <a href="{{ $action['url'] ?? $action['href'] ?? route('tentor.absensi') }}" @class([
                                     'flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-[12px] font-semibold transition',
                                     'bg-ember-600 text-white hover:bg-ember-700' => $action['tone'] === 'ember',
                                     'bg-bark-800 text-white hover:bg-bark-900' => $action['tone'] === 'bark',
@@ -135,7 +135,7 @@
         {{-- QualiFix sidebar --}}
         <div class="space-y-4">
             <div class="flex items-center justify-between gap-2">
-                <h2 class="text-[14px] font-bold text-bark-800">QualiFix Siswa</h2>
+                <h2 class="text-[14px] font-bold text-bark-800">Qualifix Siswa</h2>
                 <span @class([
                     'text-[11px] font-bold',
                     'text-ember-600' => $qualifixTickets->isNotEmpty(),
@@ -150,7 +150,7 @@
                     <p class="text-[12px] text-bark-400">Tidak ada pertanyaan menunggu tanggapan Anda.</p>
                 </div>
             @else
-                @foreach ($qualifixTickets as $ticket)
+                @foreach ($qualifixTickets->take(2) as $ticket)
                     <div class="rounded-2xl border border-bark-100 bg-white p-4">
                         <div class="flex items-start gap-3 mb-3">
                             <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ember-100 text-[13px] font-bold text-ember-700">{{ $ticket['initials'] }}</div>
@@ -161,16 +161,73 @@
                         </div>
                         <div class="rounded-xl border border-bark-100 bg-bark-50 p-3 mb-3">
                             <p class="text-[11px] font-bold text-bark-600 uppercase tracking-wide">Topik: {{ $ticket['topik'] }}</p>
-                            <p class="mt-1 text-[12.5px] leading-relaxed text-bark-600">{{ $ticket['preview'] }}</p>
+                            <p class="mt-1 text-[12.5px] leading-relaxed text-bark-600 line-clamp-3">{{ $ticket['preview'] }}</p>
                         </div>
-                        <a href="#" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-[12px] font-bold text-white hover:bg-amber-600 transition">
+                        <a href="{{ route('tentor.qualifix') }}" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-[12px] font-bold text-white hover:bg-amber-600 transition">
                             @include('layouts.partials.icon', ['name' => 'message-circle', 'class' => 'h-4 w-4'])
                             Jawab &amp; Berikan Pembahasan
                         </a>
                     </div>
                 @endforeach
+
+                {{-- Teks akses pertanyaan lainnya di bawah pertanyaan terakhir / di atas akses cepat --}}
+                <div class="rounded-xl border border-bark-100 bg-white p-3 text-center">
+                    @if ($qualifixTickets->count() > 2)
+                        <a href="{{ route('tentor.qualifix') }}" class="inline-flex items-center gap-1.5 text-[12px] font-bold text-ember-600 hover:text-ember-700 transition">
+                            <span>Lihat {{ $qualifixTickets->count() - 2 }} pertanyaan lainnya di Qualifix</span>
+                            @include('layouts.partials.icon', ['name' => 'arrow-right', 'class' => 'h-3.5 w-3.5'])
+                        </a>
+                    @else
+                        <a href="{{ route('tentor.qualifix') }}" class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-bark-600 hover:text-ember-600 transition">
+                            <span>Buka Halaman Qualifix Selengkapnya</span>
+                            @include('layouts.partials.icon', ['name' => 'arrow-right', 'class' => 'h-3.5 w-3.5'])
+                        </a>
+                    @endif
+                </div>
             @endif
+
+            {{-- Akses Cepat Pengajar --}}
+            <div class="rounded-2xl border border-bark-100 bg-white p-4">
+                <p class="text-[10px] font-bold uppercase tracking-wide text-bark-400 mb-3">Akses Cepat Pengajar</p>
+                <ul class="space-y-0">
+                    @php
+                        $quickLinks = [
+                            ['Lihat Kalender Jadwal Pekanan', 'calendar', route('tentor.absensi')],
+                            ['Katalog Bank Soal & Modul', 'folder-open', route('tentor.materi')],
+                            ['Daftar Pertanyaan Qualifix', 'message-circle', route('tentor.qualifix')],
+                        ];
+                    @endphp
+                    @foreach ($quickLinks as [$label, $icon, $href])
+                        <li>
+                            <a href="{{ $href }}" class="flex items-center gap-3 px-1 py-3 text-[13px] font-medium text-bark-700 hover:text-ember-600 transition @if (!$loop->last) border-b border-bark-100 @endif">
+                                @include('layouts.partials.icon', ['name' => $icon, 'class' => 'h-4 w-4 text-bark-400'])
+                                <span class="flex-1">{{ $label }}</span>
+                                @include('layouts.partials.icon', ['name' => 'chevron-right', 'class' => 'h-4 w-4 text-bark-300'])
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     </div>
 
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const clockEl = document.getElementById('liveClock');
+    if (!clockEl) return;
+
+    function updateLiveClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        clockEl.textContent = `${hours}:${minutes}:${seconds} WIB`;
+    }
+
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+});
+</script>
+@endpush
 @endsection
